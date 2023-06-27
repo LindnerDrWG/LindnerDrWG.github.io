@@ -1,0 +1,271 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 18.10.1 ] */
+/* [wxMaxima: title   start ]
+  INTRODUCTORY DIFFERENTIAL EQUATIONS
+   [wxMaxima: title   end   ] */
+
+
+/* [wxMaxima: comment start ]
+    by Dr. Wolfgang Lindner, Leichlingen, Germany, 2023
+   [wxMaxima: comment end   ] */
+
+
+/* [wxMaxima: section start ]
+What is an ordinary Differential Equation?
+   [wxMaxima: section end   ] */
+
+
+/* [wxMaxima: section start ]
+Analytical Solution Methods
+   [wxMaxima: section end   ] */
+
+
+/* [wxMaxima: subsect start ]
+... case y'=f(x)
+   [wxMaxima: subsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* MAXIMA --- ODE type I --- */
+odefx(u,x,xo,yo):= block( 
+      I1: integrate(u,x,xo,x),                       /* (1) */
+      I2: I1+C,                                      /* (2)  */
+      I3: rhs( solve( at(I2,x=xo) = yo, C)[1]),      /* (3) */
+      I4: I1+I3 )$                                   /* (4) */
+
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+odefx(x^2, x,0,1);    /* (5) */
+odefx(x^2, x,1,1);    /* (6) */
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* Maxima -- IVP example with build-in function ode2 */
+'diff(y,x) = x^2;       /* the given ODE */
+ode2(%,y,x);            /* solve ODE */
+ic1(%,x=0,y=1);         /* solve ODE respecting the IVP y(0)=1 */
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsect start ]
+the case y'=f(y)
+   [wxMaxima: subsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+kill(all);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* MAXIMA --- ODE type II --- */
+odefy(u,y,xo,yo):= block( 
+      F: integrate(u,y),
+      /* print(F), */
+    Sol: solve(F=x+C,y)[1],
+     eq: at(Sol,[x=xo,y=yo]),
+      c: rhs(solve(eq,C)[1]),
+     I4: [Sol, c])$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+odefy( 1/cos(y)^2, y, 1,1);
+
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsect start ]
+the case y'=f(x).g(y) :  Separation of Variables
+   [wxMaxima: subsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+kill(all);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* MAXIMA --- ODE type III --- */
+odefxgy(f,g, x,y, xo,yo):= block(
+  F: integrate(f,x,xo,x),
+  G: integrate(1/g,y,yo,y),
+  print("DGL:", 'diff(y,x) = f*g ),
+  print(".. initial condition:", y(xo) = yo),
+  print("1. step - identify f(x) and g(y): ", f, " , ", g),
+  print("2. step - calculate F(x)=", 'integrate(f,x,xo,x)= F),
+  print("3. step - calculate G(y)=", 'integrate(1/g,y,yo,y) = G),
+  print("4. step - set up Eq. F(x)=G(y):", F=G),
+  print("5. step - solve  Eq. F(x)=G(y(x)) for y: ", Sol: solve(F=G,y)),
+  print("6. step - choose solution with ", y(xo)=yo),
+  print("solution: Sol ="),
+Sol)$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+odefxgy(-x,   y^2, x,y, 0,1);
+/*     f(x)   g(y) */
+/* [wxMaxima: input   end   ] */
+/* [wxMaxima: answer  start ] */
+p;
+/* [wxMaxima: answer  end   ] */
+
+
+/* [wxMaxima: input   start ] */
+kill(all);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* Maxima -- ODE type III by ode2 -- */
+ode2('diff(y,x) = -x*y^2,  y, x);
+ic1(%,x=0,y=1);
+solve(%,y);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* MAXIMA --- ODE type III : SEPARATION OF VARIABLES --- */ 
+separable(f,g, x,y, xo,yo):=
+   solve( integrate(1/g,y,yo,y)=integrate(f,x,xo,x), y); 
+
+separable(-x,y^2, x,y, 0,1);
+/* [wxMaxima: input   end   ] */
+/* [wxMaxima: answer  start ] */
+p;
+/* [wxMaxima: answer  end   ] */
+
+
+/* [wxMaxima: subsect start ]
+the case y'=f(x).y + g(x) :  linear ODE
+   [wxMaxima: subsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* MAXIMA --- ODE type IV : linear ODE and VARIATION OF CONSTANT  --- */
+linear1(f,g, x,y, xo,yo) := 
+                (yo+integrate(g/exp(integrate(f,x,xo,x)), x,xo,x))
+                  * exp(integrate(f,x,xo,x));
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+linear1(-1,0,x,y,0,1);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* Maxima --ODE type IV - INTEGRATING FACTOR METHOD */
+VoC(p,q, x,y, xo,yo):= block(
+  M: exp(integrate(p,x)),  /* integrating factor */
+  My: integrate(P*y,x),
+  print("Step 1: check correct shape y'+py=q :  ", 'diff(y,x)+p*y=q),
+  print("    ... with initial condition:", y(xo) = yo),
+  print("Step 2 - choose integrating factor M(x) = exp(integral p) =", M),
+  print("Step 3 - multiply ODE by M*(y'+py=q), integrate : ", 
+                                  M*y=integrate(M*q,x)),
+  print("Step 4 - divide through M :", y=expand(integrate(M*q,x)/M)+C/M),
+  c:   at(expand(integrate(M*q,x)/M+C/M), x=xo),
+  print("Step 5 - calculate C for yo=y(xo) :", solve(yo=c,C) ))$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+VoC(1, 1,x,y,0,1);
+/*  p  q         */
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* Maxima -- ODE type IV -- */ 
+ode2( 'diff(y,x) = -y+1, y, x); 
+ic1(%,x=0,y=1);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsect start ]
+the case f_x+f_y . y' = 0 : exact ODE
+   [wxMaxima: subsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* MAXIMA --- ODE type V: EXACT ODE  --- */
+exact(P,Q, x,y):= 
+  if is( diff(P,y) = diff(Q,x))             /* (1) */
+  then 
+     block( [A,B,C,D], 
+             F: integrate(P,x),
+             B: F + funmake(A, [y]),        /* (2) */
+             C: diff(B,y) = Q,
+             D: rhs((solve(C,A(y))[1])),    /* (3) */
+             E: integrate(D,y),
+             f: F+E  )
+  else ("ODE is not exact.")$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+P: x^2+y^2;
+Q: 2*y*(x+1);
+exact(P,Q, x,y);
+
+solve(f=1, y);          /* (4) */
+wxplot2d (sqrt(3/(x+1)-x^3/(x+1))/sqrt(3), [x, -2, 2], [y, -1, 5])$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* Maxima -- ODE type V EXACT ODE -- */
+(x^2+y^2)+2*y*(x+1)*'diff(y,x)=0;
+ode2(%,y,x);
+solve(%,y);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+wxdraw3d(  user_preamble="set size ratio -1",
+           xaxis=true, yaxis=true,
+         explicit( x*y^2+y^2+x^3/3, x,-5,5, y,-5,5),
+           contour_levels = 10,
+           /* contour_levels = {0,1,2,3,4,5}, */
+           contour        = both ) $
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsect start ]
+the case y'=f(y/x) : substitutions
+   [wxMaxima: subsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* MAXIMA --- ODE type VI : HOMOGENOUS ODE --- */
+kill(values,arrays)$
+f(x,y) := (y+x)/x;                                      /* (1) */
+eq1: u+x*du/dx = subst(u*x,y,f(x,y));                   /* (2) */
+solve(eq1,du);                                          /* (3) */
+SEPARABLE(g,h, x,y) := integrate(g,x)=integrate(1/h,y)$
+eq2: SEPARABLE(1/x, 1, x,u) ;                           /* (4) */
+eq3: subst(y/x, u, eq2);                                /* (5) */
+solve(eq3,y);                                           /* (6) */
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+kill(all);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+'diff(y,x)  =  (y+x)/x ;
+ode2(%,y,x);
+method;
+/* [wxMaxima: input   end   ] */
+
+
+
+/* Old versions of Maxima abort on loading files that end in a comment. */
+"Created with wxMaxima 18.10.1"$

@@ -1,0 +1,335 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 18.10.1 ] */
+/* [wxMaxima: title   start ]
+  INTRODUCTORY DIFFERENTIAL EQUATIONS
+   [wxMaxima: title   end   ] */
+
+
+/* [wxMaxima: comment start ]
+    by Dr. Wolfgang Lindner, Leichlingen, Germany, 2023
+   [wxMaxima: comment end   ] */
+
+
+/* [wxMaxima: section start ]
+What is an ordinary Differential Equation?
+   [wxMaxima: section end   ] */
+
+
+/* [wxMaxima: section start ]
+Analytical Solution Methods
+   [wxMaxima: section end   ] */
+
+
+/* [wxMaxima: section start ]
+Intermezzo: iterate
+   [wxMaxima: section end   ] */
+
+
+/* [wxMaxima: section start ]
+Numerical Solution Methods for IVP
+   [wxMaxima: section end   ] */
+
+
+/* [wxMaxima: section start ]
+Systems of IVP's
+   [wxMaxima: section end   ] */
+
+
+/* [wxMaxima: section start ]
+Boundary Value Problems - Numerical Methods
+   [wxMaxima: section end   ] */
+
+
+/* [wxMaxima: input   start ] */
+fpprintprec:5$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+iterate(u,x,x0,n) :=  block([numer:true],
+                      cons(x0, makelist(x0:subst(x0,x,u), i,1,n)))$
+
+iterate2(u,x,x0,n) := block([numer:true],
+  cons(x0, makelist(x0:subst([x[1]=x0[1],x[2]=x0[2]],u), i,1,n)))$
+
+iterate3(u,x,x0,n) := block([numer:true],
+  cons(x0, makelist(x0:subst([x[1]=x0[1],x[2]=x0[2],x[3]=x0[3]],u),i,1,n)))$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsect start ]
+Shooting Method
+   [wxMaxima: subsect end   ] */
+
+
+/* [wxMaxima: subsubsect start ]
+Solve y"= y+sin(x+y′), y(0)=1.2, y(3) = 2.4 by shooting
+   [wxMaxima: subsubsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+fpprintprec:5$
+
+iterate3(u,x,x0,n) := block([numer:true],
+  cons(x0, makelist(x0:subst([x[1]=x0[1],x[2]=x0[2],x[3]=x0[3]],u),i,1,n)))$
+
+RK4sys( x,y,z, xo,yo,zo, h,n):= block(
+    k1 : h*f(x,y,z),
+    l1 : h*g(x,y,z),
+    k2 : h*f(x+1/2*h, y + 1/2*k1, z + 1/2*l1),
+    l2 : h*g(x+1/2*h, y + 1/2*k1, z + 1/2*l1),
+    k3 : h*f(x+1/2*h, y + 1/2*k2, z + 1/2*l2),
+    l3 : h*g(x+1/2*h, y + 1/2*k2, z + 1/2*l2),
+    k4 : h*f(x+    h, y +     k3, z + l3),
+    l4 : h*g(x+    h, y +     k3, z + l3),
+    iterate3([x+h, y + 1/6*(1*k1+2*k2+2*k3+1*k4), 
+                   z + 1/6*(1*l1+2*l2+2*l3+1*l4)],
+             [x,y,z],[xo,yo,zo],n) )$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+fpprintprec:5$ ratprint:false$ 
+f(x,y,z):=z; 
+g(x,y,z):=y+sin(x+z); 
+RK4sys(x,y,z, 0,1.2, 1, 3/16, 16);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+last(RK4sys(x,y,z, 0,1.2, -1,   3/16, 16))[2];
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+fpprintprec:5$
+ratprint:false$ 
+f(x,y,z):=z;
+g(x,y,z):=y+sin(x+z);
+F(w):= last(RK4sys(x,y,z, 0,1.2,w,   3/16, 16))[2] - 2.4;
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+find_root(F,w,-1,0);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+bisec(F,xL,xR, tol,n) := block(
+   if    (F(xL)*F(xR) > 0) then 
+         print("Sign does not change within interval.")
+   else  for i:1 while ((i<100) and (abs(xR-xL)>tol)) do 
+             (xM:(xL+xR)/2,
+              if   (F(xM)*F(xR) > 0) 
+              then xR:xM 
+              else xL:xM, n:n+1 , print(n, float(xM)) ,
+    xM  ))$
+
+bisec(F, xL:-1, xR:0, tol:0.00001, n:0);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+RK4sys(x,y,z, 0,1.2, -0.9369,   3/16, 16);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* MAXIMA --- ROMER’s method for 2nd order ODE --- */ 
+RK4romer( x,y,yp, xo,yo,ypo, h, n):= block(
+              k1 : h* f(x,y,yp),
+              k2 : h* f(x+h/2, y + 1/2*h*yp + h/8*k1, yp + k1/2),
+              k3 : h* f(x+h/2, y + 1/2*h*yp + h/8*k1, yp + k2/2),
+              k4 : h* f(x+h,   y +     h*yp + h/2*k3, yp + k3),
+              iterate3([x+h, y+h*(yp+1/6*(k1+k2+k3)), yp+1/6*(k1+2*k2+2*k3+k4)],
+                       [x,y,yp],[xo,yo,ypo],n) )$
+
+f(x,y,yp):=y+sin(x+yp);
+RK4romer(x,y,yp, 0,1.2,-0.9369, 3/16, 16);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+f(x,y,yp):=y+sin(x+yp);
+wxdraw2d(xaxis = true, 
+    point_size=2,
+    points_joined=true,
+    points([0,0]),
+    xlabel="x",ylabel="y",
+    color=red,
+    points( RK4romer(x,y,yp, 0,1.2,-0.93689, 3/16, 16+1) ),
+    color=blue,
+    points( RK4romer(x,y,yp, 0,1.2, -0.8,       3/16, 16+1) ),
+    color=magenta,
+    points( RK4romer(x,y,yp, 0,1.2, -1,       3/16, 16+1) ),
+  title="shooting at y(3)=2.4")$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsubsect start ]
+Solve y"= y/(1+x^2)+y'/10 with y(0)=1, y(2)=3
+   [wxMaxima: subsubsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+iterate3(u,x,x0,n) := block([numer:true],
+  cons(x0, makelist(x0:subst([x[1]=x0[1],x[2]=x0[2],x[3]=x0[3]],u),i,1,n)))$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+RK4sys( x,y,z, xo,yo,zo, h,n):= block(
+    k1 : h*f(x,y,z),
+    l1 : h*g(x,y,z),
+    k2 : h*f(x+1/2*h, y + 1/2*k1, z + 1/2*l1),
+    l2 : h*g(x+1/2*h, y + 1/2*k1, z + 1/2*l1),
+    k3 : h*f(x+1/2*h, y + 1/2*k2, z + 1/2*l2),
+    l3 : h*g(x+1/2*h, y + 1/2*k2, z + 1/2*l2),
+    k4 : h*f(x+    h, y +     k3, z + l3),
+    l4 : h*g(x+    h, y +     k3, z + l3),
+    iterate3([x+h, y + 1/6*(1*k1+2*k2+2*k3+1*k4), 
+                   z + 1/6*(1*l1+2*l2+2*l3+1*l4)],
+             [x,y,z],[xo,yo,zo],n) )$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* MAXIMA --- SHOOTING METHOD for BVP --- */
+fpprintprec:5$
+ratprint:false$ 
+f(x,y,z) := z;  /* = y'  */
+g(x,y,z) := y/(1+x^2)+z/10;
+F(w):= last( RK4sys(x,y,z, 0,1,w,   1/8, 16))[2] - 3;
+find_root(F,w,0,1);
+
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+f(x,y,yp):=y/(1+x^2)+yp/10;
+RK4romer(x,y,yp, 0,1, 0.058068, 0.1, 20);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+f(x,y,yp):=y/(1+x^2)+yp/10;
+wxdraw2d(xaxis = true, 
+    point_size=2,
+    points_joined=true,
+    points([0,0]),
+    xlabel="x",ylabel="y",
+    points( RK4romer(x,y,yp, 0,1, 0.058068, 0.1, 20) ),
+    color=red,
+    title="shooting at y(2)=3")$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsect start ]
+Finite Difference Method
+   [wxMaxima: subsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+iterate3(u,x,x0,n) := block([numer:true],
+  cons(x0, makelist(x0:subst([x[1]=x0[1],x[2]=x0[2],x[3]=x0[3]],u),i,1,n)))$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsubsect start ]
+Solve y"+0.2y'+4y=3x+1, y(0)=0.1, y(1)=0.7
+   [wxMaxima: subsubsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+kill(y)$ 
+fpprintprec:5$ ratprint:false$ 
+
+y        :  makelist (concat (y,i), i,0, 4);                /* (0) */
+yp(k,h)  := (y[k+2]-y[k])/(2*h);                            /* (1) */
+ypp(k,h) := (y[k]-2*y[k+1]+y[k+2])/h^2;
+x(k)     := xo+k*h;
+FDM(k,h) := ypp(k,h) + 0.2*yp(k,h) + 4*y[k+1] = 3*x(k)-1;   /* (2) */
+/*          y''      + 0.2 y'      + 4 y      = 3x-1   */
+
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+n:4$ xo:0$ xe:1$
+h: (xe-xo)/n;
+eq[1]: FDM(1,h), expand, numer;
+eq[2]: FDM(2,h), expand, numer;
+eq[3]: FDM(3,h), expand, numer;
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+M: flatten([y0=0.1, makelist(eq[i], i,1,3), y4=0.7]);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+rref(a):=block([p,q,k], [p,q]:matrix_size(a), a:echelon(a), k:min(p,q),
+    for i thru min(p,q) do (if a[i,i]=0 then (k:i-1, return())),
+    for i:k thru 2 step -1 do 
+            (for j from i-1 thru 1 step -1 do a: rowop(a,j,i,a[j,i])),
+    a)$
+
+Am: augcoefmatrix(M, [y0,y1,y2,y3,y4]);      /* (1) */
+rref(Am), numer;                             /* (2) */
+Y: -col(rref(Am), 6), numer;                 /* (3) */
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+ye(x):= exp(-x/10)*( 31/80*cos(sqrt(399)*x/10)
+                     + 0.464502*sin(sqrt(399)*x/10)) + 3*x/4 - 23/80;
+
+X: makelist(x(k), k,0,4);
+Y: flatten (makelist (makelist (Y[i], i, 5)));
+XY: makelist([ X[i],Y[i]] ,i,1,n+1);
+wxdraw2d(xaxis = true, 
+    point_size=2,
+    points_joined=true,
+    xlabel="X(i)",ylabel="Y(i)",
+    points(XY),
+    color=red,
+    explicit(ye(x),x,0,1),  /* Vegleich mit exakter Lösung */
+  title="FDM approximating polygon solution")$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsubsect start ]
+the general procedure FDM for y"=f(x,y,y')
+   [wxMaxima: subsubsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* MAXIMA --- FINITE DIFFERENCE METHOD (FDM) for BVP of 2nd order --- */
+FDM(xo,xe,a,b,n):= block( kill(y),
+    h    : (xe-xo)/n,
+    x(k) := xo + k*h,
+
+    y     :  makelist (concat (y,i), i,0, n),                   /* (1) */
+    yn    :  y[n+1],
+    yp(k) := (y[k+2]-y[k])/(2*h), 
+    ypp(k):= (y[k]-2*y[k+1]+y[k+2])/h^2,
+
+    Eqs: flatten([y0=a, makelist( BVP(i),i,1,n-1), yn=b]),      /* (2) */
+    Y  : map(rhs, linsolve(Eqs, y))                             /* (3) */
+    )$
+
+
+/* Test BVP:   y''+0.2y'+4y=3x+1   BC: y(0)=0.1=a, y(1)= 0.7=b */
+fpprintprec:5$  ratprint:false$ 
+
+BVP(k):=ypp(k) + 0.2*yp(k) + 4*y[k+1]=3*x(k)-1;                 /* (4) */
+FDM(xo:0, xe:1, a:0.1, b:0.7, n:8), numer;                      /* (5) */
+
+/* [wxMaxima: input   end   ] */
+
+
+
+/* Old versions of Maxima abort on loading files that end in a comment. */
+"Created with wxMaxima 18.10.1"$

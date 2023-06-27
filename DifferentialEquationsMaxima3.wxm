@@ -1,0 +1,435 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 18.10.1 ] */
+/* [wxMaxima: title   start ]
+  INTRODUCTORY DIFFERENTIAL EQUATIONS
+   [wxMaxima: title   end   ] */
+
+
+/* [wxMaxima: comment start ]
+    by Dr. Wolfgang Lindner, Leichlingen, Germany, 2023
+   [wxMaxima: comment end   ] */
+
+
+/* [wxMaxima: section start ]
+What is an ordinary Differential Equation?
+   [wxMaxima: section end   ] */
+
+
+/* [wxMaxima: section start ]
+Analytical Solution Methods
+   [wxMaxima: section end   ] */
+
+
+/* [wxMaxima: section start ]
+Intermezzo: iterate
+   [wxMaxima: section end   ] */
+
+
+/* [wxMaxima: subsect start ]
+iterate by hand
+   [wxMaxima: subsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* Maxima */
+fpprintprec:5$ 
+ratprint:false$ 
+kill(functions, values, arrays)$ 
+
+f(x):= 0.5*(x+2/x);               /* recurrence formula */
+y[0](x) := 3;                   /* start value */
+y[n](x) := f(y[n-1](x));       /* recursion:  y(n)  --f-->  y(n+1)  */
+
+y[5](x);                    /*  calculated value */
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsect start ]
+iterate by iterate
+   [wxMaxima: subsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+fpprintprec:5$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsubsect start ]
+the one-dimensional function iterate
+   [wxMaxima: subsubsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+iterate(u,x,x0,n) :=  block([numer:true],
+                      cons(x0, makelist(x0:subst(x0,x,u), i,1,n)))$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+fpprintprec: 5$                          /* (4) */
+iterate( 0.5*(x+2/x),  x,3, 4);         /* (5) */
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsubsect start ]
+the two-dimensional function iterate2
+   [wxMaxima: subsubsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+iterate2(u,x,x0,n) := block([numer:true],
+  cons(x0, makelist(x0:subst([x[1]=x0[1],x[2]=x0[2]],u), i,1,n)))$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+fpprintprec: 5$                        	
+Sqrt2 :    iterate2([n+1, 0.5*(x+2/x)], [n,x], [1,3],4);      /* (6) */
+transpose( Sqrt2);
+/* transpose( iterate2([n+1, 0.5*(x+2/x)], [n,x], [1,3],4) );   (7) */
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* wxMaxima */
+wxdraw2d(xaxis = true, 
+    user_preamble="set size ratio -1", /* axis equal scaled */
+    xrange = [0,5], yrange = [-0.1,2],
+    xlabel ="x",ylabel ="y",
+    point_size=2, points_joined=false,
+    color = magenta,
+    points( Sqrt2 ),
+  title="HERON iteration for Sqrt2");
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsubsect start ]
+*Variants of iterate
+   [wxMaxima: subsubsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* MAXIMA --- ITERATE --- */
+iterate1(u,x,xo,n) := block( 
+                     [l:[xo], numer:true, val:xo],              /* (1) */
+	                     for i thru n do 
+	                        (val: subst(val,x,u), l: cons(val,l)),  /* (2) */
+	                     reverse(l))$                               /* (3) */
+
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+fpprintprec: 5$                        	/* (4) */
+iterate1( 0.5*(x+2/x),  x,3, 4);         /* (5) */
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: comment start ]
+(R. Fateman) For these other forms like iterate1a, 
+        the first argument must be a function, not an expression!
+   [wxMaxima: comment end   ] */
+
+
+/* [wxMaxima: input   start ] */
+fpprintprec: 5$ 
+iterate1a(f,y0,n):= cons(y0, makelist(y0: apply(f,[y0]), i,1,n));
+
+iterate1a( lambda([x], 0.5*(x+2/x)), 3, 4); 
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+f(z) := 0.5*(z+2/z);
+iterate1a(f, 3,4);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+fpprintprec: 5$ 
+iterate1b(f,y0,n) := if n=0 then [y0] 
+                            else cons(y0, map(f, iterate1b(f,y0,n-1)))$
+iterate1b( lambda([x], 0.5*(x+2/x)), 3, 4);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+f(z):= 0.5*(z+2/z);
+iterate1b(f, 3,4);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsect start ]
+First Applications of iterate
+   [wxMaxima: subsect end   ] */
+
+
+/* [wxMaxima: subsubsect start ]
+simplified Newton-Raphson method
+   [wxMaxima: subsubsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+iterate(u,x,x0,n) :=  block([numer:true],
+                      cons(x0, makelist(x0:subst(x0,x,u), i,1,n)))$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* MAXIMA --- NEWTON-RAPHSON iteration -- */
+/*           include our function iterate(..) here */
+
+newton1(u,x,a,n) := block([c: float(at(diff(u,x),x=a))],       /* (1) */
+                           iterate( x-u/c, x,a, n)     )$      /* (2) */
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+fpprintprec:5
+newton1( x^2-2 ,x,1, 9);        /* (3) */
+
+f(x):= x^2-cos(x);
+newton1(f(x),x,1,5);            /* (4) */
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+newton(u,x,a,n) := iterate( x - u/diff(u,x), x,a, n);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* wxMaxima */
+f(x):= x*x-2;  a: 1;  b: 2;
+m: at(diff(f(x),x),x=a);  
+X: makelist(0,i,1,6);
+Y: newton1(f(x),x,3,4);  /* you must run newton1 before its use ! */
+XY: makelist([Y[i],X[i]], i,1,5);
+wxdraw2d(xaxis = true, 
+    point_size = 2, color = green, points(XY), 
+    point_size = 2, point_type = filled_circle, 
+    color =magenta, points([[a,f(a)]]), 
+    color =red,     explicit( f(x), x,0.5,2.5), 
+    color =blue,    explicit( m*(x-a)+f(a), x,0.5,2.5), 
+    title="simplified NEWTON-RAPHSON method")$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsubsect start ]
+simplified Secant method
+   [wxMaxima: subsubsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+iterate(u,x,x0,n) :=  block([numer:true],
+                      cons(x0, makelist(x0:subst(x0,x,u), i,1,n)))$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* MAXIMA --- SECANT METHOD   --- */
+secant1(u,x, a,b, n) := block( 
+                         [C: (a-b)/(subst(a,x,u)-subst(b,x,u))],  /* (1) */
+                         iterate( x - C*u, x,a,n)) ;             /* (2) */
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+secant1(x^2-2,x, 1,2, 5);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+f(x):= x^2-cos(x);
+secant1(f(x),x, 1,2, 5), numer;
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+signChange(a,b) := if  f(a)*f(b) < 0  then true else false;
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+f(x):= x*x-2; 
+signChange(-2,2);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: comment start ]
+-------- EXERCISE 73:
+   [wxMaxima: comment end   ] */
+
+
+/* [wxMaxima: input   start ] */
+iterate3(u,x,x0,n) := block([numer:true],
+  cons(x0, makelist(x0:subst([x[1]=x0[1],x[2]=x0[2],x[3]=x0[3]],u),i,1,n)))$
+
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+slope(x,y):= (x*f(y)-y*f(x))/(f(y)-f(x));
+secants(a,b,n) := iterate3([x,y,slope(y,z)],[x,y,z],[a,b,slope(a,b)],n) ;
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+f(x):= x^2-2;
+transpose(secants(0,2, 5));
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: comment start ]
+-------- EXERCISE 74:
+   [wxMaxima: comment end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* wxMaxima */
+f(x):= x^2-2;
+a:1; b:2;
+m:  (f(a)-f(b))/(a-b), numer;
+X:  makelist(0,i,1,5)$
+Y:  secant1(f(x),x, 1,2, 5)$
+XY: makelist([Y[i],X[i]], i,1,5);
+wxdraw2d(xaxis = true, 
+    point_size=2,
+    color=green, points(XY), 
+    point_size = 2,
+    point_type = filled_circle,
+    color=magenta, points([[a,f(a)],[b,f(b)]]), 
+    color=red,     explicit(f(x),x,0.5,2.5), 
+    color=blue,    explicit(m*(x-a)+f(a),x,0.5,2.5), 
+    title="simplified Secant method")$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsect start ]
+Implict differentation and the Taylor method for ODE's
+   [wxMaxima: subsect end   ] */
+
+
+/* [wxMaxima: subsubsect start ]
+implicit differentiation
+   [wxMaxima: subsubsect end   ] */
+
+
+/* [wxMaxima: subsubsect start ]
+idiff
+   [wxMaxima: subsubsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+iterate(u,x,x0,n) :=  block([numer:true],
+                      cons(x0, makelist(x0:subst(x0,x,u), i,1,n)));
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* MAXIMA  --- IMPLICIT DIFFERENTATION --- */
+idiff(f,x,y,m):=block( 
+                IMP1: iterate('diff(u,x) + f*'diff(u,y), u,f,m-1), /*(1)*/
+                factor(ev(IMP1, diff)) )$                        /*(2)*/
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+expand( idiff(x*y,x,y,4) );
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsubsect start ]
+Taylor method for ODEs
+   [wxMaxima: subsubsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+iterate(u,x,x0,n) :=  block([numer:true],
+                      cons(x0, makelist(x0:subst(x0,x,u), i,1,n)))$
+idiff(f,x,y,m):=block( 
+                IMP1: iterate('diff(u,x) + f*'diff(u,y), u,f,m-1),
+                factor(ev(IMP1, diff)) )$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* MAXIMA --- IMPLICIT TAYLOR METHOD of order m --- */
+iTaylor(f,x,y, h, m) := y + idiff(f,x,y,m).makelist(h^r/r!, r,1,m);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+makelist(h^r/r!, r,1,4);
+iTaylor(x*y, x,y, h,3);
+iTaylor(x*y, x,y, 1/5, 3),expand;
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: comment start ]
+------- EXERCISE 76:
+   [wxMaxima: comment end   ] */
+
+
+/* [wxMaxima: input   start ] */
+fpprintprec: 5$
+iterate2([x+0.2, iTaylor(x*y, x,y, 0.2, 3)], [x,y], [0,1], 5); 
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsubsect start ]
+iTaylorsol (Taylor solution method for ODE)
+   [wxMaxima: subsubsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+iterate(u,x,x0,n) :=  block([numer:true],
+                      cons(x0, makelist(x0:subst(x0,x,u), i,1,n)))$
+iterate2(u,x,x0,n) := block([numer:true],
+        cons(x0, makelist(x0:subst([x[1]=x0[1],x[2]=x0[2]],u), i,1,n)))$
+idiff(f,x,y,m):=block( 
+                IMP1: iterate('diff(u,x) + f*'diff(u,y), u,f,m-1),
+                factor(ev(IMP1, diff)) )$
+iTaylor(f,x,y, h, m) := y + idiff(f,x,y,m).makelist(h^r/r!, r,1,m)$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* MAXIMA ---  TAYLOR SOLUTION METHOD of ODE y'=f(x,y) --- */
+/* include functions iterate2(u,x,xo,n), idiff(f,x,y,m) 
+   and     iTaylor(f,x,y,h,m) here */
+
+iTaylorsol(f,x,y, xo,yo, h, m, n) := 
+                  iterate2([x+h, iTaylor(f,x,y, h, m)], [x,y], [xo,yo], n)$
+
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* MAXIMA ---  TAYLOR SOLUTION METHOD of ODE y'=f(x,y) --- */
+/* include functions iterate2(u,x,xo,n), idiff(f,x,y,m) 
+   and     iTaylor(f,x,y,h,m) here */
+
+iTaylorsol(f,x,y, xo,yo, h, m, n) := 
+                  iterate2([x+h, iTaylor(f,x,y, h, m)], [x,y], [xo,yo], n);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+iTaylorsol(x*y, x,y, 0,1, 0.2, 3, 5) ;
+/* [wxMaxima: input   end   ] */
+
+
+
+/* Old versions of Maxima abort on loading files that end in a comment. */
+"Created with wxMaxima 18.10.1"$

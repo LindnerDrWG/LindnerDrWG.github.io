@@ -1,0 +1,382 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 18.10.1 ] */
+/* [wxMaxima: title   start ]
+  INTRODUCTORY DIFFERENTIAL EQUATIONS
+   [wxMaxima: title   end   ] */
+
+
+/* [wxMaxima: comment start ]
+    by Dr. Wolfgang Lindner, Leichlingen, Germany, 2023
+   [wxMaxima: comment end   ] */
+
+
+/* [wxMaxima: section start ]
+What is an ordinary Differential Equation?
+   [wxMaxima: section end   ] */
+
+
+/* [wxMaxima: section start ]
+Analytical Solution Methods
+   [wxMaxima: section end   ] */
+
+
+/* [wxMaxima: section start ]
+Intermezzo: iterate
+   [wxMaxima: section end   ] */
+
+
+/* [wxMaxima: section start ]
+Numerical Solution Methods for IVP
+   [wxMaxima: section end   ] */
+
+
+/* [wxMaxima: section start ]
+Systems of IVP's
+   [wxMaxima: section end   ] */
+
+
+/* [wxMaxima: input   start ] */
+fpprintprec:5$
+iterate(u,x,x0,n) :=  block([numer:true],
+                      cons(x0, makelist(x0:subst(x0,x,u), i,1,n)))$
+
+iterate2(u,x,x0,n) := block([numer:true],
+  cons(x0, makelist(x0:subst([x[1]=x0[1],x[2]=x0[2]],u), i,1,n)))$
+
+iterate3(u,x,x0,n) := block([numer:true],
+  cons(x0, makelist(x0:subst([x[1]=x0[1],x[2]=x0[2],x[3]=x0[3]],u),i,1,n)))$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* MAXIMA -- ODE system of 2 coupled equations */
+sol: rk([4-x^2-4*y^2, y^2-x^2+1], [x, y], [-1.25, 0.75],  [t, 0,4, 0.02])$
+        /* eq1        eq2          vars     x0    y0       region  h   */  
+
+wxplot2d([discrete, makelist([p[1], p[2]], p, sol)], 
+         [xlabel, "t"], [ylabel, "x"])$
+wxplot2d([discrete, makelist([p[1], p[3]], p, sol)], 
+         [xlabel, "t"], [ylabel, "y"])$
+wxplot2d([discrete, makelist([p[2], p[3]], p, sol)], 
+         [xlabel, "x"], [ylabel, "y"])$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsect start ]
+Solving IVP systems
+   [wxMaxima: subsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* MAXIMA -- ODE system of 2 coupled equations */
+sol: rk([4-x^2-4*y^2, y^2-x^2+1], [x, y], [-1.25, 0.75],  [t, 0,4, 0.02])$
+        /* eq1        eq2          vars     x0    y0       region  h   */  
+fpprintprec:5$
+sol: rk([y, x+t], [x, y], [0, 1], [t, 0, 1, 0.2]);
+tX : makelist([p[1], p[2]], p, sol);
+tY : makelist([p[1], p[3]], p, sol);
+XY : makelist([p[2], p[3]], p, sol);
+wxdraw2d(xaxis = true, points_joined=true,
+    xlabel="t", ylabel="x", points(tX))$
+wxdraw2d(xaxis = true, points_joined=true,
+    xlabel="t", ylabel="y", points(tY))$
+wxdraw2d(xaxis = true, points_joined=true,
+    xlabel="x", ylabel="y", points(XY))$
+/*
+wxplot2d([discrete, makelist([p[1], p[2]], p, sol)], 
+         [xlabel, "t"], [ylabel, "x"])$
+wxplot2d([discrete, makelist([p[1], p[3]], p, sol)], 
+         [xlabel, "t"], [ylabel, "y"]),
+wxplot2d([discrete, makelist([p[2], p[3]], p, sol)], 
+         [xlabel, "x"], [ylabel, "y"])$
+*/
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsubsect start ]
+iterate3
+   [wxMaxima: subsubsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+iterate3(u,x,x0,n) := block([numer:true],
+  cons(x0, makelist(x0:subst([x[1]=x0[1],x[2]=x0[2],x[3]=x0[3]],u),i,1,n)))$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* Do not forget to invoke iterate3 before .. */ 
+fpprintprec: 5$ 
+f(t,x,y) := y;                           /* the system (f,g) */
+g(t,x,y) := -t*y-x-6*t^2;
+a:0; b:4; c:0;                           /* ICs */
+h: 1/8;                                  /* chose step size */
+n: 16;                                   /* chose number of iterations */
+iterate3([t+h, x+h*f(t,x,y),             /* updating the ODE system */
+               y+h*g(t,x,y)], [t,x,y], [a,b,c], n);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: comment start ]
+        ---- EXAMPLE 21:
+   [wxMaxima: comment end   ] */
+
+
+/* [wxMaxima: input   start ] */
+fpprintprec:5$ 
+h: 0.1;
+f(x,y,z) := 2*y-3*z;
+g(x,y,z) := y-2*z;
+iterate3([x+h, f(x,y,z)*h + y, g(x,y,z)*h + z], [x,y,z], [0,1,0], 10);
+
+/* test: */	
+y5: cosh(1.0)+2*sinh(1.0);
+z5: sinh(1.0);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsubsect start ]
+The Euler Method for systems of IVPs
+   [wxMaxima: subsubsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+iterate3(u,x,x0,n) := block([numer:true],
+  cons(x0, makelist(x0:subst([x[1]=x0[1],x[2]=x0[2],x[3]=x0[3]],u),i,1,n)));
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* MAXIMA --- EULER method for systems of IVP --- */
+EULERsys(t,x,y, to,xo,yo, h,n) := 
+     iterate3([t+h, x+h*f(t,x,y), y+h*g(t,x,y)], [t,x,y], [to,xo,yo], n)$
+ 
+/* Test: */   
+f(t,x,y) := y;
+g(t,x,y) := x+t;
+EULERsys(t,x,y, 0,0,1, 0.2, 5);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsubsect start ]
+Picard–Lindelöf method of successive approximation for sys
+   [wxMaxima: subsubsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+kill(all)$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+fpprintprec:5$  ratprint:false$  kill(arrays)$
+    
+f(x,y,z) := z;     /* =y' */
+g(x,y,z) := y + x; /* =z' */
+    
+[a,b] : [0,0];    /* y(a) = b */
+[c,d] : [0,1];    /* z(c) = d = y'(c) */
+    
+y[0](x) := b;
+y[n](x) := b + integrate( f(t, y[n-1](t), z[n-1](t)), t,a,x);
+    
+z[0](x) := d;
+z[n](x) := d + integrate( g(t, y[n](t), z[n-1](t)), t,c,x);
+    
+y[5](x), expand;  
+y[5](1), numer;
+z[5](1), numer;
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsubsect start ]
+RK4sys alias RUNGE-KUTTA method for Systems of IVP's
+   [wxMaxima: subsubsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+fpprintprec:5$
+iterate3(u,x,x0,n) := block([numer:true],
+  cons(x0, makelist(x0:subst([x[1]=x0[1],x[2]=x0[2],x[3]=x0[3]],u),i,1,n)))$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* MAXIMA --- RUNGE-KUTTA method RK4sys for systems of IVP --- */
+
+RK4sys( x,y,z, xo,yo,zo, h,n):= block(
+    k1 : h*f(x,y,z),
+    l1 : h*g(x,y,z),
+    k2 : h*f(x+1/2*h, y + 1/2*k1, z + 1/2*l1),
+    l2 : h*g(x+1/2*h, y + 1/2*k1, z + 1/2*l1),
+    k3 : h*f(x+1/2*h, y + 1/2*k2, z + 1/2*l2),
+    l3 : h*g(x+1/2*h, y + 1/2*k2, z + 1/2*l2),
+    k4 : h*f(x+    h, y +     k3, z + l3),
+    l4 : h*g(x+    h, y +     k3, z + l3),
+    iterate3([x+h, y + 1/6*(1*k1+2*k2+2*k3+1*k4), 
+                   z + 1/6*(1*l1+2*l2+2*l3+1*l4)],
+             [x,y,z],[xo,yo,zo],n) )$
+
+/* Test: ODE system {f=z, g=y+x} with y(0)=0 & z(0)=1. Wanted: y=? & z=? */
+fpprintprec:5$
+f(x,y,z) := z;
+g(x,y,z) := y+x;
+RK4sys(x,y,z, 0,0,1, 0.2, 5);
+
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsect start ]
+IVP of 2nd Order
+   [wxMaxima: subsect end   ] */
+
+
+/* [wxMaxima: comment start ]
+        b.  EULERsys:
+   [wxMaxima: comment end   ] */
+
+
+/* [wxMaxima: input   start ] */
+f(x,y,z) := z;
+g(x,y,z) := y+x;
+EULERsys(x,y,z, 0,0,1, 0.1, 10);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: comment start ]
+        c. RK4sys:
+   [wxMaxima: comment end   ] */
+
+
+/* [wxMaxima: input   start ] */
+fpprintprec:5$
+f(t,x,y):=y;
+g(t,x,y):=x+t;
+RK4sys(t,x,y, 0,0,1, 0.1, 10);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: comment start ]
+        d.  PICARD-LINDELÖF systems:
+   [wxMaxima: comment end   ] */
+
+
+/* [wxMaxima: input   start ] */
+fpprintprec:5$   ratprint:false$   kill(arrays)$  /* because of y[n] */
+	
+f(x,y,z):= z;
+g(x,y,z):= y+x;
+	
+[a,b] : [0,0];   /* x0=a, b=y0=y(x0) */
+[c,d] : [0,1];   /* x0=c, d=y'(x0)=z(x0) */
+	
+y[0](x) := b;
+y[n](x) := b + integrate( f(t, y[n-1](t), z[n-1](t)), t,a,x);
+	
+z[0](x) := d;
+z[n](x) := d + integrate( g(t, y[n](t), z[n-1](t)), t,c,x);
+	
+y[9](x), expand; 
+y[9](1), numer;
+z[9](1), numer;
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: comment start ]
+        d. rk(.) build-in for systems
+   [wxMaxima: comment end   ] */
+
+
+/* [wxMaxima: input   start ] */
+fpprintprec:5$
+sol: rk([y, x+t], [x, y], [0, 1],  [t, 0, 1, 0.2])$
+ 
+wxplot2d([discrete, makelist([p[1], p[2]], p, sol)],  
+         [xlabel, "t"], [ylabel, "x"])$
+wxplot2d([discrete, makelist([p[1], p[3]], p, sol)], 
+         [xlabel, "t"], [ylabel, "y"])$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+fpprintprec:5$
+sol: rk([y, x+t], [x, y], [0, 1], [t, 0, 1, 0.2]);
+tX: makelist([p[1], p[2]], p, sol);
+tY: makelist([p[1], p[3]], p, sol);
+wxdraw2d(xaxis = true, 
+    points_joined=true,
+    xlabel="ti", ylabel="Xi",
+    points(tX),
+    xlabel="ti", ylabel="Yi",
+    points(tY),
+    title="rk(.) systems")$;
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsubsect start ]
+BRÄUNING's method for 2nd order IVP
+   [wxMaxima: subsubsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+iterate3(u,x,x0,n) := block([numer:true],
+  cons(x0, makelist(x0:subst([x[1]=x0[1],x[2]=x0[2],x[3]=x0[3]],u),i,1,n)))$
+
+/* MAXIMA -- BRAEUNING's method for 2nd order IVP --- */
+RK4ode2( x,y,yp, xo,yo,ypo, h, n):= block( 
+        k0 : 1/2*h^2* f(x,y,yp),
+        k1 : 1/2*h^2* f(x+h/2, y + 1/2*h*yp + 1/4*k0, yp + k0/h),
+       k1p : 1/2*h^2* f(x+h/2, y + 1/2*h*yp + 1/4*k0, yp + k1/h),
+        k2 : 1/2*h^2* f(x+h,   y +     h*yp + k1p,    yp + 2*k1p/h),
+         k : 1/3*(k0+  k1+  k1p   ),
+         l : 1/6*(k0+2*k1+2*k1p+k2),
+      iterate3([x+h, y+h*yp+k, yp+2*l/h],[x,y,yp],[xo,yo,ypo],n) )$
+    
+/* Test 2nd order IVP y''=x+y+y' with y(0)=1 and y'(0)=1  */
+f(x,y,yp):=x+y+yp;
+RK4ode2(x,y,yp, 0,1,1, 0.1, 10);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsubsect start ]
+ROMER's method for 2nd order IVP
+   [wxMaxima: subsubsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+iterate3(u,x,x0,n) := block([numer:true],
+  cons(x0, makelist(x0:subst([x[1]=x0[1],x[2]=x0[2],x[3]=x0[3]],u),i,1,n)))$
+
+/* MAXIMA --- ROMER’s method for 2nd order ODE --- */ RK4romer( x,y,yp, xo,yo,ypo, h, n):= block(
+              k1 : h* f(x,y,yp),
+              k2 : h* f(x+h/2, y + 1/2*h*yp + h/8*k1, yp + k1/2),
+              k3 : h* f(x+h/2, y + 1/2*h*yp + h/8*k1, yp + k2/2),
+              k4 : h* f(x+h,   y +     h*yp + h/2*k3, yp + k3),
+              iterate3([x+h, y+h*(yp+1/6*(k1+k2+k3)), yp+1/6*(k1+2*k2+2*k3+k4)],
+                       [x,y,yp],[xo,yo,ypo],n) )$
+
+/* Test: 2nd order ODE y’’=x+y+y’ with y(0)=1 and y’(0)=1; wanted: y(1)=? */ 
+fpprintprec:5$
+f(x,y,yp):=x+y+yp;
+RK4romer(x,y,yp, 0,1,1, 0.1, 10);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: comment start ]
+        ----- EXAMPLE 23:
+   [wxMaxima: comment end   ] */
+
+
+/* [wxMaxima: input   start ] */
+fpprintprec:5$
+g: 9.81$ L: 1$
+f(x,y,yp) := g/L*y;     /* = y'' */
+
+               /* x0 y0   yp0      h   n */
+RK4romer(x,y,yp,  0, 0.1, 0,     0.05, 20);
+/* [wxMaxima: input   end   ] */
+
+
+
+/* Old versions of Maxima abort on loading files that end in a comment. */
+"Created with wxMaxima 18.10.1"$

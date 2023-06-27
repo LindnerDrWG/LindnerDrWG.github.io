@@ -1,0 +1,375 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 18.10.1 ] */
+/* [wxMaxima: title   start ]
+  INTRODUCTORY DIFFERENTIAL EQUATIONS
+   [wxMaxima: title   end   ] */
+
+
+/* [wxMaxima: comment start ]
+    by Dr. Wolfgang Lindner, Leichlingen, Germany, 2023
+   [wxMaxima: comment end   ] */
+
+
+/* [wxMaxima: section start ]
+What is an ordinary Differential Equation?
+   [wxMaxima: section end   ] */
+
+
+/* [wxMaxima: section start ]
+Analytical Solution Methods
+   [wxMaxima: section end   ] */
+
+
+/* [wxMaxima: section start ]
+Intermezzo: iterate
+   [wxMaxima: section end   ] */
+
+
+/* [wxMaxima: section start ]
+Numerical Solution Methods for IVP
+   [wxMaxima: section end   ] */
+
+
+/* [wxMaxima: input   start ] */
+fpprintprec:5$
+iterate(u,x,x0,n) :=  block([numer:true],
+                      cons(x0, makelist(x0:subst(x0,x,u), i,1,n)))$
+
+iterate2(u,x,x0,n) := block([numer:true],
+  cons(x0, makelist(x0:subst([x[1]=x0[1],x[2]=x0[2]],u), i,1,n)))$
+
+iterate3(u,x,x0,n) := block([numer:true],
+  cons(x0, makelist(x0:subst([x[1]=x0[1],x[2]=x0[2],x[3]=x0[3]],u),i,1,n)))$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsect start ]
+RK1 alias the EULER Method
+   [wxMaxima: subsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+ye: exp(x^2/2);      /* exact solution  ye */
+yp: diff(ye, x);     /* their slope ye' */
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+E(x,y) := [x + 0.2, y +0.2* x*y];
+       /* xn + h    Yn+  h*f(xn,Yn)  */
+ratprint:false$ 
+fpprintprec:5$ 
+E(0.0, 1);
+E(0.2, 1);
+E(0.4, 1.04);
+E(0.6, 1.1232);
+E(0.8, 1.257984);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+XY: [E(0,1),E(0.2,1),E(0.4,1.04),E(0.6,1.1232),E(0.8,1.257984)];
+wxdraw2d(xaxis = true, 
+    point_size=2, points_joined=true,
+    xlabel="xi", ylabel="Yi",
+    points(XY),
+    color=red,
+    explicit(exp(x^2/2),x,0,1),  /* exact solution ye */
+    title="EULER polygon")$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsubsect start ]
+The Euler Method for IVP
+   [wxMaxima: subsubsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+fpprintprec:5$
+iterate2(u,x,x0,n) := block([numer:true],
+  cons(x0, makelist(x0:subst([x[1]=x0[1],x[2]=x0[2]],u), i,1,n)));
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+f(x,y):= x*y;
+xo: 0;
+yo: 1;
+h: 0.2;
+n: 5;   /* recurrence__term    vars.   initial  steps */
+iterate2( [x+h,  y+h*f(x,y)],  [x,y],  [xo,yo], n     );
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+U(x) := exp(x^2/2); 
+U(1), numer;
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* MAXIMA : --- EULER method  --- */
+EULER(x,y, xo,yo, h, n) := iterate2([x+h, y+h*f(x,y)],[x,y],[xo,yo],n);  
+
+/* Test ODE  y'= xy with y(0)=1 */
+fpprintprec: 5$ 
+f(x,y):=x*y;
+EULER( x,y, 0, 1, 0.2, 5);  
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* MAXIMA : --- EULER method denoted as RK1  --- */
+RK1(x,y, xo,yo, h, n) := block(
+    k1: f(x,y),
+    iterate2([x+h, y+h*k1],[x,y],[xo,yo],n));
+
+RK1( x,y, 0, 1, 0.2, 5); 
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: comment start ]
+        ----- EXERCISE 88:
+   [wxMaxima: comment end   ] */
+
+
+/* [wxMaxima: input   start ] */
+fpprintprec:5$
+second(z):= z[2];
+ye(x):= exp(x^2/2);
+f(x,y):=x*y;
+Pe: EULER( x,y, 0,1, 0.2, 5);             /* Euler method points */
+L1: map(second,Pe);
+L2: makelist(ye(x),x,0,1,0.2);
+abs(L2-L1);
+localError: lmax(abs(L2-L1));
+globalError: sum(abs(L2-L1)[i],i,1,length(L1));
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsubsect start ]
+Modified Euler method alias 'RK2e of order 2'
+   [wxMaxima: subsubsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+U(x) := exp(x^2/2); 
+U(1), numer;           /* exact value */
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+fpprintprec:5$
+f(x,y) := x*y; 
+k1 : f(x,y);
+k2 : f(x+0.2, y + 0.2*k1);
+iterate2([x+0.2, y + 0.2*(k1+k2)/2],[x,y],[0,1],5);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+iterate2(u,x,x0,n) := block([numer:true],
+        cons(x0, makelist(x0:subst([x[1]=x0[1],x[2]=x0[2]],u), i,1,n)))$
+
+/* MAXIMA : --- modified EULER method --- */
+modiEULER(x,y, xo,yo, h,n):= block([k1,k2], 
+               k1 : f(x,y),
+               k2 : f(x+h, y + h*k1),
+               iterate2([x+h, y+h/2*(k1+k2)],[x,y],[xo,yo],n) )$
+                                
+/* Test using ODE  y'= xy with y(0)=1 */
+f(x,y) := x*y;
+modiEULER( x,y, 0,1, 0.2, 5);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+RK2e( x,y, xo,yo, h,n) :=
+       iterate2([x+h, y+h/2*( f(x,y)  + f(x+h,y+h*f(x,y)) )], 
+                [x,   y], [xo,yo], n)$
+ 
+f(x,y) := x*y;                               
+RK2e( x,y, 0,1, 0.2, 5);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsect start ]
+RK2h alias HEUN's Method
+   [wxMaxima: subsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+fpprintprec: 5$ 
+iterate2(u,x,x0,n) := block([numer:true],
+        cons(x0, makelist(x0:subst([x[1]=x0[1],x[2]=x0[2]],u), i,1,n)))$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* MAXIMA --- HEUN's method --- */
+HEUN( x,y, xo,yo, h,n) := block(  
+           k1 : f(x,y),
+               k2 : f( x+2*h/3,  y+2*h/3*k1 ),
+               iterate2([x+h, y+h/4*(k1+3*k2)],[x,y],[xo,yo],n) );
+                                 
+/* Test with ODE  y'= xy with y(0)=1 */
+f(x,y):= x*y;                
+HEUN( x,y, 0,1, 0.2, 5);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+fpprintprec:5$
+k(z):= z[2];
+ye(x):=exp(x^2/2);
+f(x,y):= x*y;   
+P : HEUN(x,y, 0,1, 0.2, 5);
+L1: map(k,P);
+L2: makelist(ye(x),x,0,1,0.2);
+abs(L2-L1);
+globalErrorHEUN: sum(abs(L2-L1)[i],i,1,length(L1));
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsect start ]
+RK2m alias the Midpoint Method
+   [wxMaxima: subsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+fpprintprec: 5$ 
+iterate2(u,x,x0,n) := block([numer:true],
+        cons(x0, makelist(x0:subst([x[1]=x0[1],x[2]=x0[2]],u), i,1,n)))$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* MAXIMA : --- MIDPOINT METHOD --- */
+midpoint(x,y, xo,yo, h,n) := 
+         iterate2([x+h, y+h*f( x+h/2, y+h/2*f(x,y) ) ],[x,y],[xo,yo],n);
+	
+/* Test with ODE  y'= xy with y(0)=1 */
+f(x,y):=x*y;
+midpoint( x,y, 0,1, 0.2, 5);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+fpprintprec:5$
+k(z):= z[2];
+ye(x):=exp(x^2/2);
+f(x,y):=x*y;
+P : midpoint(x,y, 0,1, 0.2, 5);
+L1: map(k,P);
+L2: makelist(ye(x),x,0,1,0.2);
+abs(L2-L1);
+globalErrorMidpoint: sum(abs(L2-L1)[i],i,1,length(L1));
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: comment start ]
+        ----- EXERCISE 105:
+   [wxMaxima: comment end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* MAXIMA : --- MIDPOINT METHOD as RK2 method --- */
+midpoint1( x,y, xo,yo, h,n) :=  block(  
+               k1 : f(x ,y),  
+               k2 : f(x, y + h/2*k1), 
+	            iterate2([x+h, y+h*k2], [x,y], [xo,yo], n));
+
+/* Test with ODE  y'= xy with y(0)=1 */
+f(x,y):=x*y;
+midpoint1(x,y, 0,1, 0.2, 5);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* MAXIMA --- Midpoint method variant--- */
+midpoint2(x,y, xo,yo, h,n) := 
+         iterate2([x+h, 
+                   y+1/2*h*( f(x,y)+f(x+h,y+h)) ], [x,y], [xo,yo], n);
+	
+f(x,y):=x*y;
+midpoint2( x,y, 0,1, 0.2, 5);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsect start ]
+RK4 alias the classic RUNGE-KUTTA method
+   [wxMaxima: subsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+kill(all)$
+fpprintprec: 5$ 
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+iterate2(u,x,x0,n) := block([numer:true],
+        cons(x0, makelist(x0:subst([x[1]=x0[1],x[2]=x0[2]],u), i,1,n)))$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsubsect start ]
+the Runge–Kutta RK4 recurrence
+   [wxMaxima: subsubsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* MAXIMA : --- classic RUNGE-KUTTA  method of order 4 --- */
+RK4(x,y,xo,yo,h,n):= block(
+                     k1 : f(x,y),
+  	                k2 : f(x+h/2, y + h/2*k1),
+	                  k3 : f(x+h/2, y + h/2*k2),
+	                  k4 : f(x+h  , y + h*k3),
+	                     iterate2([x+h, y+h/6*(1*k1+2*k2+2*k3+1*k4)], 
+	                              [x  , y], [xo,yo], n) )$
+	                
+/* Test ODE: y'= xy with y(0)=1 */
+f(x,y):= x*y;
+RK4( x,y, 0,1, 0.2, 5);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsubsect start ]
+the build-in rk(.) method
+   [wxMaxima: subsubsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+results: rk(x-y^2, y,1, [x, 0,8, 0.1])$
+wxdraw2d(xaxis = true, 
+    points_joined=true,
+    xlabel="xi", ylabel="Yi",
+    points(results),
+    title="rk(.) polygon")$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: comment start ]
+       ----- EXERCISE 111:
+   [wxMaxima: comment end   ] */
+
+
+/* [wxMaxima: input   start ] */
+iterate2(u,x,x0,n) := block([numer:true],
+        cons(x0, makelist(x0:subst([x[1]=x0[1],x[2]=x0[2]],u), i,1,n)))$
+/* MAXIMA --- RUNGE-KUTTA order 3 --- */
+RK3(x,y,xo,yo,h,n) := block(
+                   k1 :  f(x,y),
+	                k2 : f(x+h/2, y + h/2*k1),
+	                k3 : f(x+h, y + 2*h*k2-h*k1),
+	                iterate2([x+h, y+h/6*(1*k1+4*k2+1*k3)],[x,y],[xo,yo],n))$
+	                 
+/* Test ODE: y'= xy with y(0)=1 */
+f(x,y):= x*y;
+RK3(x,y, 0,1, 0.2, 5);
+/* [wxMaxima: input   end   ] */
+
+
+
+/* Old versions of Maxima abort on loading files that end in a comment. */
+"Created with wxMaxima 18.10.1"$

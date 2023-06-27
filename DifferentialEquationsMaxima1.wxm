@@ -1,0 +1,87 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 18.10.1 ] */
+/* [wxMaxima: title   start ]
+  INTRODUCTORY DIFFERENTIAL EQUATIONS
+   [wxMaxima: title   end   ] */
+
+
+/* [wxMaxima: comment start ]
+    by Dr. Wolfgang Lindner, Leichlingen, Germany, 2023
+   [wxMaxima: comment end   ] */
+
+
+/* [wxMaxima: section start ]
+What is an ordinary Differential Equation?
+   [wxMaxima: section end   ] */
+
+
+/* [wxMaxima: subsect start ]
+Definition of ODE
+   [wxMaxima: subsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* wxMaxima */
+kill(functions,values,arrays)$
+load(drawdf)$
+wxdrawdf(y-x^2, [x,y], /* the given ODE y’=y-x^2 */
+    xaxis = true, yaxis = true, xlabel="x", ylabel="y",
+    [x, -4, 4], [y, -0.1, 5], /* chose interval J=[-4, +4] */ 
+    solns_at( [0,2],[0,3],[0,4],[0,5] ), /* the solution with y(0)=2 .. */ 
+    color=blue,
+    solns_at([0,1]) /* the solution with y(0)=1 painted in blue */ 
+)$
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: subsect start ]
+Existence-Uniqueness Theorem - Picard iteration
+   [wxMaxima: subsect end   ] */
+
+
+/* [wxMaxima: input   start ] */
+y(x):= exp(x^2); 
+y(0); 
+diff(y(x),x); 
+2*x*y(x);
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* MAXIMA --- PICARD iteration --- */ 
+fpprintprec: 5$
+ratprint: false$
+kill(functions, values, arrays)$
+
+f(x,y):= 2*x*y;
+[a,b]: [0,1];
+y[0](x) := b;
+y[n](x) := b + integrate(f(t,y[n-1](t)),t,a,x);
+y[3](x), expand;
+makelist(y[n](x),n,0,4);
+
+/* [wxMaxima: input   end   ] */
+
+
+/* [wxMaxima: input   start ] */
+/* visualize the approximation process */
+ratprint:false$
+Pic: makelist([1,y[n](1)],n,0,4), numer;    /* (5) */
+wxdraw2d(xaxis = true,
+    /* user_preamble="set size ratio -1", */ 
+    xrange = [0,2], yrange = [-0.1,4], 
+    xlabel="x", ylabel="y",
+    color=cyan, explicit(y[0](x),x,0,2 ), 
+    color=blue, explicit(y[1](x),x,0,2 ), 
+    color=green, explicit(y[2](x),x,0,2 ), 
+    color=yellow, explicit(y[3](x),x,0,2 ), 
+    color=red, explicit(exp(x^2),x,0,2 ), 
+    point_size=2, points_joined=false, 
+    color=magenta, points( Pic ), 
+    title="PICARD iteration")$
+/* [wxMaxima: input   end   ] */
+
+
+
+/* Old versions of Maxima abort on loading files that end in a comment. */
+"Created with wxMaxima 18.10.1"$
