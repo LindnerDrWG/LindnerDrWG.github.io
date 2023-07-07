@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+innerL2(f1,f2) = defint(f1*f2,x,0,1)  -- inner product as DEFinite INTegral
+
+GramSchmidtL2(B) = do( 
+    O=(0,0),                          -- container with two zero functions
+    O[1]=B[1],
+    O[2]=B[2] - innerL2(O[1],B[2]) / innerL2(O[1],O[1])*O[1],
+    O)                                -- result as rows
+
+B  = (1,x)
+Bg = GramSchmidtL2(B)                -- make B orthoGonal resp. innerL2(.)
+Bg
+
+normL2(f) = sqrt(defint(f*f,x,0,1))  -- norm in L2[0,1]
+
+onbL2(B) = do(onb=B, 
+            odim=dim(B,1),
+            for(k,1,odim, onb[k] = B[k]/normL2(B[k])), 
+            onb)  
+
+Bn=onbL2(Bg)                         -- make Bg orthoNormal resp. innerL2
+Bn
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

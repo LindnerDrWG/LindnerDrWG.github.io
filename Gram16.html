@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+GerschgorinCircles(A) = do( 
+   check( dim(A,1)==dim(A,2) ),
+   n = dim(A,1),
+   for(i,1,n, 
+     R = sum(j,1,n, mag(A[i,j])) - mag(A[i,i]), -- radius
+     C = (A[i,i],0),                            -- center
+     print("Circle:", i,C,R)
+   ))
+
+A = ((2,0,-1),(-1,3,1),(0,2,5))
+GerschgorinCircles(A)
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

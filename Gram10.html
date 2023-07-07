@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+##### RECIPROCAL via CLIFFORD Algebra cl(3)
+run("EVA2.txt")
+cl(3)
+
+reciprocal(u,v,w) = do(               -- (1)
+   u123 = outp(outp(u,v),w),          -- equivalent to Box()
+   ru = gp(outp(v,w), inverse(u123)), -- ru is reciprocal to u
+   rv = gp(outp(w,u), inverse(u123)), -- (2) 
+   rw = gp(outp(u,v), inverse(u123)),
+   ( (ru[2],ru[3],ru[4]),  -- 3x3 matrix with dual basis
+     (rv[2],rv[3],rv[4]),  --     saved in its rows
+     (rw[2],rw[3],rw[4]))  ) 
+
+a1 = 5e1-2e2+6e3      -- a1 expressed in vector basis (e1,e2,e3) of G^3
+a2 =-3e1-1e2-4e3
+a3 = 9e1-5e2+7e3
+
+B = reciprocal(a1,a2,a3)   -- dual Basis as rows
+B = transpose(B)           -- dual basis as columns
+B
+
+R=((-27/39,-15/39,  24/39),  -- Referenz matrix
+   (-16/39,-19/39,  7/39),
+   ( 14/39,  2/39,-11/39))
+float(R)                     -- (3)
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+run("EVA2.txt")
+cl(2)
+
+reci22(u,v) = do(               -- short version without input check
+   uv = outp(u,v),     
+   ru = gp( v,outp(v,u) ) / magnitude(uv)^2,  
+   rv = gp( u,outp(u,v) ) / magnitude(uv)^2,
+   ( (ru[2],ru[3]),             -- 1st dual basis vector
+     (rv[2],rv[3])) )           -- 2nd dual basis vector as row
+
+b1 = 0.71e1+0.71e2              -- 1st original basis vector
+b1
+b2 = 1.2e1-.13e2                -- 2nd original basis vector
+b2                              
+
+"reciprocal basis via Clifford Algebra:"
+reci22(b1,b2)                   -- read of dual basis as rows:
+
+r1 = 0.1376e1+1.2707e2        -- 1. dual basis vector
+r2 = 0.7518e1-0.7518e2        -- 2. dual basis vector as row
+
+inp(b1,r2)                    -- check orthogonality
+inp(b2,r1)
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>
