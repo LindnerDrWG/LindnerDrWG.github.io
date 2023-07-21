@@ -1,0 +1,132 @@
+##################################
+## ORDINARY DIFFERENTIAL EQUATIONS Box -- (2023) Dr. W.Lindner, Leichlingen GE
+##################################
+
+--- ODE type III ---
+
+odefxgy(f,g, x,y, xo,yo) = do(
+   print("1. step - identify f(x) and g(y): ", eval(f), eval(g)),
+   F = defint(f,x,xo,x), 
+   G = defint(1/g,y,yo,y),
+   print("2. step - calculate F(x)", F),
+   print("3. step - calculate G(y)", G) )
+
+--- ODE type IV : linear ODE  ---
+
+linear1(f,g, x,y, xo,yo) = 
+             (yo+defint(g/exp(defint(f,x,xo,x)), x,xo,x))*
+                          exp(defint(f,x,xo,x))
+
+##### ITERATE
+
+iterate(u,X,Xo,n) = do( M = zero(2,n+1), M[1,1] = Xo,                                 
+                        for(i,2,n+1, M[1,i] = eval(u, X,M[1,i-1])), M)                                          
+
+newton0(u,x,xo,n,  M,VAL) = do( M  = zero(2,n),
+                        VAL=eval(u,x,xo),
+                        for(i,1,n,   VAL   = eval(x-u/d(u,x),x,VAL),
+                                     M[1,i]= VAL), M[1,n])                        
+
+newton1(u,x,a,n) = do( c = float(eval(d(u,x),x,a)),       
+                       iterate( x-u/c, x, a, n) )         
+
+newton(u,x,a,n) = iterate( x - u/d(u,x), x,a, n)
+
+secant1(u,x, a,b, n) = do( C= (a-b)/(eval(u,x,a)-eval(u,x,b)), 
+                           iterate( x - C*u, x,a,n))          
+
+
+iterate2(u,X,Xo,n) = do( M = zero(n+1,2), M[1] = Xo,
+           for(i,2,n+1, M[i] = eval(u, X[1],M[i-1,1], X[2],M[i-1,2])),
+           transpose(M))
+
+iterate3(u,X,Xo,n) = do( M = zero(n+1,3), M[1] = Xo,
+           for(i,2,n+1, M[i] = eval(u, X[1],M[i-1,1], X[2],M[i-1,2], X[3],M[i-1,3])),
+           transpose(M) )
+
+idiff(f,x,y,n,  u) = do( M = zero(2,n),                              
+                     u = d(f,x)+d(f,y)*f, M[1,1]=f, M[1,2]=u,                                   
+                     for( i,3,n, u = d(u,x)+d(u,y)*f, M[1,i]=u), M[1])                                       
+
+makelist(u,i,m,n) = do( M   = zero(2,n),               
+                        VAL = eval(u,i,m), M[1,m] = VAL,       
+                        for( j,m+1,n, VAL = eval(u,i,j), M[1,j]= VAL ), M[1])                               
+
+iTaylor(f,x,y, h, m) = y + dot( idiff(f,x,y,m), makelist(h^r/r!, r,1,m) )
+
+
+iTaylorsol(x,y, xo,yo, h, m, n) = 
+           iterate2((x+h, iTaylor(f,x,y, h, m)), (x,y), (xo,yo), n)
+
+##### NUMERICAL METHODS
+----- f and g are to be defined global 
+
+--- EULER method  --- 
+EULER( x,y, xo,yo, h, n) =  iterate2((x+h, y+h*f(x,y)), (x,y), (xo,yo), n)  
+
+--- modified EULER method ---
+modiEULER(x,y, xo,yo, h,n,   k1,k2) = do( 
+                  k1 = f(x,y),
+                  k2 = f(x+h, y+h*k1),
+                  iterate2((x+h, y+h/2*(k1+k2)),(x,y),(xo,yo),n) ) 
+
+---  HEUN's method ---
+HEUN(x,y, xo,yo, h,n,  k1,k2) = do(  
+        k1 = f(x,y),
+        k2 = f(x+2*h/3, y+2*h/3*k1),
+	        iterate2((x+h, y+h/4*(k1+3*k2)),(x,y),(xo,yo),n) )
+
+MIDPOINT(x,y, xo,yo, h,n) =
+              iterate2( (x+h,  y+h*f(x+h/2, y+h/2*f)), 
+                        (x,    y), (xo,yo), n)
+
+--- classic RUNGE-KUTTA  method of order 4 ---
+
+RK4(x,y,xo,yo,h,n) = do(
+                     k1 = f(x,y),
+  	             k2 = f(x+h/2, y + h/2*k1),
+	             k3 = f(x+h/2, y + h/2*k2),
+	             k4 = f(x+h  , y + h*k3),
+	             iterate2((x+h, y+h/6.0*(1*k1+2*k2+2*k3+1*k4)), 
+	                      (x  , y), (xo,yo), n) )
+
+##### NUMERICAL METHODS for systems of ODEs
+
+---  EULER method for systems of IVP ---
+EULERsys(t,x,y, to,xo,yo, h,n) = 
+     iterate3((t+h, x+h*f(t,x,y), y+h*g(t,x,y)), (t,x,y), (to,xo,yo), n)
+
+RK4sys(x,y,z, xo,yo,zo, h,n)= do(
+              k1 = h*f(x,y,z),
+              l1 = h*g(x,y,z),
+              k2 = h*f(x+h/2, y+k1/2, z+l1/2),
+              l2 = h*g(x+h/2, y+k1/2, z+l1/2),
+  	      k3 = h*f(x+h/2, y+k2/2, z+l2/2),
+              l3 = h*g(x+h/2, y+k2/2, z+l2/2),
+              k4 = h*f(x+h,   y+k3,   z+l3  ),
+              l4 = h*g(x+h,   y+k3,   z+l3  ),
+	      iterate3((x+h, 
+	                y+1/6.0*(1*k1+2*k2+2*k3+1*k4),
+                        z+1/6.0*(1*l1+2*l2+2*l3+1*l4)), 
+	               (x,y,z), (xo,yo,zo), n)  )
+
+RK4ode2( x,y,yp, xo,yo,ypo, h, n) = do( 
+         k0 = 1/2*h^2* f(x,y,yp),
+         k1 = 1/2*h^2* f(x+h/2, y+1/2*h*yp+1/4*k0, yp+k0/h),
+        k1p = 1/2*h^2* f(x+h/2, y+1/2*h*yp+1/4*k0, yp + k1/h),
+         k2 = 1/2*h^2* f(x+h,   y +h*yp + k1p,  yp + 2*k1p/h),
+          k = 1/3*(k0+  k1+  k1p   ),
+          l = 1/6.0*(k0+2*k1+2*k1p+k2),
+        iterate3((x+h, y+h*yp+k, yp+2*l/h),(x,y,yp),(xo,yo,ypo),n) )
+
+---  ROMER's method for 2nd order ODE --- 
+RK4romer( x,y,yp, xo,yo,ypo, h, n) = do(
+                  k1 = h* f(x,y,yp),
+                  k2 = h* f(x+h/2, y + 1/2*h*yp + h/8*k1, yp + k1/2),
+                  k3 = h* f(x+h/2, y + 1/2*h*yp + h/8*k1, yp + k2/2),
+                  k4 = h* f(x+h,   y +     h*yp + h/2*k3, yp + k3),
+       iterate3( (x+h, 
+                  y+h*(yp+1/6.0*(k1+k2+k3)), 
+                  yp+1/6.0*(k1+2*k2+2*k3+k4)),
+                 (x,y,yp), (xo,yo,ypo), n) )
+
