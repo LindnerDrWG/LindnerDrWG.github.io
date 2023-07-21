@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+--- EIGENMATH : ODE type IV : linear ODE  ---
+VoC(p,q, x,y, xo,yo)= do(
+print("INTEGRATING FACTOR METHOD:"),
+M = exp(integral(p,x)), -- integrating factor */
+print("Step 1 - choose integrating factor M(x):", M),
+My = integral(M*q,x),
+print("Step 2 - multiply ODE by M and integrate: ", My),
+y = (integral(M*q,x)/M + C/M),
+print("Step 3 - divide result through M :", eval(y)),
+c = eval(y, x, xo),
+print("Step 4 - calculate C for yo=y(xo), i.e. solve yo=c for C:", c)
+)
+
+VoC(1, 1,x,y,0,1)    -- Test with ODE y'+y=1, y(0)=1
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>
