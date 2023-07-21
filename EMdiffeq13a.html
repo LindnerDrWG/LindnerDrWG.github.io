@@ -14,15 +14,13 @@ iterate(u,X,Xo,n) = do( M = zero(2,n+1),                             --(1)
                         for(i,2,n+1, M[1,i] = eval(u, X,M[1,i-1])),  --(3)   
                         M)                                           --(4)
 
---- EIGENMATH : simplified SECANT METHOD   --- 
---           include function iterate(..) here 
-secant1(u,x, a,b, n) = do( C= (a-b)/(eval(u,x,a)-eval(u,x,b)),  -- (1)
-                           iterate( x - C*u, x,a,n))            -- (2)
+--- EIGENMATH : simplified NEWTON-RAPHSON iteration  ---
+---             include our function iterate(..) here
 
-float(secant1(x^2-2,x, 1,2, 5))
+newton1(u,x,a,n) = do( c = float(eval(d(u,x),x,a)),        -- (1)
+                       iterate( x-u/c, x, a, n) )          -- (2)
 
-f = x^2-cos(x)
-secant1( f, x, 1.0,2.0, 5)
+newton1( x^2-2 , x,1, 9)[1,9]   -- test: calculate sqrt(2)  --(3)
 
 </textarea>
 </td><td>

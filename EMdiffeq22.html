@@ -15,12 +15,9 @@ iterate2(u,X,Xo,n) = do( M = zero(n+1,2), M[1] = Xo,
            for(i,2,n+1, M[i] = eval(u, X[1],M[i-1,1], X[2],M[i-1,2])),
            transpose(M))
 
-idiff(f,x,y,n,  u) = do( 
-                     M = zero(2,n),                              
-                     u = d(f,x)+d(f,y)*f,                        
-                     M[1,1]=f,                                   
-                     M[1,2]=u,                                   
-                     for( i,3,n, u = d(u,x)+d(u,y)*f, M[1,i]=u),     
+idiff(f,x,y,n,  u) = do( M = zero(2,n),                              
+                     u = d(f,x)+d(f,y)*f, M[1,1]=f, M[1,2]=u,                                   
+                     for( i,3,n, u = d(u,x)+d(u,y)*f, M[1,i]=u), M[1])                                       
                      M[1])                                       )
 
 makelist(u,i,m,n) = do( M   = zero(2,n),               

@@ -10,7 +10,10 @@
 <textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
 
 --- EIGENMATH : IMPLICIT TAYLOR METHOD of order m ---
---  include our function idiff(f,x,y,m) here
+
+idiff(f,x,y,n,  u) = do( M = zero(2,n),                              
+                     u = d(f,x)+d(f,y)*f, M[1,1]=f, M[1,2]=u,                                   
+                     for( i,3,n, u = d(u,x)+d(u,y)*f, M[1,i]=u), M[1])                                       
 
 makelist(u,i,m,n) = do( M   = zero(2,n),               
                         VAL = eval(u,i,m), M[1,m] = VAL,       

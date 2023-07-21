@@ -10,9 +10,19 @@
 <textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
 
 --- EIGENMATH : IMPLICIT TAYLOR METHOD of order m ---
---  include our functions idiff(f,x,y,m), makelist, iTaylor here
+iterate(u,X,Xo,n) = do( M = zero(2,n+1), M[1,1] = Xo,                                 
+                        for(i,2,n+1, M[1,i] = eval(u, X,M[1,i-1])), M)                                          
+idiff(f,x,y,n,  u) = do( M = zero(2,n),                              
+                     u = d(f,x)+d(f,y)*f, M[1,1]=f, M[1,2]=u,                                   
+                     for( i,3,n, u = d(u,x)+d(u,y)*f, M[1,i]=u), M[1])                                       
 
-iterate2((x+0.2, iTaylor(x*y, x,y, 0.2, 3)), (x,y), (0,1), 5)       --(1)
+makelist(u,i,m,n) = do( M   = zero(2,n),               
+                        VAL = eval(u,i,m), M[1,m] = VAL,       
+                        for( j,m+1,n, VAL = eval(u,i,j), M[1,j]= VAL ), M[1])                               
+
+iTaylor(f,x,y, h, m) = y + dot( idiff(f,x,y,m), makelist(h^r/r!, r,1,m) )
+
+iterate2((x+0.2, iTaylor(x*y, x,y, 0.2, 3)), (x,y), (0,1), 5)  
 
 </textarea>
 </td><td>
