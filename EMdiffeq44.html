@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+fpprintprec:5$   ratprint:false$   kill(arrays)$  /* because of y[n] */
+	
+f(x,y,z):= z;
+g(x,y,z):= y+x;
+	
+[a,b] : [0,0];   /* x0=a, b=y0=y(x0) */
+[c,d] : [0,1];   /* x0=c, d=y'(x0)=z(x0) */
+	
+y[0](x) := b;
+y[n](x) := b + integrate( f(t, y[n-1](t), z[n-1](t)), t,a,x);
+	
+z[0](x) := d;
+z[n](x) := d + integrate( g(t, y[n](t), z[n-1](t)), t,c,x);
+	
+y[9](x), expand; 
+y[9](1), numer;
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>
