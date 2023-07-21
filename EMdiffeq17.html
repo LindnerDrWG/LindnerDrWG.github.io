@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+--- EIGENMATH : simplified SECANT METHOD   --- 
+--           include function iterate(..) here 
+secant1(u,x, a,b, n) = do( C= (a-b)/(eval(u,x,a)-eval(u,x,b)),  -- (1)
+                           iterate( x - C*u, x,a,n))            -- (2)
+
+float(secant1(x^2-2,x, 1,2, 5))
+
+f = x^2-cos(x)
+secant1( f, x, 1.0,2.0, 5)
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

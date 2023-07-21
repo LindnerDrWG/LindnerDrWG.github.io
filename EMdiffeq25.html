@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+--- EIGENMATH ---
+E(x,y) = (x + 0.2, y +0.2*x*y)
+
+E(0.0, 1)
+E(0.2, 1)
+E(0.4, 1.04)
+print(0.4+0.2, 1.04+0.2*0.4*1.04)  -- example calc by hand
+E(0.6, 1.1232)
+E(0.8, 1.257984)
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

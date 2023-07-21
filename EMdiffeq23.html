@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+-- EIGENMATH : TAYLOR SOLUTION METHOD for ODE y'=f(x,y) ---
+
+iterate2(u,X,Xo,n) = do( M = zero(n+1,2), M[1] = Xo,
+           for(i,2,n+1, M[i] = eval(u, X[1],M[i-1,1], X[2],M[i-1,2])),
+           transpose(M))
+
+Taylor3(x,y, xo,yo, h,n) = 
+     iterate2((x+h, y+h*x*y + h^2/2*(x^2*y+y) + h^3/6*(x^3*y+3*x*y)),
+              (x,y),(xo,yo),n)
+                
+float(Taylor3(x,y, 0,1, 0.2, 5))
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

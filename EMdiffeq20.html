@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+--- EIGENMATH : IMPLICIT TAYLOR METHOD of order m ---
+--  include our function idiff(f,x,y,m) here
+
+makelist(u,i,m,n) = do( M   = zero(2,n),               
+                        VAL = eval(u,i,m), M[1,m] = VAL,       
+                        for( j,m+1,n, VAL = eval(u,i,j), M[1,j]= VAL ),            
+                        M[1])                               
+
+iTaylor(f,x,y, h, m) = y + dot( idiff(f,x,y,m), makelist(h^r/r!, r,1,m) )
+
+-- Test: iTaylor on the IVP y'=xy with y(0)=1
+makelist(h^r/r!, r,1,3)
+iTaylor(x*y, x,y, h,3)
+iTaylor(x*y, x,y, 1/5, 3)
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

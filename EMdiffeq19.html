@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+--- EIGENMATH : idiff = implicit differentiation --- */
+idiff(f,x,y,n,  u) = do( 
+                     M = zero(2,n),                              --(1)
+                     u = d(f,x)+d(f,y)*f,                        --(2)
+                     M[1,1]=f,                                   --(3)
+                     M[1,2]=u,                                   --(4)
+                     for( i,3,n, u = d(u,x)+d(u,y)*f, M[1,i]=u),    --(5) 
+                     M[1])                                       --(6)
+
+idiff(x*y,x,y,4)
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>
