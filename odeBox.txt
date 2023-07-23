@@ -2,6 +2,10 @@
 ## ORDINARY DIFFERENTIAL EQUATIONS Box -- (2023) Dr. W.Lindner, Leichlingen GE
 ##################################
 
+-- contributed by G. Weigt
+maxL(L,max,i) = do( max = L[1],
+                    for(i,2,dim(L), test(L[i]>max, max=L[i])), max)
+
 --- ODE type III ---
 
 odefxgy(f,g, x,y, xo,yo) = do(
@@ -40,6 +44,7 @@ iterate2(u,X,Xo,n) = do( M = zero(n+1,2), M[1] = Xo,
            for(i,2,n+1, M[i] = eval(u, X[1],M[i-1,1], X[2],M[i-1,2])),
            transpose(M))
 
+-- contributed by G. Weigt
 iterate3(u,X,Xo,n) = do( M = zero(n+1,3), M[1] = Xo,
            for(i,2,n+1, M[i] = eval(u, X[1],M[i-1,1], X[2],M[i-1,2], X[3],M[i-1,3])),
            transpose(M) )
