@@ -11,7 +11,15 @@
 
 --- EIGENMATH : local resp. global error ---
 --  include iterate2 and EULER here
---  function max contributed by G. Weigt:
+
+iterate2(u,X,Xo,n) = do( M = zero(n+1,2), M[1] = Xo,
+           for(i,2,n+1, M[i] = eval(u, X[1],M[i-1,1], X[2],M[i-1,2])),
+           transpose(M))
+
+--- EULER method  --- 
+EULER( x,y, xo,yo, h, n) =  iterate2((x+h, y+h*f(x,y)), (x,y), (xo,yo), n)  
+
+---  function max contributed by G. Weigt:
 max(L, MAX,i) = do( MAX = L[1], 
                     for(i,2,dim(L), test(L[i]>MAX, MAX=L[i])), MAX)
 
