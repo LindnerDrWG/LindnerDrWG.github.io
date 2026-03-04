@@ -1,0 +1,316 @@
+##| HYPERGEOMETRIC Distribution  with Eigenmath    - Ch. 2.4 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+
+-- REMARK: The following functions have 4 parameters, whose order
+-- is crucial, because of the multiple use of choose(). This order 
+-- differs between R, MATLAB/Octave, EXCEL etc. So take care!
+    
+
+# DEFINITION
+"=========================== hgPDF - Hypergeometric density"
+
+   hgPDF(N,R,n,r) = float( choose(R,r)*choose(N-R, n-r)/choose(N,n) )     
+
+------- "N-R-n-r" ------------------------------------------
+-- where
+-- N is the population size,
+-- R is the number of success states in the population,
+-- n is the number of draws in each trial,
+-- r is the number of observed successes.
+
+-- Model: draw from an urn with N marbles, 
+--        R of them are red ('success'), 
+--        exactly n marbles and find r of them are red. 
+
+
+hgPDF(N,R,n,r)     -- the formula expanded for inspection
+
+
+"--- 1. --- EXAMPLE: selecting red marbles"
+
+-- prototypical PROBLEM:
+-- What is the probability of selecting x = 14 red marbles from a
+-- sample of k = 20 taken from an urn containing m = 70 red marbles
+-- and n = 30 green marbles (i.e. N=100 marbles at all)?
+-- SOLUTION:
+
+--    N   R  n  r
+hgPDF(100,70,20,14)                          
+
+--           r       R       N-R     n
+-- R> dhyper(x = 14, m = 70, n = 30, k = 20)
+--    [1] 0.2140911
+-- WATCH the other ordering of the parameter list in R !!
+
+
+"--- 2. --- EXAMPLE: (national lottery)"
+
+-- In a national lottery box there are 49 numbered balls. 
+-- 6 balls are drawn. What is the probability to predict
+-- 4 numbers correct of the 6?
+
+-- SOLUTION:
+--      N            R          n         r      
+-- from 49 including 6 red take 6 and get 4 red.
+
+hgPDF(49,6,6,4)      -- [3], p.37
+"ok"
+
+"                     hypergeometrical PDF table for lottery"
+-- calculate the probabilities for exact k=0,..,6 reds
+T = zero(2,7)
+for(i,1,7, T[1,i] = i-1)
+for(i,1,7, T[2,i] = float(hgPDF(49,6,6, i-1)) )
+transpose(T)
+
+"                     hypergeometrical PDF plot for lottery"
+yrange = (0,0.5)
+xrange = (0,6)
+draw( hgPDF(49,6,6, x) ,x)
+
+y = T[2]
+draw(y[floor(x)],x)
+
+"--- 3. --- EXAMPLE from MatLAB"
+
+-- EXAMPLE: do https://de.mathworks.com/help/stats/hygepdf.html
+-- MATLAB: p = hygepdf(0:5,100,20,10)
+--         p = 0.0951  0.2679  0.3182  0.2092  0.0841  0.0215
+-- SOLUTION:
+
+for(i,1,6, print( hgPDF(100,20,10, i-1)) )
+"ok"
+
+
+"--- 4. --- Wikipedia ibid.: working example"
+---- hypergeometric PDF definition in wiki is hgPDF1(r,N,R,n)
+
+# DEFINITION
+----------------------------------------------- WIKIPEDIA hgPDF
+
+    hgPDF1(r,N,R,n) = float(  hgPDF(N,R,n,r)  )
+
+----------"r N R n"-----------------------------------------
+-- where
+-- N is the population size,
+-- R is the number of success states in the population,
+-- n is the number of random draws without replacement in each trial,
+-- r is the number of observed successes.
+
+-- EXAMPLE: we are interested in calculating the probability of 
+-- drawing r red marbles in n draws, given that there are R red
+-- marbles out of a total of N marbles. 
+
+-- For this example, assume that there are 5 red and 45 green marbles
+-- in the urn. Standing next to the urn, you close your eyes and 
+-- draw 10 marbles without replacement. 
+-- What is the probability that exactly 4 of the 10 are red?
+
+-- This problem is summarized by:
+--
+--                drawn	     not-drawn      total
+-- red   marbles:	 r =  4    R-r = 1        R   = 5
+-- green marbles:	 n-r= 6    N+r-n-R= 39    N-R = 45
+-- total	       :  n = 10	  N-n = 4        N   = 50
+
+--     (r,     N,    R,     n   )   wikipedia invoking parameters
+--      red    all   reds   draw
+
+"hgPDF1(r=4,   N=50, R=5, n=10) ="
+hgPDF1(   4,     50,   5,   10)
+"ok"
+
+"--- 5. --- Excel: example"
+
+--  =HYPGEOM.DIST(x,n,k,m) of Excel is here named hgPDF2(x,n,k,m) 
+--  respecting the other ordering of the parameter sequence!
+
+# DEFINITION
+---------------------------------------------------- EXCEL hgPDF
+
+   hgPDF2(x, n, k, m) = hgPDF(m,k,n,x) 
+
+----------------------------------------------------------
+-- Description:
+-- hgPDF2(x, n, k, m) is the probability of getting x successes 
+-- from a sample of size n, where the size of the population is m
+-- of which k are successes.
+
+
+-- EXAMPLE: A bag contains 12 balls, 8 red and 4 blue. 
+-- You reach into the bag and pick 3 balls at random (without 
+-- replacement). What is the probability that at least 2 of 
+-- the balls will be blue?
+-- SOLUTION:
+
+-- EXCEL> = HYPGEOM.DIST(2, 3, 4, 12, FALSE) + 
+--          HYPGEOM.DIST(3, 3, 4, 12, FALSE)
+--        = 0.218 + 0.18 = 0.236  
+
+hgPDF2(2,3,4,12) + hgPDF2(3,3,4,12)
+"ok"
+
+
+"--- 6. --- EXAMPLE warehouse"
+
+-- A warehouse contains 500 used computers. A random sample
+-- of 100 of these is tested and three of them are found to be 
+-- defective. What is the most likely percentage of defective 
+-- computers in the warehouse?
+
+-- SOLUTION:
+-- We seek the value of k which maximizes the value of 
+-- HYPGEOM.DIST(x,n,k,m, FALSE), i.e. the 'maximum likelihood 
+-- estimate for k'. We create a table with the value 
+-- of k from 0 to 20. (Excel)
+
+--                               x  n  k  m
+for(k,0,20, print( float( hgPDF2(3,100,k,500) )) )
+
+T = zero(2,20)
+for(i,0,19, T[1,i+1] = i+1)
+for(i,0,19, T[2,i+1] = float(hgPDF2(3,100,i+1,500)) )
+transpose(T)
+
+-- we look at the solution as k=15.
+
+-- Examples 5. and 6. are taken from: 
+-- https://real-statistics.com/binomial-and-related-distributions/hypergeometric-distribution/
+
+
+# DEFINITION
+"======================== hgCDF - hyperGEOMETRIC cumulative" 
+
+  hgCDF(N,R,n, x) = sum(k,0, floor(x), hgPDF(N,R,n,k)) 
+
+--------------------------------------------------------------
+-- Description:
+-- hgCDF(N,R,n, x) computes the hypergeometric cdf at the 
+-- value in x using the corresponding size of the population N, 
+-- number of the desired items in the population R, 
+-- and the number of samples drawn n.
+ 
+
+"--- 7. --- EXAMPLE: defective floppy disks"
+
+-- Do https://de.mathworks.com/help/stats/hygeinv.html :
+-- Suppose you have a lot of 100 floppy disks and you know that 20 
+-- of them are defective. What is the probability of drawing zero 
+-- to two defective floppies if you select 10 at random?
+
+-- SOLUTION: MATLAB> p = hygecdf(2, 100,20,10) = 0.6812
+--                               x  M   K  N
+--                               x  N   R  n
+
+hgCDF(100,20,10, 2)
+float
+"ok"
+
+"--- 8. ---"
+
+-- PROBLEM: what is the probability to draw at least 3 numbers right
+-- by drawing of 6 out of 49?
+-- SOLUTION:
+-- We have F(X>=3) = 1 - F(X<=2), so
+
+1 - hgCDF(49,6,6, 2)
+"ok"
+ 
+-- Table to draw 0..6 numbers right out of 49
+"             hgCDF table for lottery"
+T = zero(2,7)
+for(i,0,6, T[1,i+1] = i)       --  N R n i
+for(i,0,6, T[2,i+1] = hgCDF(49,6,6,i))
+transpose(T)
+
+"                     hypergometrical CDF plot for lottery"
+yrange = (0,1)
+xrange = (0,6)
+draw(  hgCDF(49,6,6,x) ,x)
+
+y = T[2]
+draw(y[floor(x)],x)
+
+
+# DEFINITION
+"=========================== hgINV - hyperGEOMETRIC quantile" 
+
+   hgINV(alpha,N,R,n, x,k) = 
+      do( k=0,
+          loop(k=k+1, x=hgCDF(N,R,n,k), x,k, test(x>alpha, break))
+          x, k)
+---------------------------------------------------------
+
+-- This function is used to find the n.th quantile, 
+-- that is if P(x <= k) is given, it finds k.
+--  
+-- hgINV(alpha, N,R,n) returns the smallest integer x such that the 
+-- hypergeometric cdf evaluated at x equals or exceeds P. 
+-- You can think of alpha as the probability of observing x defective
+-- items in n drawings without replacement from a group of N items 
+-- where R are defective.
+
+"--- 9. ---"
+
+-- EXAMPLE : do https://de.mathworks.com/help/stats/hygeinv.html
+-- Suppose you are the Quality Assurance manager for a floppy disk 
+-- manufacturer. The production line turns out floppy disks in batches 
+-- of 1,000. You want to sample 50 disks from each batch to see if 
+-- they have defects. You want to accept 99% of the batches if there
+-- are no more than 10 defective disks in the batch. 
+-- What is the maximum number of defective disks should you allow 
+-- in your sample of 50?
+
+-- SOLUTION: MATLAB> x = hygeinv(0.99,1000,10,50)  ; = 3
+--                               P    M    K  N
+--           octave> ... same
+
+--    alpha N    R  n
+hgINV(0.99, 1000,10,50)
+"ok"
+
+"--- 10. --- EXAMPLE: A manufacturer produces shirts"
+
+-- A manufacturer produces shirts in batches of 3,000. 
+-- They decide to sample 50 shirts from each batch and count the 
+-- number of defective shirts in each sample. If they want to make
+-- sure that 99.5% of the batches have no more than 20 defects, 
+-- what is the maximum number of defects that they should allow 
+-- in each sample?
+-- cf.: https://real-statistics.com/binomial-and-related-distributions/hypergeometric-distribution/
+
+-- SOLUTION:
+
+-- The answer is given by EXCEL as
+--         =HYPGEOM_INV(.995, 50, 20, 3000) = 2
+
+-- semi-automatic solution in Eigenmath using loop:
+
+k=0               -- N   R  n  x
+loop(k=k+1, x=hgCDF(3000,50,20,k), x,k, test(x>0.995, break))
+x
+k
+
+"Check: hgCDF(3000,50,20,2)  >="
+hgCDF(3000,50,20,2) 
+"ok"
+
+-- fully automatic solution in Eigenmath using hgINV:
+
+hgINV(0.995,  3000,50,20)
+"ok"
+
+"--- 11. ---"
+
+-- EXAMPLE from R: watch the other parameter list!
+-- R> qhyper(p, m, n, k, lower.tail = TRUE, log.p = FALSE)
+-- R> qhyper(p = 0.90, m = 5, n = 11, k = 4)
+--    [1] 2
+
+hgINV(0.9, 16,5,4)
+
+-- REMARK
+-- Note that N, the size of the population contains m successes 
+-- and n failures, i.e. N=m+n =16 

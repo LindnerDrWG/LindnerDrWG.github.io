@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+##| FISHER EXACT TEST  with Eigenmath    - Ch. 4.14 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+--.........  The FISHER test needs the Hypergeometric distribution.
+   hgPDF(k,N,R,n) = float(choose(R,k)*choose(N-R, n-k)/choose(N,n))    
+ 
+   hgCDF(x,N,R,n) = float( sum(k,0,x, hgPDF(k, N,R,n)) )
+
+   hgINV(alpha,N,R,n, x,k) = do( k=0,
+          loop(k=k+1, x=hgCDF(N,R,n,k), x,k, test(x>alpha, break))
+          x, k)
+--............................................................. END
+
+"--- 1. ---  EXAMPLE: Fisher's exact test"
+### --------------------------------------------------------------
+### EXAMPLE: Fisher’s exact test, Herrmann [6] p. 163
+### --------------------------------------------------------------
+-- Is natural death year independent of age and height?
+-- Use the contingency table for the US presidents of the text:
+
+--             >=70  <70
+--          X: [1     4] a+b = 5
+--          Y: [14   12] c+d = 26
+--             15    16
+--            a+c    b+d
+
+-- SOLUTION
+
+-- Ho: the natural death year is independent of age and height
+
+X = (1 , 4)
+Y = (14,12)
+
+alpha = 0.1   -- 10% 
+do( a = X[1],  b = X[2], c = Y[1], d = Y[2] )
+
+n = a+b+c+d
+
+p = hgCDF(a, n,a+b,a+c)
+p
+
+h = test(p < alpha, 0,1)     -- 0: reject Ho
+h                            -- 1: accept Ho at level alpha = 10%
+"ok  w.r.t Herrmann"
+
+
+"--- 2. --- abstract the procedure to function 'fishertest'"
+
+### --------------------------------------------------------------
+### FUNCTION fishertest : Fisher’s exact test for alpha 0.05
+### --------------------------------------------------------------
+
+fishertest(a,b,c,d,  n,p) =
+        do( test( or(a<=0, b<=0, c<=0, d<=0), "Error"),  
+            n = a+b+c+d,
+            p = hgCDF(a, n,a+b,a+c),
+            Ho = test(p < 0.05, 0,1),    -- test of Ho level 0.05
+            print(" __ FISHER test __"),
+            (("Ho", "p"), (Ho, float(p))) )   
+ 
+### -------------------------------------------------------- END
+-- REMARK
+-- Fisher test is a good approx, if n=a+b+c+d <= 40.
+-- The smaller the value of p, the greater the evidence for 
+-- rejecting the null hypothesis
+-- MATLAB: h = fishertest(x) returns a test decision for Fisher’s 
+-- exact test of the null hypothesis that there are no nonrandom 
+-- associations between the two categorical variables in x, against 
+-- the alternative that there is a nonrandom association. 
+-- The result h is 1 if the test rejects the null hypothesis at 
+-- the 5% significance level, or 0 otherwise.
+
+
+-- check Example -1.-
+
+fishertest(1,4, 14,12)   -- alpha = 0.05
+"ok"
+
+
+"--- 3. ---"
+
+-- EXAMPLE vitamin C, Herrmann, [6, p.151],
+--         cf. example stats-413-section
+
+--             Cold notCold
+--  Vitamin C:[17    122] a+b 139
+--  Placebo  :[31    109] c+d 140
+--             48    231
+--            a+c    b+d
+
+-- SOLUTION:
+fishertest(17,122, 31,109)
+"ok"
+
+
+"--- 4. ---  woman"
+-- EXERCISE: Do the 'woman' example in wikipedia
+-- https://en.wikipedia.org/wiki/Fisher%27s_exact_test
+
+
+"--- 5. ---  students"
+-- EXERCISE: Do the 'students' example in wikipedia
+-- https://de.wikipedia.org/wiki/Exakter_Test_nach_Fisher
+
+
+"--- 6. ---  cancer"
+-- EXERCISE: Do the 'cancer' example in wikipedia
+-- https://de.wikipedia.org/wiki/Exakter_Test_nach_Fisher
+
+
+"--- 7. ---  two formulas"
+-- EXERCISE: calculate P for the following four-fields-table.
+--
+--                   Men   Women  Row Total
+--    Studying	      0	   10	     : 10       a=0  b=10
+--    Non-studying  	12	    2	     : 14       c=12 d=2
+--                   .................
+--    Column Total	12	   12	     : 24
+
+-- SOLUTION:
+
+-- a. For this table the probability is 
+
+P = choose(10,0) choose(14,12) / choose(24,12)
+P
+P = float(P)
+P                -- ≈ 0.000033652
+
+-- b. or using the alternative formula for P
+
+do( a = 0,  b = 10, c = 12, d = 2 )
+n = a+b+c+d
+P = (a+b)! (c+d)! (a+c)! (b+d)! /  (n! a! b! c! d!)
+P
+"ok"
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

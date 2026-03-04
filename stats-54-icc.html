@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+##| ICC Intraclass Correlation Coefficient with Eigenmath - Ch. 5.4 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+
+-- In this script we demonstrate the determination of the
+-- Intraclass correlation coefficient ICC in three phases:
+
+-- FIRSTLY  we calculate ICC manually with Eigenmath
+-- SECONDLY we calculate ICC fully automatic 
+-- THIRDLY  we calculate the 'early ICC' by PEARSON         
+
+
+### --------------------------------------------------------------
+"--- 1. ================ EXAMPLE: women asked about their weight"
+### --------------------------------------------------------------
+
+-- EXAMPLE (Zoefel, [6, p. 133 ff])
+-- Fourteen women were asked about their weight; the given answers X
+-- were then compared to the actual measured weight Y:
+
+X=(48,48,50,50,52,58,63,56,48,63,58,58,52,60)
+Y=(51,50,50,52,53,63,70,70,49,63,59,58,56,62)
+
+-- Calculate the ICC(X,Y).
+
+-- SOLUTION:
+
+"FIRST follow the  solution procedure step-by-step:"
+-- we follow the proecedure in our book
+
+Z=(X,Y)
+Z
+
+k = 2
+n = dim(X)
+n
+
+S = sum(Z)
+S
+
+T = zero(dim(X))
+for(i,1,n, T[i]= X[i]+Y[i])
+-- for(i,1,n, T[i]= sum(transpose(Z)[i]))   -- for bigger Z :)
+
+I = (1,2,3,4,5,6,7,8,9,10,11,12,13,14)
+"(I,T):"
+(I,T)
+
+SAQtotal = sum(Z^2) - S^2/(k*n)
+SAQtotal
+float
+
+SAQrow = 1/k * sum(j,1,n, T[j]^2) - S^2/(k*n)
+SAQrow
+float 
+
+dfrow= n-1
+dfrow
+
+MQrow = SAQrow / dfrow
+MQrow
+float
+
+SAQrest = SAQtotal - SAQrow
+SAQrest
+float 
+
+dfrest= n*(k-1)
+dfrest
+
+MQrest = SAQrest / dfrest
+MQrest
+float
+
+ICC = (MQrow-MQrest)/(MQrow+(k-1)*MQrest)
+ICC
+float
+
+"ok"
+
+"--- 2. =============================== Write function ICC"
+----    We abstract the procedure above to the function
+
+### ----------------------   ICC   -------------------------
+###     icc(X,Y)
+###     method = Single Score Oneway Intraclass Correlation
+###              with k = 2 cases (fix)
+### ........................................................
+
+icc(X,Y,  Z,T,S,n) = do( 
+          k = 2,
+          n = dim(X),
+          T = zero(dim(X)),
+          Z = (X,Y),
+          S = sum(Z),
+          for(i,1,n, T[i]= X[i]+Y[i]),
+          SAQt = sum(Z^2) - S^2/(k*n),
+          SAQr = 1/k * sum(j,1,n, T[j]^2) - S^2/(k*n),
+          dfr= n-1,
+          MQr = SAQr/dfr,
+          SAQb = SAQtotal - SAQrow,      -- b : between
+          dfb= n*(k-1),
+          MQb = SAQb / dfb,
+          ICC = (MQr -MQb)/(MQr + (k-1)*MQb),
+          float(ICC) )
+-------------------------------------------------------- END
+
+-- check using EXAMPLE 1:
+X=(48,48,50,50,52,58,63,56,48,63,58,58,52,60)
+Y=(51,50,50,52,53,63,70,70,49,63,59,58,56,62)
+icc(X,Y)
+
+
+"--- 3. ===================== early ICC after PEARSON/FISHER"
+
+### ----------------------   ICCp   -------------------------
+###     iccP(X,Y)
+###     method = Intraclass Correlation after PEARSON/FISHER
+###     https://en.wikipedia.org/wiki/Intraclass_correlation
+### ........................................................
+iccP(X,Y,  Z,T,S,n) = do( 
+          n = dim(X),
+          Xbar = 1/(2*n)*sum(i,1,n, X[i]+Y[i]),
+          sigma2 = 1/(2*n)*( sum(i,1,n, (X[i]-Xbar)^2) +
+                             sum(i,1,n, (Y[i]-Xbar)^2) ),
+          r = 1/(n*sigma2)*sum(i,1,n, (X[i]-Xbar)*(Y[i]-Xbar)),
+          float(r))
+-------------------------------------------------------- END
+
+-- Check using Example 1
+
+X=(48,48,50,50,52,58,63,56,48,63,58,58,52,60)
+Y=(51,50,50,52,53,63,70,70,49,63,59,58,56,62)
+
+iccP(X,Y)
+
+
+"--- 4. ============================== EXERCISE: significance"
+## USE the FACT
+##  The test for significance of ICC use the statistics
+##
+##      F = MQrow/MQrest
+##
+##  which is F-distributed with (n-1; n*(k-1)) degrees of freedom.
+--  and do an F test for the significance of the ICC. 
+--  partial SOLUTION:
+
+F = MQrow/MQrest
+F = float(F)
+F
+"ok"
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

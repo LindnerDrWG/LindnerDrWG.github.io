@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+##| CHI-SQUARED distribution with Eigenmath    - Ch. 3.5 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+
+# DEFINITION
+"============================== chi2PDF - Chi-squared prob.density"
+
+  chi2PDF(x, k) = 1/(2^(k/2)*tgamma(k/2))*x^(k/2-1)*exp(-x/2.)
+
+-------------------------------------------------------------------
+-- REMARK
+-- Use x>0 & k>0 else 0
+-- k is degrees of freedom, also often noted f(reedom) or df.
+-- We adopt the notation of MATLAB/Octave.
+
+
+"--- 1. ---"
+
+chi2PDF(2, 3) 
+
+"chi2PDF(0.95,10) ="
+chi2PDF(0.95,10)
+"ok"
+
+--   R> dchisq(x=0.95, df = 10)    [1] 0.0006595433
+--   octave:1> pkg load statistics
+--   octave:2> chi2pdf(0.95,10)    ans = 6.5954e-04
+
+
+"--- 3. ---"
+"                      Chi-square for df=2"
+f = chi2PDF(x,2)       -- cf. [3] p.60
+xrange = (0,10)
+yrange = (0,0.3)
+draw(f,x)
+
+"chi2PDF(5,6) ="
+chi2PDF(5,6)
+"ok"
+
+
+"--- 4. ---" 
+
+"    x       chi2PDF(x, 6)          Chi-squared table for df=6"
+T = zero(2,9)
+for(i,1,9, T[1,i] = 0.1*i)
+for(i,1,9, T[2,i] = chi2PDF(0.1*i ,6))
+transpose(T)
+"ok"
+
+
+"--- 5. ---"
+
+"                      Chi-squared for df=6"
+f = chi2PDF(x,6)       
+xrange = (0,10)
+yrange = (0,0.3)
+draw(f,x)
+"ok"
+
+"--- 6. ---"
+
+## chi2CDF needs incomplete Gamma function GammaP = 'gammainc'
+## lower incomplete gamma by series formula with gamma (Python)
+## rosettacode.org/wiki/Statistics/Chi-squared_distribution#Python
+
+-- ........................................................ GammaP
+
+   GammaP(x,k) = x^k*exp(-x) * sum(m,0,100, x^m/tgamma(k+m+1))
+
+-- ........................................................ END
+
+GammaP(3 ,2)
+GammaP(3.,2)
+"ok"
+
+-- https://de.mathworks.com/help/matlab/ref/gammainc.html
+-- octave> gammainc(3,2)    ans = 0.8009
+
+"                      incomplete gamma function 'GammaP' for k=3"
+f = GammaP(x,3)     
+xrange = (0,10)
+yrange = (0,1)
+draw(f,x)
+"ok"
+
+# DEFINITION
+"=============================== CDF for CHI^2 distribution"
+
+  chi2CDF(x, k) =  test( or(x<=0,k<=0), 0,
+                   float(GammaP(x*0.5, k*0.5 )) )
+
+------------------------------------------------------------------
+-- Cumulative probability function (cdf) for chi-squared
+-- rosettacode.org/wiki/Statistics/Chi-squared_distribution#Python
+
+
+"--- 7. ---"
+
+"chi2CDF(3,5) ="
+chi2CDF(3,5) 
+"ok"
+--   R> pchisq(3, df = 5)    [1] 0.3000142
+
+chi2CDF(7.81, 3) - chi2CDF(0.35, 3)
+
+
+"--- 8. --- chi^2 table for df=3" 
+
+-- EXAMPLE: Reproduce the following table:
+-- Values for chi^2 with 3 degrees of freedom, i.e. df=3
+--  x   Chi^2(x)   P value (df=3)
+--  x   Chi^2cdf   P-value
+--  1   0.198748   0.801252
+--  2   0.427593   0.572407
+--  4   0.738536   0.261464
+--  8   0.953988   0.046012
+-- 16   0.998866   0.001134
+-- 32   0.999999   0.000001
+
+X = (1,2,4,8,16,32)
+"     x      chi2CDF(x)      P-value" 
+T = zero(3,6)  
+for(i,1,6, T[1,i] = X[i])
+for(i,1,6, T[2,i] = chi2CDF(X[i],3))
+for(i,1,6, T[3,i] = 1-chi2CDF(X[i],3))
+transpose(T)
+"ok"
+
+
+"                      chi2CDF for k=3"
+xrange = (0,8)
+yrange = (0,1)
+draw( chi2CDF(x,3) )  
+
+# DEFINITION
+"=============================== chi2INV - quantiles of chi2"
+
+chi2INV(x,alp, a,b,k,t,y) = do(
+           a = -30.0, b = 30.0,    -- interval [a,b] choosen for x
+           for(k,1,100,  t = (a + b) / 2, y = chi2CDF(t,alp),
+                         test(abs(x - y) < 0.000001, break, 
+                         y < x, a = t, b = t)),  t) 
+-------------------------------------------------------------- END
+-- implementation of the inverse cumulative chi2-distribution
+
+
+"--- 9. ---"
+
+-- EXAMPLE:
+-- Find the 95th percentile for the chi-square distribution 
+-- with 10 degrees of freedom.
+-- SOLUTION: 
+
+"chi2INV(0.95,10) ="
+chi2INV(0.95,10)
+"ok"
+
+-- CHECK
+-- MATLAB> chi2inv(0.95,10)             ans = 18.3070
+--      R> qchisq(x = 0.95, df = 10)    [1]   18.30704
+
+
+"--- 10. ---"
+
+for(i,1,10, print( chi2INV(0.1*i,10) ))
+
+-- CHECK
+-- octave> chi2inv(0.1:0.1:1.0, 10)
+-- ans = 4.8652 6.1791 7.2672 8.2955 9.3418  10.4732 11.7807 13.4420
+--       15.9872  Inf (is our right limit b=20 ;)
+"ok"
+
+
+"--- 11. ---"
+
+X=(0.9,0.95,0.975,0.99)
+
+"     x          chi2INV(x,10)          df=10" 
+T = zero(3, 4)  
+for(i,1,4, T[1,i] = X[i])
+for(i,1,4, T[2,i] = chi2INV(X[i],10))
+ML = (15.987, 18.307, 20.483, 23.209)
+for(i,1,4, T[3,i] = ML[i])
+transpose(T)
+"ok"
+
+
+"                      Chi^2 INV (quantiles) for k=3"
+xrange = (0,1)
+yrange = (0,30)
+draw( chi2INV(x,10), x)
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+##| SPEARMAN rank correlation rho   with Eigenmath    - Ch. 5.2 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+
+-- In this script we demonstrate the determination of Spearman's
+-- rank correlation coefficient rho in three phases:
+
+-- FIRSTLY  we calculate rho ρ manually with Eigenmath
+-- SECONDLY we calculate rho semi-automatic using two helper
+--          functions Rank() and correspond(ence)
+-- THIRDLY  we calculate rho fully automatic using function 
+--          spearman() with the help of cov(ariance) function.         
+
+
+###----------------------------------------------------------
+"--- 1. ================ EXAMPLE: heigths of fathers vs sons"
+###----------------------------------------------------------
+  
+# PROBLEM: The heights of a sample of 12 fathers and their oldest 
+#          sons are measured giving the following data:
+#          Far : 65,63,67,64,68,62,70,66,68,67,69,71
+#          Son : 68,66,68,65,69,66,68,65,71,67,68,70
+#          cf. Spiegel p. 434 P 17.24
+# TASK:    Calculate the Spearman rank correlation rho.
+
+-- SOLUTION manually step-by-step by Eigenmath-'hand'
+
+Far = (65, 63, 67, 64, 68, 62, 70, 66, 68, 67, 69, 71)
+Son = (68, 66, 68, 65, 69, 66, 68, 65, 71, 67, 68, 70)
+
+-- we may sort both data sets by eye, because they are small :)
+--                  4. item
+sFar = (62, 63, 64, 65, 66, 67, 67, 68, 68, 69, 70, 71)
+sSon = (65, 65, 66, 66, 67, 68, 68, 68, 68, 69, 70, 71)
+
+-- Because sFar[4]=65, 65 has rank=4, we set 4 in place Far[1]=65,..:
+--            1.
+-- Far =     (65, 63,  67, 64, 68, 62, 70, 66,  68,  67, 69, 71)
+--             |   |  ...
+-- rankFar = ( 4,  2, 6.5,  3,8.5,  1, 11,  5, 8.5, 6.5, 10, 12)
+
+-- we rank equal data using mean values if 'ties' are seen:
+
+rankFar = ( 4,    2, 6.5,   3, 8.5,   1,  11,   5, 8.5, 6.5,  10, 12)
+rankSon = (7.5, 3.5, 7.5, 1.5,  10, 3.5, 7.5, 1.5,  12,   5, 7.5, 11)
+
+-- we have the fathers table
+ 
+TF = zero(3,12)
+TF[1] = Far
+TF[2] = sFar
+TF[3] = rankFar
+TF
+
+-- and the sons table:
+
+TS = zero(3,12)
+TS[1] = Son
+TS[2] = sSon
+TS[3] = rankSon
+TS
+
+-- we now calculate the differences of corresponding ranks 
+
+D = rankFar - rankSon
+
+-- and their squared values to get positive signs
+
+D2 = D^2
+
+"row 1: D, row2 : D^2:"
+(D, D2)
+
+sum(D^2)
+
+n = dim(Far)
+n
+
+-- According to [1], Spearman's correlation rho is defined as 
+--     r = 1 - 6*sum((ranks(x)-ranks(y)).^2)/(N*(N*N-1))
+
+rhoSpearman = 1 - 6*sum(D^2)/n/(n^2-1)
+rhoSpearman
+
+"ok"
+
+
+###---------------------------------------------------------
+"--- 2. =========== semi-automatic solution using sort() and Rank()"
+###---------------------------------------------------------
+
+-- we need two helper functions: sort and Rank
+-----..................................................... SORT 
+sort(v,i,k,n,t) = do( n = dim(v),         -- by G. Weigt 7/2025
+     loop( test(n < 2, break), k = 1,
+           for(i, 1, n - 1,
+               test(v[i] > v[i + 1], 
+                 do( t = v[i], v[i] = v[i + 1], v[i + 1] = t,
+                     k = i ))), n = k), v)
+
+Rank(W, i,j,k,n,t, Srank) = do(            -- by G. Weigt 8/25  
+         j = 1, n = dim(W), Srank = 0,
+         loop( test(j > n, break),
+               k = j + 1,
+               loop( test(k > n, break, W[j]==W[k], k=k+1, break)),
+               t = 0.5*(j + k - 1),
+               for(i, j, k-1, W[i] = t),
+               t = k - j,
+               Srank = Srank + t^3 - t,
+               j = k), W)
+----..................................................... END 
+
+-- the data
+Far = (65, 63, 67, 64, 68, 62, 70, 66, 68, 67, 69, 71)
+Son = (68, 66, 68, 65, 69, 66, 68, 65, 71, 67, 68, 70)
+
+-- we first sort both samples using function sort():
+
+sFar = sort(Far)       -- sort Fathers
+
+sSon = sort(Son)       -- sort Sons
+
+-- we rank both _sorted_(!) data using function Rank:
+
+rFar = Rank(sFar)
+
+rSon = Rank(sSon)
+
+-- check:
+
+"rows: original sample, then sorted and then ranked Fathers:"
+(Far, sFar, rFar)
+
+"sorted and ranked Sons:"
+(Son, sSon, rSon)
+
+-- we now construct the correspondence between the original data
+-- and the rankings of the sorted data:
+
+-- a. we demonstrate the idea for finding corresponding pairs
+
+M = zero(dim(Far))
+    for(i,1,dim(Far), test(sFar[i]=Far[1], M[1]=Rank(sFar)[i]))
+    for(i,1,dim(Far), test(sFar[i]=Far[2], M[2]=Rank(sFar)[i]))
+    for(i,1,dim(Far), test(sFar[i]=Far[3], M[3]=Rank(sFar)[i])) 
+--  etc. we abstract to ..
+M
+
+MF = zero(dim(Far))
+     for(j,1,dim(Far),
+     for(i,1,dim(Far), test(sFar[i]=Far[j], MF[j]=Rank(sFar)[i])))
+MF
+
+MS = zero(dim(Son))
+     for(j,1,dim(Son),
+     for(i,1,dim(Son), test(sSon[i]=Son[j], MS[j]=Rank(sSon)[i])))
+MS
+
+-- b.  we abstract this procedure into a function 'correspond'
+
+correspond(X,sX, M) = do(              -- X and sortedX
+    M=zero(dim(X)),
+    for(j,1,dim(X),
+    for(i,1,dim(X), test(sX[i]=X[j], M[j]=Rank(sX)[i]))),
+    M)
+
+cF = correspond(Far, sFar)
+cF         
+
+cS = correspond(Son, sSon)
+cS         
+
+-- now the rest of the procedure is the same as above: 
+
+D = cF - cS       -- difference of corresponding sample items
+D
+
+D2 = D^2          -- differences squared
+D2
+
+n = dim(Far)
+
+rhoSpearman = 1 - 6*sum(D^2)/n/(n^2-1)
+rhoSpearman
+"ok"
+
+
+"--- 3. ================ full-automatic solution using 'spearman1'"
+----    we abstract the whole process into function spearman1 
+
+### --------------------------------------------------------------
+### FUNCTION spearman1 : general function SPEARMAN's rho_S
+### --------------------------------------------------------------
+    spearman1(X,Y) = do(
+                   n  = dim(X),
+                   sX = sort(X),
+                   sY = sort(Y),
+                   cX = correspond(X, sX),
+                   cY = correspond(Y, sY),
+                   D  = cX - cY,
+                   rho = 1 - 6*sum(D^2)/n/(n^2-1),
+                   rho)            -- return value
+### .......................................................... END
+
+-- REMARK: this solution does NOT respect 'ties',
+--         therefore we present function spearman() below
+
+-- EXAMPLE: solution in ONE STEP: call spearman1 with Far and Son
+
+Far = (65, 63, 67, 64, 68, 62, 70, 66, 68, 67, 69, 71)
+Son = (68, 66, 68, 65, 69, 66, 68, 65, 71, 67, 68, 70)
+spearman1(Far,Son)
+
+"ok - Spiegel p.473: r = 0.7465"
+
+-- CHECK with R
+-- > Far = c(65,63,67,64,68,62,70,66,68,67,69,71)
+-- > Son = c(68,66,68,65,69,66,68,65,71,67,68,70)
+-- > cor.test(Far, Son, method = "spearman")
+--
+--   	Spearman's rank correlation rho
+--    data:  Far and Son
+--    S = 74.285, p-value = 0.005903
+--    alternative hypothesis: true rho is not equal to 0
+--    sample estimates:
+--    rho = 0.7402623 
+
+
+"--- 4. ================ full-automatic solution using cov() etc."
+
+"-- a. -- step-by-step solution to watch the process"
+-- we do the example from the script: math vs econometry
+
+--X = (65,63,67,64,68,62,70,66,68,67,69,71)     -- father
+--Y = (68,66,68,65,69,66,68,65,71,67,68,70)     -- sun
+
+X=(70,78,90,87,84,86,91,74,83,85)      -- math
+Y=(90,94,79,86,84,83,88,92,76,75)      -- econ
+
+mean(X)   = float( sum(X)/dim(X) )  
+cov(X,Y)  = 1/dim(X) * sum( (X-mean(X)) * (Y-mean(Y)) )
+sd(X)     = sqrt( sum((X-mean(X))^2) /dim(X) )
+
+-- values in script (Excel) are from hight to low,
+-- we implement sorting/ranking from low to hight
+
+sX = sort(X)
+sY = sort(Y)
+
+rX = Rank(sX)
+rX
+rY = Rank(sY)
+rY
+
+(rX,rY) 
+
+correspond(X,sX, M) = do(              -- X and sortedX
+    M=zero(dim(X)),
+    for(j,1,dim(X),
+    for(i,1,dim(X), test(sX[i]=X[j], M[j]=Rank(sX)[i]))),
+    M)
+
+cX = correspond(X, sX)
+cX         
+
+cY = correspond(Y, sY)
+cY         
+
+cXY = cov(cX,cY)
+cXY
+
+sdX =sd(cX)
+sdX
+
+sdY=sd(cY)
+sdY
+
+rhoS = cov(cX,cY)/(sd(cX)*sd(cY))
+rhoS
+
+"-- b. -- abstract the process"
+-- We abstract the procedure above to 
+
+# DEFINITION
+### --------------------------------------------------------------
+### FUNCTION spearman : general function SPEARMAN's rho_S
+### --------------------------------------------------------------
+
+mean(X)   = float( sum(X)/dim(X) )  
+cov(X,Y)  = 1/dim(X) * sum( (X-mean(X)) * (Y-mean(Y)) )
+sd0(X)     = sqrt( sum((X-mean(X))^2) /dim(X) )
+
+correspond(X,sX, M) = do( M=zero(dim(X)),
+           for(j,1,dim(X),
+           for(i,1,dim(X), test(sX[i]=X[j], M[j]=Rank(sX)[i]))), M)
+
+spearman(X,Y) = do(
+                n  = dim(X),
+                sX = sort(X),  sY = sort(Y),
+                rX = Rank(sX), rY = Rank(sY),
+                cX = correspond(X, sX), cY = correspond(Y, sY),
+                rhoS = cov(cX,cY)/(sd0(cX)*sd0(cY)),
+                rhoS)           
+## ----------------------------------------------------------- END
+
+-- check:
+X=(70,78,90,87,84,86,91,74,83,85)      -- math
+Y=(90,94,79,86,84,83,88,92,76,75)      -- econ
+
+spearman(X,Y)
+"ok"
+
+--  CHECK
+--  octave:1> pkg load statistics
+--  octave:2> X = [70,78,90,87,84,86,91,74,83,85];
+--  octave:3> Y = [90,94,79,86,84,83,88,92,76,75];
+--  octave:4> spearman(X, Y)
+--            ans = -0.4182
+
+
+"--- 4. ---   EXERCISE: significance"
+##  USE the FACT
+##  The test for significance of SPEARMAn rhoS  use the statistics
+##
+##      T = |rhoS|*sqrt(n-2) / sqrt( 1-rohS^2 ) 
+##
+##  which is t-distributed with df=n-2.
+--  and do an t test for the significance of the rhoS. 
+--  SOLUTION: ...
+
+
+--  Result:
+T = 2.905 
+T
+"ok"
+
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

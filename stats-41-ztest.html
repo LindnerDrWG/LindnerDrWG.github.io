@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+##| Z - Test  with Eigenmath    - Ch. 4.1 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+
+-- REMARK 
+-- To calculate the Z-TEST we need the functions
+-- stdnormCDF() and stdnormINV() as helper: 
+
+--................................................. stdnormCDF/INV
+   stdnormCDF(x)       = 1/2*erfc(-x/sqrt(2))
+
+   normCDF(x,mu,sigma) = stdnormCDF((x-mu)/sigma)
+
+   stdnormINV(x, a,b,k,t,y) = test(x=0, "-Inf", x=1, "+Inf",
+                 and(0<x,x<1),
+                  do( a = -10, b = 10,         -- x in [a,b]
+                    for(k,1,100, t = (a+b)/2, y = stdnormCDF(t),
+                     test(abs(x-y)<0.0000001, break, y<x,a=t, b=t)
+                    ), float(t) ))
+--................................................ END helpers
+
+-- We solve the example from section §4.1, i.e.
+-- http://www.countbio.com/web_pages/left_object/R_for_biology/R_biostatistics_part-1/one_sample_Z_test.html
+
+
+"--- 1. --- EXAMPLE (female blood pressure)"
+
+-- The female blood pressure of a certain population is known to 
+-- follow Gaussian (alias: normal) distribution with a mean 124.6 and
+-- standard deviation 14.5 measured in units of mmHg. 
+-- In order to test the effect of a food product on the female blood
+-- pressure, a clinical trial was performed in which 12 female 
+-- volunteers of this population consumed the product for 3 months and 
+-- their blood pressure were measured in the end. 
+-- The readings are as follows:
+
+X = (141.5, 152.3, 121.2, 123.0, 151.6, 124.8, 138.9, 137.4, 145.6, 135.6, 135.4, 121.5)
+
+-- From this data, can we conclude that the population mean of the 
+-- data set from which these random obserations are drawn is not equal
+-- to (ie., different from) 124.6? 
+-- Let alpha=0.05 be the probability of rejecting the null hypothesis.
+
+"======================= I. SOLUTION step-by-step"
+
+mu0   = 124.6                            -- given data
+sigma = 14.5
+alpha = 0.05
+n     = dim(X)                           -- data length
+n
+ 
+"- a. -    computing the test statistic Z"
+
+mean(X) = sum(X)/dim(X)                  -- sample mean
+mean(X)
+
+Z = sqrt(n)*(mean(X) - mu0)/sigma        -- test statistics
+Z                                        -- critical value
+
+u975 = stdnormINV(1-alpha/2)             -- two-sided, quantile
+u975                                     -- alpha/2 = 0.025
+
+-- DECISION:
+-- In our case, since the computed Z value of 2.65 is in the rejection
+-- region, the two sided null hypothesis is rejected to a significance 
+-- level of 0.05.
+
+"- b. -    computing the p-value"
+
+-- Testing null hypothesis by computing the p-value for the 
+-- observation: If the null hypothesis is true, what is the 
+-- probability of getting the computed Z statistic? 
+-- This probability is called the"p-value" of the observed test 
+-- statistic.
+
+p = 1 - stdnormCDF(Z)                    -- p-value
+p
+
+-- DECISION: Since the p-value 𝑝 = 0.004 of the observed test 
+-- statistic is less than alpha/2 = 0.025, we reject the null 
+-- hypothesis to a significance level of 0.05.
+
+"- c. -    by computing the confidence interval:"
+
+-- For a significance level 𝛼=0.05, the 95% two sided confidence 
+-- interval(CI) for the population mean is calculated via
+
+u975 = stdnormINV(1-alpha/2)             -- two-sided, quantile
+u975                                     -- alpha/2 = 0.025
+
+CIleft = mean(X) - u975*sigma/sqrt(n)    -- confidence interval
+CIleft                                   -- .. left limit
+
+CIright= mean(X) + u975*sigma/sqrt(n)
+CIright                                  -- .. right limit
+"ok"
+
+-- DECISION: Since the 95% confidence intervall (127.5, 143.9) does 
+-- not contain the test value 124.6, we say that the population mean 
+-- mu is not equal to 124.6, and hence _reject_ the null hypothesis 
+-- which states that mu = 124.6.
+
+"--- 2. --- EXERCISE"
+-- Do Example-2 'one-sided hypothesis test' from ibid.
+
+
+-- Now we abstract the process to a function Ztest.
+"======================= II. automatic SOLUTION using Z-TEST"
+
+min(a,b) = test(a<=b, a,b)
+
+# PROCEDURE
+------------------------------------------------------ Z-test
+
+ztest(data, mu0, sigma, alpha, altHyp,  M) =
+
+# input:	  data       - sample (vector of values)
+#          mu0, sigma - parameter of normal distribution
+#          alpha      - significance level (0<=alpha<=1)
+#          altHyp     - mode of test
+#                          0 = two sided
+#                          1 = one sided greater
+#                         -1 = one sided smaller
+# output: (Z-value, quantile, ConfidenceInterval, p-value)
+
+do(print("   _______ Z-test ________"), 
+   -- choose default: mu0 = 0; sigma = 1; alpha = 0.05; altHyp = 0
+   n  = dim(data),
+   mD = mean(data),
+   Z  = sqrt(n)*(mD - mu0)/sigma,          -- test statistic
+   test( altHyp == 0,                      -- two-sided test
+         do(
+            quantil = stdnormINV(1-alpha/2),
+            CI = (mD - quantil*sigma/sqrt(n), 
+                  mD + quantil*sigma/sqrt(n)),
+            p  = min( 2 * stdnormCDF(Z), 
+                      2 * (1-stdnormCDF(Z))), 
+            p
+            )),
+
+   test( altHyp == 1,                     -- one-sided test greater
+         do(
+            quantil = stdnormINV(1-alpha),
+            CI = ("Inf", mD - quantil*sigma/sqrt(n)),
+            p  = 1 - stdnormCDF(Z),
+            p
+            )),
+
+   test( altHyp == -1,                    -- one sided smaller
+         do(
+            quantil = stdnormINV(1-alpha),
+            CI = ("-Inf", 
+                  mD + quantil*sigma/sqrt(n)),
+            p = stdnormCDF(Z),
+            p
+            )),
+
+   M = zero(5,2),
+   M[1,1] = "Z",
+   M[2,1] = "quantil",
+   M[3,1] = "CI.left",
+   M[4,1] = "CI.right",
+   M[5,1] = "p",
+   M[1,2] = Z,
+   M[2,2] = quantil,
+   M[3,2] = CI[1], 
+   M[4,2] = CI[2],
+   M[5,2] = p,
+   M
+)
+------------------------------------------------------ END Z-test
+
+"--- 3. ---"
+
+-- CHECK of ztest with above data
+
+X = (141.5, 152.3, 121.2, 123.0, 151.6, 124.8, 138.9, 137.4, 145.6, 135.6, 135.4, 121.5)
+
+-- given data: mu0   = 124.6,  sigma = 14.5,  alpha = 0.05
+--       mu0   sigma  alpha  type
+ztest(X, 124.6, 14.5, 0.05,  1)         
+"ok"
+
+-- CHECK using Octave:
+-- octave> pkg load statistics
+-- octave> X = [141.5, 152.3, 121.2, 123.0, 151.6, 124.8, 138.9,
+--              137.4, 145.6, 135.6, 135.4, 121.5]
+-- octave> [h, pval, ci, zvalue] = 
+--         ztest(X, 124.6, 14.5,"alpha", 0.05, "tail", "both") 
+--         ans =    h  = 1
+--               pval  = 7.8189e-03
+--               ci    = 127.53   143.94
+--              zvalue = 2.6598
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

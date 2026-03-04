@@ -1,0 +1,191 @@
+##| GEOMETRIC Distribution  with Eigenmath  - Ch. 2.2 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+# DEFINITION
+"=============================== geoPDF - GEOMETRIC density"
+
+   geoPDF(k,p) = float( p*(1-p)^k  )
+
+----------------------------------------------------------
+-- where
+-- k : number of failures before the first success, k=0,1,2..
+-- p : probability of success on a given trial, 0<p<1. 
+-- This definition uses the convention of Matlab.
+
+-- Remark: 
+-- The geometric distribution is the number of failures before 
+-- a success, not the number of trials including the success!
+
+"--- 1. ---"
+
+-- get the exact value as integer
+k=12
+p=1/6
+p*(1-p)^k
+float
+do( k=quote(k), p=quote(p) ) -- clear symbol k and p
+
+geoPDF(12,1/6)                          
+geoPDF(3,0.5)                          
+
+
+"--- 2. --- EXAMPLE: probability of a man asking for help"
+
+-- Calculate the probability of a man asking for help, 
+-- when the probability of getting help is 0.5 (p=0.5). 
+-- Show: The probability that the person experiences 5 'failures' 
+--       before the first success is 0.015625.
+-- SOLUTION:
+
+geoPDF(5, 0.5)
+
+-- CHECK
+-- R> dgeom(x=5, prob=.5)
+--    [1] 0.015625
+
+
+"--- 3. ---"
+
+"                     Geometrical PDF table for k=0..10, p=1/6"
+T = zero(2,11)
+for(i,0,10, T[1,i+1] = i)
+for(i,0,10, T[2,i+1] = float(geoPDF(i, 1/6)) )
+transpose(T)
+
+"                     Geometrical PDF plot for k=0..10, p=1/6"
+yrange = (0,0.2)
+xrange = (0,10)
+draw( geoPDF(x, 1/6), x)  -- warning: plot is 'continous'
+
+y = T[2]
+draw(y[floor(x)],x)       -- draw version 2
+
+
+
+# DEFINITION
+"============================= geoCDF - cumulative GEO Distribution" 
+
+  geoCDF(n,p)  = float( 1-(1-p)^(n+1) )    -- explicit formula
+
+  geoCDF1(n,p) = sum(k,0,n, geoPDF(k,p))   -- math. definition
+
+--------------------------------------------------------------
+
+"--- 4. ---"
+
+-- EXAMPLE:
+-- The probability of getting the help is 0.6(p=0.6); 
+-- calculate the probability that the person will have to talk 
+-- to 8 or less people to find someone who helps.
+
+geoCDF(8,0.6)        
+geoCDF1(8,0.6)
+
+-- R> pgeom(q=8, prob=.6)
+--   [1] 0.9997379
+
+"--- 5. ---"
+
+geoCDF(9,1/36)       
+geoCDF1(9,1/36)       -- ok
+
+
+"--- 6. ---"
+
+geoCDF(10,0.5)        -- ok 0.3769
+
+"                     Geometric CDF table for k=1..10, p=1/6"
+T = zero(2,10)
+for(i,1,10, T[1,i] = i)
+for(i,1,10, T[2,i] = geoCDF(i, 1/6) )
+transpose(T)
+
+"                     Geometric CDF plot for k=1..10, p=1/6"
+yrange = (0,1)
+xrange = (0,10)
+draw(  geoCDF(x, 1/6) ,x)   -- continous with x in IR
+
+y = T[2]
+draw(y[floor(x)],x)         -- discret with x in IN 
+
+
+"--- 6a.---"  
+-- cumulative distribution without for(..)
+
+1/36*sum(k,0,9, (35/36)^k)         -- ok, ^k instead ^(k-1)
+float                              --      0..9 is 1..10
+
+1/36*sum(k,1,10, (35/36)^(k-1))    -- ok, ^(k-1) instead ^k
+float
+
+sum(k,0,9, geoPDF(k,1/36.))          -- ok
+
+geoCDF( 9, 1/36.)
+"ok"
+
+
+# DEFINITION
+"=============================== geoINV - geometric quantile"
+
+   geoINV(u,p) = ceiling(( log(1-u)/log(1-p) - 1)) 
+
+--------------------------------------------------------
+-- with 0<u<1, explicit formula
+-- quantile: given u, the smallest x such that P(X<=x) > u
+
+"--- 7. ---"
+
+-- Example:
+-- Calculate the probability that how many “failures” 
+-- would the person need to experience to be at the 70th percentile
+-- for a number of failures before the first success.
+-- SOLUTION:
+
+geoINV(0.70, 1/6)
+float
+
+geoINV(0.70, 0.4)
+
+-- R> qgeom(p=.70, prob=0.4)
+--    [1] 2
+"ok"
+
+
+"--- 8. --- alternative definition of geoINV"
+
+# DEFINITION
+-------------------------------------------------- geoINV1 
+  geoINV1(alpha, p, x,k) = do( k=0,
+        loop(k=k+1, x=geoCDF(k,p), x,k, test(x>alpha, break))
+        x, k)
+---------------------------------------------------------
+-- This is an alternative to geoINV using a loop construct.
+-- The function is used to find the n.th quantile, 
+-- that is if P(x <= k) is given, it finds k.
+
+geoINV1(0.7, 0.4)
+
+
+"--- 9. ---"
+
+-- Example:
+-- evaluate the inverse probability at pin = 0.25, p = 0.6835.
+-- Result: 3 ok
+
+geoINV(0.6835, 0.25)
+
+geoINV1(0.6835, 0.25)
+
+"--- 10. --- EXAMPLE: five-year-old car battery"
+
+-- Suppose the probability of a five-year-old car battery not starting
+-- in cold weather is 0.03. If we want no more than a ten percent 
+-- chance that the car does not start, what is the maximum number of
+-- days in a row that we should try to start the car? 
+-- > cf. MatLAB ibid.
+
+y = 0.1
+p = 0.03
+x = geoINV(y,p)
+x

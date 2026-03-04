@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+##| sem  with Eigenmath    - Ch. 1.4 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+--          helper functions
+mean(X) = float( sum(X)/dim(X) )                -- population mean
+sd(X)   = sqrt(sum((X-mean(X))^2) /(dim(X)-1))  -- sample sd
+
+# DEFINITION
+----------------------------------------------- sem, std. error mean
+
+   sem(X) = sd(X)/sqrt(dim(X))                  
+
+----------------------------------------------- END
+
+-- REMARK:
+-- The usual definition for 'standard error of the mean' is
+--     SEM = std(data)/sqrt(length(data)); 
+-- We adopt this definition.
+
+"--- 0. ---"
+
+sem((4, 36, 45, 50, 75))
+
+"--- 1. ---"
+
+sem((1,2,3,4))
+"ok"
+
+-- R>  sem <- function(X) sd(X)/sqrt(length(X))
+--     sem(c(1,2,3,4))
+--     [1] 0.6454972
+
+
+"--- 2. --- EXERCISE"
+
+-- Read: https://library.soton.ac.uk/variance-standard-deviation-and-standard-error
+-- Program the right most explicit term for SE in [+] in Eigenmath.
+-- Calculate the sem (=SE) of examples 1 and 2 in [+] using Eigenmath.
+
+
+"--- 3. --- EXERCISE"
+
+-- Do the example in
+-- https://www.investopedia.com/terms/s/standard-error.asp#toc-understanding-standard-error
+
+-- Read:
+-- https://evol.bio.lmu.de/_statgen/StatEES/15SS/standarderror_handout.pdf
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

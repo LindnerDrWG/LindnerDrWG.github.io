@@ -1,0 +1,393 @@
+##| WILCOXON one sample signed rank test with Eigenmath - Ch. 4.10 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+
+--........................... Prerequisites: sort, Rank etc."
+normCDF(L, mu,sigma) = 
+                1/2 + 1/2*float(erf((L-mu)/(sqrt(2)*sigma)))
+
+sort(v,i,k,n,t) = do( n = dim(v),         -- by G. Weigt 7/2025
+     loop( test(n < 2, break), k = 1,
+           for(i, 1, n - 1,
+               test(v[i] > v[i + 1], 
+                 do( t = v[i], v[i] = v[i + 1], v[i + 1] = t,
+                     k = i ))), n = k), v)
+
+Rank(W, i,j,k,n,t, Srank) = do(            -- by G. Weigt 8/25  
+         j = 1, n = dim(W), Srank = 0,
+         loop( test(j > n, break),
+               k = j + 1,
+               loop( test(k > n, break, W[j]==W[k], k=k+1, break)),
+               t = 0.5*(j + k - 1),
+               for(i, j, k-1, W[i] = t),
+               t = k - j,
+               Srank = Srank + t^3 - t,
+               j = k), Srank,W)
+
+correspond(X,sX, M) = do(   -- X and sortedX, by W. Lindner 7/25
+    M=zero(dim(X)),
+    for(j,1,dim(X),
+    for(i,1,dim(X), test(sX[i]=X[j], M[j]=Rank(sX)[i]))), M)
+
+--......................................................... END
+
+
+##############################################################
+"--- 1. --- EXAMPLE 2.2 from PennState Eberly College"
+##############################################################
+-- https://online.stat.psu.edu/stat415/lesson/20/20.2"
+
+-- Let X_i denote the length, in centimeters, of a randomly 
+-- selected pygmy sunfish, i=1..10. 
+-- If we obtain the following data set:
+--       5.0 3.9 5.2 5.5 2.8 6.1 6.4 2.6 1.7 4.3
+-- can we conclude that the median length of pygmy sunfish 
+-- differs significantly from 3.7 centimeters?
+
+-- SOLUTION:
+
+Y = (5.0, 3.9, 5.2, 5.5, 2.8, 6.1, 6.4, 2.6, 1.7, 4.3)
+
+-- We formulate the null hypthesis H0:
+--    H0 : m = m0, i.e. the median length is equal to m0 = 3.7 
+
+-- METHOD of Wilcoxon signed-rank test statistics is
+-- 1. we subtract the median from each measurement,
+-- 2. we find absolute values of the differences,|Xi− m0|
+-- 3. we rank the absolute values of the differences Xi− m0
+-- 4. we find the value of W, the Wilcoxon signed-rank test statistics
+--    by definition        W = ∑ Zi*Ri
+
+n    = dim(Y)
+sign = zero(n)
+d    = zero(n)
+med  = 3.7          -- null hypothesis: median m0=3.7
+
+d = Y - med         -- differences to the median
+d
+
+sign = sgn(d)
+sign
+
+-- Determine the rank of the absolute values (in ascending order) 
+-- according to their magnitude.
+
+md = mag(d)         -- make differences positive
+md
+
+sd = sort(md)       -- sort the positive differences
+sd
+
+cd = correspond(md,sd)     -- correspond uses Rank(sd)
+cd                         -- i.e. rank sorted differences
+
+-- find indices with positive difference d>0
+
+Z= zero(n)
+   for(i,1,n, test(d[i]>0, Z[i]=1))
+Z
+
+-- calculate statistics W, which is the
+-- vector of products Z[i]*cd[i]
+
+ZR = zero(n)
+     for(i,1,n, ZR[i]= Z[i]*cd[i])
+ZR
+
+W = sum(ZR)
+W
+
+id= zero(n)
+    for(i,1,n, id[i]=i)
+id
+
+-- summary
+-- ("No", "Yi" , "Yi-3.7", "|Yi-3.7|", "Rank Ri", "signed Ri")
+--      Y-3.7    |Y-3.7|   R   Z*R = W statistics
+(id, Y, Y-med, mag(Y-med), cd, ZR)
+
+--  test statistics
+W = dot(Z,cd)
+W
+"ok"
+
+-- cite ibid.:
+-- Determine if the observed value of W is extreme in light of the 
+-- assumed value of the median under the null hypothesis. 
+-- That is, calculate the P-value associated with W, and make a 
+-- decision about whether to reject or not to reject.
+
+-- When the null hypothesis is true, for large n,
+-- then T follows an approximate standard normal distribution N(0, 1).
+
+T = (W - n*(n+1)/4)/ sqrt(n*(n+1)*(2*n+1)/24)
+T
+
+-- Well, in this case, with n = 10, our sample size is fairly small 
+-- so we can use the exact distribution of W. The upper and lower 
+-- percentiles of the Wilcoxon signed rank statistic when n = 10 are:
+
+# n=10: Pr(T>=W=40) = 0.116
+
+-- Therefore, our P-value is 2 × 0.116 = 0.232. 
+-- Because our P-value is large, we cannot reject the null hypothesis.
+
+
+"--- 2. --- EXERCISE 2.4 from psu.edu"
+
+-- Do Example 20-4 of
+-- https://online.stat.psu.edu/stat415/lesson/20/20.2
+
+
+"--- 3. -- abstract the procedure to function signrank()"
+        -- i.e WILCOXON one sample signed rank test
+
+##############################################################
+  signrank(X,med, n,d,sd,md,cd,Z,ZR) = do(
+##############################################################
+     n    = dim(X),
+     sign = zero(n),  sign = sgn(d),
+     d    = zero(n),  d = X - med,
+     md = mag(d),
+     sd = sort(md),
+     cd = correspond(md,sd),
+     Z  = zero(n), for(i,1,n, test(d[i]>0, Z[i]=1)),
+     W = dot(Z,cd),
+     T = (W - n*(n+1)/4)/ sqrt(n*(n+1)*(2*n+1)/24),
+     print(" _ Wilcoxon test _"), 
+     (("W", "T"),(W,T)))
+######################################################## END
+
+
+-- check:
+Y = (5.0, 3.9, 5.2, 5.5, 2.8, 6.1, 6.4, 2.6, 1.7, 4.3)
+signrank(Y,3.7)
+"ok"
+
+
+###########################################################
+"--- 4. --- EXAMPLE: placebo-controlled clinical trial"
+###########################################################
+
+-- https://nbisweden.github.io/workshop-mlbiostatistics/session-rank-tests/docs/wilcoxon-signed-rank-i.html
+
+-- Let's imagine we are a part of team analyzing results of a 
+-- placebo-controlled clinical trial to test the effectiveness of a 
+-- sleeping drug. We have collected data on 10 patients when they took -- a sleeping drug and when they took a placebo.
+-- The hours of sleep recorded for each study participant:
+
+X=(6.1, 6.0, 8.2, 7.6, 6.5, 5.4, 6.9, 6.7, 7.4, 5.8)     -- drug
+
+Y=(5.2, 7.9, 3.9, 4.7, 5.3, 7.4, 4.2, 6.1, 3.8, 7.3)     -- p.bo
+
+-- Before we investigate the effect of drug, a senior statistician ask 
+-- us: “Is the median sleeping time without taking the drug
+-- significantly less than the recommended 7 h of sleep?”
+
+-- SOLUTION: therefore we consider only Y.
+
+-- We formulate the null hypthesis H0:
+--    H0 : m = m0, i.e. the median sleeping time is equal to m0 = 7 
+
+-- METHOD of Wilcoxon signed-rank test statistics is
+-- 1. we subtract the median from each measurement,
+-- 2. we find absolute values of the differences,|Xi− m0|
+-- 3. we rank the absolute values of the differences Xi− m0
+-- 4. we find the value of W, the Wilcoxon signed-rank test statistics
+--    by definition        W = ∑ Zi*Ri
+
+n    = dim(Y)
+sign = zero(n)
+d    = zero(n)
+med = 7             -- hypo median m0
+
+d = Y - med         -- differences to the median
+d
+
+sign = sgn(d)
+sign
+
+md = mag(d)         -- make differences positive
+md
+
+sd = sort(md)       -- sort the positive differences
+sd
+
+cd = correspond(md,sd)    -- correspond uses Rank(sd)
+cd                        -- i.e. rank sorted differences 
+cd
+
+-- find indices with positive difference d>0
+
+Z= zero(n)
+   for(i,1,n, test(d[i]>0, Z[i]=1))
+Z
+
+-- calculate statistics W, which is the
+-- vector of products Z[i]*cd[i]
+
+ZR = zero(n)
+     for(i,1,n, ZR[i]= Z[i]*cd[i])
+ZR
+-- sum(ZR) = W
+
+-- id is used for summary table
+id= zero(n)
+    for(i,1,n, id[i]=i)
+id
+
+-- summary table
+--      Y-7    |Y-7|       R   Z*R = W statistics
+(id, Y, Y-med, mag(Y-med), cd, ZR)
+
+--  test statistics is ZR
+W = dot(Z,cd)
+W
+
+-- the critical value is
+T = (W - n*(n+1)/4)/ sqrt(n*(n+1)*(2*n+1)/24)
+T
+
+-- DECISION w.r.t. H0
+-- a. decision using p Value
+
+-- We got W= 6.5 and now we need to calculate the p-value associated 
+-- with W to be able to make decision about rejecting the null
+-- hypothesis. We refer to the statistical table 
+-- 'Upper and LowerPercentiles of the Wilcoxon Signed Rank Test, W'
+-- Here is an excerpt:
+
+pW(x, p) = do(    -- p Value for Wilcoxon distribution n=10
+              test( or(x<=16,x>=39), p=0.138),
+              test( or(x<=15,x>=40), p=0.116),
+              test( or(x<=14,x>=41), p=0.097),
+              test( or(x<=13,x>=42), p=0.080),
+              test( or(x<=12,x>=43), p=0.065),
+              test( or(x<=11,x>=44), p=0.053),
+              test( or(x<=10,x>=45), p=0.042),
+              test( or(x<=9, x>=46), p=0.032),
+              test( or(x<=8, x>=47), p=0.024),
+              test( or(x<=7, x>=48), p=0.019),
+              test( or(x<=6, x>=49), p=0.014),
+              test( or(x<=5, x>=50), p=0.010),
+              test( or(x<=4, x>=51), p=0.007),
+              test( or(x<=3, x>=52), p=0.005),
+              p         -- return value
+) 
+
+-- For sample size n = 10 we can see that probability of 
+-- observing W ≤ 11 or W ≥ 44 is 0.053.
+
+"pW(6.5) = "
+pW(6.5)
+
+-- The p-value associated with observing W = 6.5 is just under 0.019.
+-- Assuming 5% significance level, we have enough evidence to reject
+-- the null hypothesis and conclude that the median is significantly
+-- less than 7 hours.
+
+-- b. decision using critical Value
+--    critical values T for Wilcoxon test (for n>25 use stdnormCDF)
+--    critical values table w.r.t. alpha=0.05, excerpt                                    --                               6,7,8,9,10,11,12, ... 25
+Wcrit05 =("-","-","-","-","-",   0,2,3,5, 8,10,13,
+          17,21,25,29,34,40,46,52,58,65,73,81,89)
+
+-- for n=10 the critical value wc is
+wc = Wcrit05[10]
+wc
+test(W >= wc, "accept H0", "reject H0")
+
+
+-- CHECK with R:
+#> Y=c(5.2, 7.9, 3.9, 4.7, 5.3, 7.4, 4.2, 6.1, 3.8, 7.3)
+#> # run Wilcoxon signed rank test for a median
+#> wilcox.test(x = Y, y=NULL, alternative="less", mu=7, exact=F)
+#
+#	Wilcoxon signed rank test with continuity correction
+#  data:  Y
+#  V = 6.5, p-value = 0.01827
+#  alternative hypothesis: true location is less than 7
+"ok"
+
+
+
+
+##############################################################
+"--- 5. --- EXAMPLE: from ch.4.10"
+##############################################################
+
+-- Calculate the {\sc Wilcoxon} test statistic W for the sample X 
+-- with hypothesized median x_0=7, where  
+--   X=(7.0, 7.6, 6.5, 9.0, 7.3, 6.0, 4.4, 8.1, 4.2, 7.8, 5.8)
+-- from figure.34.
+
+Y=(7.0, 7.6, 6.5, 9.0, 7.3, 6.0, 4.4, 8.1, 4.2, 7.8, 5.8)
+
+n    = dim(Y)
+n
+sign = zero(n)
+d    = zero(n)
+med  = 7               -- hypo median m0
+d    = Y - med         -- differences to the median
+
+sign = sgn(d)
+md   = mag(d)         -- make differences positive
+sd   = sort(md)       -- sort the positive differences
+cd   = correspond(md,sd)      -- R'anking of sd
+
+-- find indices with positive difference d>0
+Z= zero(n)
+   for(i,1,n, test(d[i]>0, Z[i]=1))
+
+-- calculate statistics W, which is the
+-- vector of products Z[i]*cd[i]
+
+ZR = zero(n)
+     for(i,1,n, ZR[i]= Z[i]*cd[i])
+
+Index= zero(n)
+     for(i,1,n, Index[i]=i)
+
+-- summary in rows:
+                  
+(Index,             -- 1st row: index
+     Y,             -- 2nd row: the data Y
+     Y-med,         -- 3rd row: Y-7
+     mag(Y-med), 
+     cd, 
+     ZR)            -- W statistics
+
+--  test statistics
+W = dot(Z,ZR)       - sum of numbers in kast row
+W
+
+-- W, is the sum of the ranks of positive differences between 
+-- the observations; warning: item 1 gives 0 !
+-- the critical value is, see MATLAB signrank
+
+n = 11
+T = (W - n*(n+1)/4)/ sqrt(n*(n+1)*(2*n+1)/24)
+T
+
+-- DECISION w.r.t. H0
+-- decision using critical Value
+-- critical values T for Wilcoxon test (for n>25 use stdnormCDF)
+
+-- see: https://users.stat.ufl.edu/~winner/tables/wilcox_signrank.pdf
+-- critical values table w.r.t. alpha=0.05, excerpt:   
+
+In      =  (5,  6,7,8,9,10,11,12) -- ..
+alpha05 =  ("_",0,2,3,5, 8,10,13) -- ..  
+Wcrit05 =  (In, alpha05)
+
+-- for In=11 we have for alpha0.05 associated 10, i.e. wc = 10
+
+wc = 10
+test( W >= wc, "accept H0", "reject H0")
+
+-- check via signrank():
+Y = (7.0, 7.6, 6.5, 9.0, 7.3, 6.0, 4.4, 8.1, 4.2, 7.8, 5.8)
+signrank(Y, 7)
+"ok"
+

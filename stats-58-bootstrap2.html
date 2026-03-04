@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+##| BOOTSTRAP2 for independent samples  with Eigenmath  - Ch. 5.8of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+-- REMARK:
+-- To alculate the significance level of 2 independent samples X, Y
+-- w.r.t. equalness of their means, we do:
+-- 1. determine the difference D of their means
+-- 2. build a new sample M by the union of X and Y: M = X v Y
+-- 3. draw a big number of pairwise samples out of M
+-- 4. count the number z of the random samples from M,
+--    whose means have a difference d > D.
+-- 5. the significance level is counter z / number of drawn samples
+
+-- We abstract this procedure in a functon boot2:
+
+# DEFINITION
+### -------------------- boot2 --------------------------------
+--- calculate the significance level of 2 independent samples
+--- w.r.t. equalness of their means
+
+boot2(X,Y, d,g,r,z,s,t,p) = do(
+           IT=10000,                        -- number of ITerations
+           m = dim(X),
+           n = dim(Y),
+           M = zero(m+n),    -- long vector of dim = n+m
+           z = 0,              
+           s = sum(X), 
+           t = sum(Y),
+           d = s/m - t/n,    -- d = mean(X)-mean(Y)      
+           g = m + n,        -- total dimension of container M
+                             -- append X and Y to M=(X|Y)
+           for(i,1,g, M[i] = test(i<=m, X[i], Y[i-m])),  
+           for(j,1,IT, s = 0, t = 0, -- s,t reset to 0
+              for(i,1,m,             -- choose index r randomly        
+                  r = 1 + mod(floor(1+g*rand()),g), -- 1<=r<=g
+                  s = s + M[r]),     -- sum m elements of M randomly
+              for(i,1,n,           
+                  r = 1 + mod(floor(1+g*rand()),g),  
+                  t = t + M[r]),    -- sum n elements of M randomly
+              s = float(s/m), t = float(t/n),  -- new means s and t 
+              test(s-t >= d, z = z + 1) ),
+           p = float(z/IT),         -- probability
+           print("   ____________ boot2 ____________"),
+           (("e.meanX","e.meanY","significance:"),(s,t,p)))         
+### ------------------------------------------------------ END
+
+-- WARNING:    0 <= rand() < 32767. (!!) cf. [3], p.77
+-- Eigenmath:  0 <= rand() < 1           
+
+
+"--- 1. ========== EXAMPLE:  31 US presidents "   
+
+-- cf. HERRMANN, [6, p. 207].
+-- There was a random sample of 31 US presidents drawn, who died of
+-- natural causes. The whole sample was divided in tall (X) and small
+-- (Y) persons.
+-- The null hypothesis is: age and height are independent.
+
+-- SOLUTION:
+
+X = (85,79,90,67,80)
+
+Y = (67,56,53,77,88,57,63,78,70,
+     66,83,67,60,74,65,64,73,71,
+     60,90,63,71,64,78,68,72)
+
+mean(x) = float( sum(x)/dim(x) )
+
+mean(X)
+mean(Y)
+D = mean(X)-mean(Y)     -- difference of the means of both samples
+D
+
+boot2(X,Y)
+"ok"
+
+-- RESULT:
+-- We get values around 0.013.
+-- With a 5% probability of error, the null hypothesis, that age and 
+-- size differ only by chance, can be rejected.
+
+
+"--- 2. ========== EXAMPLE from ch.5.8"
+
+X=(4.3,2.1,5.3)
+Y=(2.4,1.1,2.8)
+
+mean(X)
+mean(Y)
+D = mean(X)-mean(Y)     -- difference of the means of both samples
+D
+
+boot2(X,Y)
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

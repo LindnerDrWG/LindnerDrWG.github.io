@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+##| MEAN with Eigenmath  -  Ch. 1.1 of
+##| Book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+-- two minus signs marks a COMMENT line.
+#  one sharp sign also.
+
+# DEFINITION
+------------------------------------------------
+
+mean(X)       = float( sum(X)/dim(X) )        -- empir.sample mean
+
+------------------------------------------------
+
+-- variants
+
+meanF(X,f)    = float( dot(f,X)/sum(f) )        -- mean w. frequency
+meanA(X,A)    = float( A + sum(X-A)/dim(X) )    -- mean  w.r.t. A
+meanAF(X,f,A) = float( A + dot(f,(X-A))/sum(f)) -- meanF w.r.t. f & A
+
+
+"--- 1. ---"
+
+-- EXAMPLE in wiki> https://en.wikipedia.org/wiki/Mean
+
+mean((4,36,45,50,75))   -- mean of sequence (4,36,45,50,75)
+"ok"
+
+X = (0,2,1,4)
+mean(X)
+"ok"
+
+-- check with Matlab
+-- Matlab> X = [0; 2; 1; 4]
+--         M = mean(A)
+--         M = 1.7500
+
+
+"--- 2. ---"
+
+-- EXAMPLE (Spiegel p.108, P 4.14)
+-- Use the frequency distribution 'f' of heights in 'in' 
+-- to calculate the mean height of 100 students.
+-- SOLUTION: the data is
+
+"      the data set:"
+in = ("Height (in)","60-62","63-65","66-68","69-71","72-74")
+X = ("Marks (X)",    61,64,67,70,73)
+f = ("Frequency (f)", 5,18,42,27, 8)
+(in,X,f)      -- construct table of data
+
+-- in short:
+f = ( 5,18,42,27, 8)    -- freq
+X = (61,64,67,70,73)    -- marks
+
+meanF(X,f)
+"ok"
+
+
+"--- 3. ---"
+
+-- EXAMPLE (Spiegel, p.74, P 3.19 - grouped data with guessed mean A)
+-- Calculate the arithmetic mean of the numbers 5,8,11,9,12,6,14,10
+-- choosing as the 'guessed mean' the number A=9.
+-- SOLUTION:
+
+X = (5,8,11,9,12,6,14,10)
+meanA(X,9)              -- with guessed mean A=9
+
+-- and with given frequency f
+f = ( 5,18,42,27, 8)    -- freq
+X = (61,64,67,70,73)    -- marks
+meanAF(X,f,9)           -- with guessed mean A=9
+"ok"
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

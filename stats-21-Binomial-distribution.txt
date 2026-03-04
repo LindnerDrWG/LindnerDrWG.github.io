@@ -1,0 +1,350 @@
+##| BINOMIAL DISTRIBUTION  with Eigenmath    - Ch. 2.1 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+-- We define binoPDF, binoCDF and binoINV.
+ 
+# DEFINITION
+"=============================== binoPDF - BINOMIAL probability" 
+
+   binoPDF(k,n,p) = choose(n,k)*p^k*(1-p)^(n-k)
+
+----------------------------------------------------------------
+-- where
+-- n : counts the number of independent Bernoulli trials 0,1,2,..
+-- p : specifies a probability of success, 0<=p<=1
+-- k : counts the number of successes 0,1,2,..
+
+-- We use the notation convention of Matlab/Octave: binopdf
+-- P(X=k): represents the probability of getting exactly k successes
+-- binoPDF : binomial probability (or: density, mass) function
+
+
+"--- 1. --- EXAMPLE (wiki, ibid., coin example)"
+
+-- Suppose a biased coin comes up heads with probability 0.3 when
+-- tossed. Calculate the probability of seeing exactly 4 heads 
+-- in 6 tosses.
+
+binoPDF(4, 6, 0.3)     -- look up every value form a bino-'table'
+
+-- CHECK                         
+-- R> dbinom(4, size=6, prob=0.3)  [1] 0.059535
+--    'd' in dbinom means _d_ensity function
+
+"--- 2. ---"
+
+"                     Binomial PDF table for n=10 & p=1/6"
+T = zero(2,10)
+for(i,1,10, T[1,i] = i)
+for(i,1,10, T[2,i] = float(binoPDF(i, 10, 1/6)) )
+transpose(T)
+
+"--- 3. ---"
+
+"                     Binomial PDF plot for n=10 & p=1/6"
+yrange = (0,1)
+xrange = (0,10)
+draw(  float(binoPDF(x, 10, 1/6)),x)
+
+"                     Binomial PDF plot for n=40 & p=0.5"
+yrange = (0,0.5)
+xrange = (0,40)
+draw(  float(binoPDF(x, 40, 0.5)),x)
+
+
+#  DEFINITION --------------------------------------- binPDF
+-- binomial probability function 2nd version
+-- without choose() in case 1st version does not work ;)
+
+binPDF(k,n,p, q,m) = do(
+    q = 1-p,
+    m = n+1,
+    test( or(p<=0, p>=1, n<0, k<0, k>n), print("OUT OF RANGE!"),
+          do( r = log(p/q),
+              b = n*log(q),
+              for(i,1,k, b = b + r + log(m/i-1)),
+              float(exp(b))  -- return value is probability 
+        ) ))
+----------------------------------------------------- END
+
+"- 1a. -"
+binPDF(4,6, 0.3)        -- wiki problem 'coin'
+
+"- 2a. -"
+binPDF(2, 10,1/6)       -- ok
+
+
+# DEFINITION
+"=============================== binoCDF - cumulative BINOMIAL" 
+
+   binoCDF(k,n,p) = sum(j,0,floor(k), choose(n,j)*p^j*(1-p)^(n-j) )
+
+--------------------------------------------------------------
+-- where
+-- n : counts the number of independent Bernoulli trials 0,1,2,..
+-- p : specifies a probability of success 0<=p<=1
+-- k : counts the number of successes 0,1,2,..
+-- binoCDF means _c_umulative BINOMIAL distribution
+-- WARNING: Eigenmath 'sum' function needs k to be an integer,
+--          so 'floor(k)' instead of k is necessary. 
+
+
+"--- 5. --- EXAMPLE"
+
+-- Compute the cdf of the binomial distribution 
+-- with 10 trials and the probability of success 0.5.
+
+binoCDF(4, 6,0.3)       -- ok 0.059535
+
+binoCDF(4, 10,0.5)      -- ok 0.3769
+
+-- R> pbinom(4, size=10, prob=0.5)        [1] 0.3769531
+--    'p' in pbinom means _p_robability 
+
+"--- 6. ---"
+
+"                     Binomial CDF table for n=10 & p=1/6"
+T = zero(2,11)
+for(i,1,11, T[1,i] = i-1)
+for(i,1,11, T[2,i] = float(binoCDF(i-1,10, 1/6)) )
+transpose(T)
+
+"                     Binomial CDF plot for n=10 & p=1/6"
+yrange = (0,1)
+xrange = (0,10)
+draw( binoCDF(x, 10, 1/6), x)
+
+
+"--- 7. --- EXCURS: expection value E for binoDF"
+
+-- expection value E (mean), variance Var for binoDF
+--                    X*f(k)
+
+E(k,n,p) = sum(j,0,n, k*binoPDF(k,n,p))             -- or: = n*p
+E(3,5,0.5)
+
+--                      (X - EX )^2
+Var(k,n,p) = sum(j,0,n, (k - n*p)^2*binoPDF(k,n,p)) -- or: =n*p*(1-p)
+Var(3,5,0.5)
+
+
+"--- 8. --- EXCURS: binCDF"
+
+-- a cumulative binomial distribution function, 2nd version
+-- without choose() in case 1st version does not work
+
+# DEFINITION
+------------------------------------------------------------
+binCDF(k,n,p, s,b,q,r) =                     -- s=sum, b=bin
+    test( or(p<=0,p>=1,n<0,k<0, k>n), -1,
+      do(
+          q = 1-p,
+          r = log(p/q),
+          b = n*log(q),
+          s = exp(b),
+          for(i,1,k, 
+              do( b = b + r + log((n+1)/i-1)),
+                  s = s + exp(b) ), -- end do
+          float(s)           -- return value is probability
+        ))
+------------------------------------------------------- END
+
+
+binCDF(190,200,0.9) 
+
+binCDF(4, 6,0.3)       -- ok 0.9890
+
+"--- 9. --- binoINV: via a simple search"
+
+-- binoINV: inverse BINOMIAL Distribution function.
+-- The inverse binomial cumulative distribution function results 
+-- in the minimum number of successes, such that the cumulative
+-- probability for that minimum number of successes is >= the given
+-- cumulative probability (area, alpha-value). 
+-- But: There is no closed formula for binoINV :(
+-- So we do a simple search to solve following problem
+
+-- PROBLEM 1:
+-- Given a number of trials n=100, the probability of success p=0.3,  
+-- the cumulative area of the binomial distribution A=0.7, 
+-- find a value 𝑥 such that A = 0.7 <= binoCDF(100,0.3,x).
+-- Verify EXCEL's solution: x = 32:  = BINOM.INV(100, 0.3, 0.7).
+
+-- cf. https://math.stackexchange.com/questions/1426069/finding-the-inverse-of-the-binomial-cumulative-distribution-function
+
+-- SOLUTION:
+"Task: search for k with binoCDF >= 0.7 for 1st time"
+
+for(k,30,35,  print((k, binoCDF(k,100,0.3))) )
+
+"ok -> k=32"
+
+
+"--- 10. ---"
+
+-- PROBLEM 2: (Texas Instruments)
+-- Assume the toss of a fair coin 30 times. 
+-- What is the minimum number of heads you must observe such that 
+-- the cumulative probability for that number of observed heads 
+-- is at least 0.95?
+
+-- SOLUTION:
+-- we solve this TI problem using Eigenmath loop:
+-- IDEA: x = binCDF(k,30,0.5) and we use the table of values 
+-- (starting at 0 and increment by 1) to find when the cumulative
+-- probability is at or just above the given cumulative probability.
+-- This gives you a view of all values to make decisions. 
+-- For this example, search in the table to find the cumulative 
+-- probability just larger than 0.95. 
+-- So, the number of successes is 19.
+
+-- .. using binoCDF
+k=0
+loop(k=k+1, x=binoCDF(k,30,0.5), x,k, test(x>0.95, break))
+x
+k
+
+"Check: binCDF(k,30,0.5) >="
+binoCDF(19,30,0.5)
+
+
+"--- 11. --- binoINV"
+
+-- MOTIVATION for binoINV
+-- (quoting TI): The results on the screen first show that the
+-- minimum number of successes to obtain at least the given cumulative 
+-- probability of 0.95 is 19. 
+-- Next, the cumulative probability for up to 19 is computed using 
+-- binCDF and is approximately 0.9506314271 which meets the criteria
+-- of 0.9506314271≥0.95.  cf.:
+-- https://education.ti.com/html/webhelp/EG_TI84PlusCE/EN/Subsystems/e-guide_ref84plus_en/content/m_appxa/aa_appxa_i.HTML
+-- Abstracting this process we write a small function binoINV:
+
+
+# DEFINITION
+"=============================== binoINV - Binomial INVerse"
+
+  binoINV(alpha,n,p, x,k) = do( k=0,
+               loop(k=k+1, x=binCDF(k,n,p), test(x>alpha, break))
+               x,k)
+
+---------------------------------------------------------
+-- This function is used to find the nth quantile of binoCDF, 
+-- that is to find k in P(x <= k).
+
+"--- 11.a --- EXAMPLE in R"
+
+binoINV(0.95, 30,0.5)
+
+-- CHECK in R:
+-- R> qbinom(0.95, size=30, prob=0.5)       [1] 19
+--   'q' in _q_binom means _q_antile function
+
+"--- 11.b --- EXAMPLE in EXCEL"
+ -- checking the Excel formula in -9.-
+ --              32 = BINOM.INV(100, 0.3, 0.7)
+
+binoINV(0.7, 100, 0.3)
+"ok"
+
+"--- 12. ---  Excurs: binoCDF using incomplete beta"
+
+-- We may use the build-in function 'incbeta' of Eigenmath 
+-- version >3.50  to plot binoCDF version for 'continous' CDF.
+
+# DEFINITION
+---------------------------- binoCDF1 with incomplete beta 
+
+    binoCDF1(k,n,p) = incbeta(1-p, n-k,k+1)
+
+---------------------------------------------------------
+ 
+binoCDF1(4, 10,0.5)      -- ok 0.3769
+binoCDF1(4, 6,0.3)       -- ok 0.059535
+
+
+"                     Binomial CDF plot for n=10 & p=1/6"
+yrange = (0,1)
+xrange = (0,10)
+draw( binoCDF1(x, 10, 1/6) ,x)
+
+"                     Binomial CDF plot for n=40 & p=0.5"
+yrange = (0,1)
+xrange = (0,40)
+draw( binoCDF1(x, 40, 0.5) ,x)
+
+
+"--- 13. ---  binoCDF via nCk()"
+
+-- We define a 'continous' version of choose() via Gamma function
+-- and a new version of binoCDF:
+
+# DEFINITION
+"=============================== nCk() via Gamma function" 
+
+   nCk(n,k) = tgamma(n+1) / (tgamma(k+1)*tgamma(n-k+1))
+
+   binoCDF2(k,n,p) = sum(j,0,floor(k), nCk(n,j)*p^j*(1-p)^(n-j) )
+
+---------------------------------------------------------
+
+nCk(4,2)
+choose(4,2)
+
+nCk(100,17)
+choose(100,17)
+
+binoCDF2(4, 10, 0.5)      -- ok 0.3769
+binoCDF2(4, 6, 0.3)       -- ok 0.9890
+
+"ok"
+
+yrange = (0,1)
+xrange = (0,10)
+draw( binoCDF2(x, 10, 1/6) ,x)
+
+###########################################################
+"--- 14. --- SURPLUS: source code of incbeta alias betainc"
+###########################################################
+
+-- EXCURS: see the remark in the booklet.
+-- Before version 3.50 of Eigenmath there was no build-in function
+-- incbeta. To show the potential implementation of incbeta
+-- we used the following alias betainc := incbeta.
+
+betainc(x,a,b) = test(           -- adapted by G. Weigt 2025
+                      x <= 0, 0,
+                      x >= 1, 1,
+                      x > (a+1)/(a+b+2), 1 - betainc1(1-x, b, a),
+                      betainc1(x,a,b) )
+
+betainc1(x,a,b, c,d,f,i,m,n) = do( 
+         f=1, c=1, d=0,
+         for(i,0,200,
+             m = floor(i/2), 
+             test( i==0,        n = 1,
+                   mod(i,2)==0, n = m*(b-m)*x/(a+ 2*m-1)/(a+2*m),
+                   n = -(a+m)*(a+b+m)*x/(a+2*m)/(a+2*m+1) ),
+             d = 1+n*d,
+             test(abs(d) < 10.0^(-30), d = 10.0^(-30)),
+             d = 1/d,
+             c = 1+n/c,
+             test(abs(c) < 10.0^(-30), c = 10.0^(-30)),
+             f = f*c*d,
+             test(abs(1-c*d) < 10.0^(-8), break)
+             ),
+		   m = lgamma(a) + lgamma(b) - lgamma(a + b),
+         x = float(x),
+         m = exp(log(x)*a + log(1-x)*b-m)/a,
+         test(abs(1-c*d) < 10.0^(-8), m*(f-1), tgamma(0))
+         )
+
+binoCDF3(k,n,p) = betainc(1-p, n-k,k+1)
+
+-----------------------------------------------------------------
+
+-- check:
+binoCDF3(4, 10, 0.5)      -- ok 0.3769
+binoCDF3(4, 6, 0.3)       -- ok 0.9890
+

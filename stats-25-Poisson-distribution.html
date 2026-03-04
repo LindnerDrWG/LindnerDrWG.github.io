@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+##| POISSON Distribution for EigenMath    - Ch. 2.5 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+
+# DEFINITION
+"============================== poissonPDF - Poisson density"
+
+          poissonPDF(L, k) = float(  L^k*1/k! * exp(-L)  )
+
+--------- L = lambda ----------------------------------------
+
+-- MATLAB: "The Poisson probability density function lets you obtain 
+-- the probability of an event occurring within a given time or space
+-- interval exactly k times if on average the event occurs L times
+-- within that interval."
+
+poissonPDF(L, k)       -- show definition pretty-printed
+
+"--- 1. ---"
+
+poissonPDF(3,2)
+
+poissonPDF(4,3)
+
+poissonPDF(300/360,0)  
+
+"--- 2. ---"
+
+for(k,0,10, print(float(poissonPDF(4,k))) )
+
+"                       Poisson(4,k)"
+-- discrete points are plotted because of k!
+f = poissonPDF(4, x)
+xrange = (0,10)
+yrange = (0,0.3)
+draw(f,x)
+
+"-- 2.a --  check with R"
+
+-- EXAMPLE: 
+-- What is the probability of making 2 to 4 sales in a week 
+-- if the average sales rate is 3 per week?
+
+-- SOLUTION:
+
+poissonPDF(3,2) + poissonPDF(3,3) + poissonPDF(4,4)
+"ok"
+
+-- R>  # Using exact probability
+--     dpois(x=2, lambda=3) + dpois(3,3) + dpois(4,4)
+-- [1] 0.6434504
+
+
+
+"--- 3. --- Poisson value table"
+
+-- Example: https://en.wikipedia.org/wiki/Poisson_distribution
+-- L:=Lambda =1 
+
+T = zero(2,6)
+for(i,0,5, T[1,i+1] = i)
+for(i,0,5, T[2,i+1] = float(poissonPDF(1,i)))
+transpose(T)
+
+"--- 4. --- World Cup soccer match"
+
+-- [ibid.] It is reported that the average number of goals in a 
+-- World Cup soccer match is approximately 2.5 and the Poisson 
+-- model is appropriate. Because the average event rate is 2.5 goals
+-- per match, we have Lambda = 2.5 .
+-- SOLUTION:
+
+#  Lambda =2.5 
+T = zero(2,8)
+for(i,0,7, T[1,i+1] = i)
+for(i,0,7, T[2,i+1] = float(poissonPDF(2.5,i)))
+transpose(T)
+
+"--- 5. --- EXERCISES"
+
+-- 5.a EXERCISE: Solve the examples ("Beispiele") in
+--           https://de.wikipedia.org/wiki/Poisson-Verteilung
+
+
+-- 5.b EXERCISE: [3,p.42] On average, a book contains one typo
+-- error on every page. What is the probability that there are two 
+-- typographical errors on a given page?  (solution: 18.4 %)
+
+
+-- 5.c EXERCISE: [3,p.42]
+-- What is the probability that at a party with 25 people,
+-- everyone will have different birthdays? 
+-- Hint: 25 people gives choose(25,2)= 300 birthday-pairs.
+--       So lambda = 300/365. (Solution: 56%)
+
+
+-- 5.d EXERCISE: [3,p.42] In a city, there are an average of two 
+-- accidents per day. What is the probability of more than four 
+-- accidents per day?
+-- Solution: Lambda = 2. Pr(X<4)=1-Pr(X<=4) = .. =5.2%
+
+
+# DEFINITION
+"========================== poissonCDF - Poisson Distribution" 
+
+   poissonCDF(L,x) = sum(k,0,floor(x), poissonPDF(L,k) )
+
+--------------------------------------------------------------
+
+"--- 6. ---"
+
+"                       PoissonCDF(4,k)"
+xrange = (0,10)
+yrange = (0,2)
+draw(poissonCDF(4, x),x)
+
+poissonCDF(2,4)
+
+-- CHECK
+-- R>  ppois(4,2)
+--     [1] 0.947347
+
+"                       List of poissonCDF(1,k), k=0..12"
+for(k,0,12, print( poissonCDF(1,k)) )
+
+-- Table 
+"                      Table of poissonCDF(1,k) "
+T = zero(2,13)
+for(i,0,12, T[1,i+1] = i)
+for(i,0,12, T[2,i+1] = float(poissonCDF(1,i)))
+transpose(T)
+
+"--- 7. --- EXERCISE"
+
+-- Do the examples in
+--    https://de.mathworks.com/help/stats/poisscdf.html
+
+
+# DEFINITION
+"========================== EXCURS: approximation of PoissonCDF" 
+
+   poissonCDF1(lambda,k, p) = 
+               test( or(k<0, lambda <=0), -1,  -- BAD PARAMETER
+                 do( p=-lambda,
+                     for(i,1,k, p = p+log(lambda)-log(i)),
+                     float( exp(p) )))
+
+--------------------------------------------------------------
+-- cf. [3], p.45
+-- An alternative implementation uses the incomplete Gamma function
+
+"--- 8. ---"
+
+poissonCDF1(2,4)
+
+1-poissonCDF1(2,4)
+
+
+"--- 9. ---  Reproduce table above using poissonCDF1"
+
+n=100
+p=0.01
+lambda = n*p   
+for(k,0,12, print( poissonCDF1(lambda,k)) )
+do( n=quote(n), p=quote(p))
+
+
+# DEFINITION
+"============================ poissonINV - Poisson quantile" 
+
+   poissonINV(alpha,L, x,k) = 
+      do( k=0,
+          loop(k = k+1, 
+               x = poissonCDF(L,k), 
+               x,k, test(x>alpha, break))
+          x,k)
+
+---------------------------------------------------------
+
+-- This function is used to find the n.th quantile, 
+-- that is if P(x <= k) is given, it finds k.
+--  
+-- Description: https://de.mathworks.com/help/stats/poissinv.html
+-- X = poissonINV(alpha,L) returns the smallest value X such that 
+-- the Poisson cdf evaluated at X equals or exceeds P, using mean
+-- parameters in lambda. 
+
+"--- 10. ---"
+
+-- EXERCISE: Do the example in
+--           https://de.mathworks.com/help/stats/poissinv.html
+-- If the average number of defects (L) is two, 
+-- what is the 95th percentile of the number of defects?
+
+-- SOLUTION: 
+-- MATLAB> poissinv(0.95,2) = 5
+
+poissonINV(0.95, 2)
+"ok"
+
+-- R> qpois(0.95, 2)
+--    [1] 5
+
+poissonINV(0.5, 2)       -- medium number of defects
+"ok"
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>
+

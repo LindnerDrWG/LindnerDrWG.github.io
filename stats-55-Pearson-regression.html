@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+##| LINEAR REGRESSION   with Eigenmath    - Ch. 5.5 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+-- Links:
+-- https://en.wikipedia.org/wiki/Linear_regression
+-- https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/lm
+
+### --------------------------------------------------------------
+"--- 1. ========== EXAMPLE: electrical resistance of a conductor"
+### --------------------------------------------------------------
+
+-- HERRMANN [6,p.193]: 
+-- We have the following measurement series, which measures the 
+-- electrical resistance of a conductor as a function of temperature:
+
+   X = (19,25,30,36,40,45,50)
+   Y = (76.3, 77.8, 79.8, 80.8, 82.4, 83.9, 85.1)
+
+-- Determine the linear regression line through the points (X,Y).
+-- SOLUTION: 
+
+"FIRST Solution step-by-step"
+
+mean(X) = float( sum(X)/dim(X) )    
+
+n = dim(X)
+n
+
+mX = mean(X)               -- mean of X
+mX
+
+mY = mean(Y)
+mY
+
+sXY = sum((X-mX)*(Y-mY))   -- covariance of X and Y
+sXY
+
+sX = sum((X-mX)^2)         -- sum the squared differences to the mean
+sX
+
+a = sXY/sX                 -- constance b of regression line y=ax+b
+a
+
+b = 1/n*(sum(Y)-a*sum(X))  -- the slope or regression coefficient
+b
+
+"          y = a.x + b :"
+(("a","b"),(a,b))
+"ok"
+
+
+"SECOND Solution using regression function"
+-- We abstract the foregoing process into a function
+
+# DEFINITION
+### --------------------------------------------------------------
+###   regression : PEARSON's LINEAR REGRESSION LINE 
+###                for linear relation between X and Y, X ~lin Y
+### --------------------------------------------------------------
+    mean(X)       = float( sum(X)/dim(X) )  
+
+    regression(X,Y,   mX,mY,sX,sY,sXY,a,b) = 
+                    do( 
+                      n   = dim(X),
+                      mX  = mean(X),
+                      mY  = mean(Y), 
+                      sX  = sum((X-mX)^2),
+                      sXY = sum((X-mX)*(Y-mY)),
+                      a   = sXY/sX,                
+                      b   = 1/n*(sum(Y)-a*sum(X)),
+                      print(" _____  y = a*x + b  ____"),
+                      (("a","b"), (a,b)))
+
+    lm(X,Y) = regression(X,Y)
+------------------------------------------------------ END
+
+-- EXAMPLE from above
+-- Find the linear regression line between the variables
+-- X and Y in the table:
+
+   X = (19,25,30,36,40,45,50)
+   Y = (76.3, 77.8, 79.8, 80.8, 82.4, 83.9, 85.1)
+
+   regression(X,Y)
+"ok"
+
+-- CHECK with R:
+-- R> temperature <- c(19,25,30,36,40,45,50)
+--    resistance <- c(76.3, 77.8, 79.8, 80.8, 82.4, 83.9, 85.1)
+--    lm(resistance ~ temperature)
+
+
+"--- 3. --- EXAMPLE Spiegel p.361, P 14.12"
+
+-- Is there a connection between grade point average (GPA) and hours
+-- of TV watched per week. There is a sample of 10 hight school studs:
+
+TVhours = (20,5,8,10,13,7,13,5,25,14)
+GPA     = (2.35, 3.8, 3.5, 2.75, 3.25, 3.4, 2.9, 3.5, 2.25, 2.75)
+
+-- SOLUTION:
+
+lm(TVhours, GPA)
+"ok"
+
+-- RESULT: The variable TVhours and GPA are negativly correlated.
+-- i.e. as more hours of TV are watched, the lower is the GPA ;( 
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

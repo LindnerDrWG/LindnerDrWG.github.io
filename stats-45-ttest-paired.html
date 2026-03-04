@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+##| Paired t-Test  with Eigenmath    - Ch. 4.5 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+##|      Hypothesis Tests for two paired samples
+
+
+mean(X)  = sum(X)/dim(X)
+sd(X)    = sqrt(sum((X-mean(X))^2) /(dim(X)-1.))
+min(a,b) = test(a<=b, a,b)
+
+-- To calculate the paired t-TEST score 'T' we need the functions
+-- tCDF() and tINV() from T-distribution.txt as helper: 
+
+--........................................................ tINV tCDF
+  tCDF(x, df) = tdist(x, df)     
+  tINV(x, df) = tdistinv(x, df)
+--........................................................ END
+
+
+#################################################
+"--- 1. ---  EXAMPLE: monthly rainfall"
+#################################################
+
+-- We use the example in \cite[p.99]{Herrmann}.
+-- The monthly rainfall in millimeters over the course of two years 
+-- is considered. We assume that the differences in rainfall are 
+-- normally distributed. The null hypothesis is the assumption of 
+-- the same rainfall with a 5 % probability of error.
+-- SOLUTION:
+
+X = (52.4,37.4,41.2,71.5,51.3,21.6,17.7,21.2,41.3,32.0,53.0,61.4)
+Y = (47.8,42.0,33.2,41.0,29.5,28.1,17.4,21.5,41.4,51.3,49.5,53.7)
+
+"--- a.  We do the calculation STEP-BY-STEP to show the procedure."
+
+alpha=0.05   -- significance level of rejecting the null hypothesis
+
+n = dim(X)
+n
+
+df = n-1
+df
+
+D  = X-Y
+D
+
+sum1 = sum(D)
+sum1
+
+sum2 = dot(D,D)      -- = sum(i,1,n, D[i]*D[i])
+sum2
+
+d = sqrt( (sum2 - sum1^2/n)/(n*(n-1.)) )
+d
+
+T = sum1/(n*d)
+T
+
+pValue = min( 2*tCDF(T,df), 2*(1-tCDF(T,df)) )
+pValue
+
+test(pValue < 0.975, "accept H0", "reject H0")
+"ok"
+
+
+-- t95 = tINV(1-alpha/2, df)        -- quantil method "both sided"
+-- CI  = (mean(D) - t95*T, mean(D) + t95*T)
+-- CI
+-- ?? to fix
+
+"--- b.  we abstract the procedure to Eigenmath functon tdiff()"
+
+# DEFINITION
+------------------------------------------------------- tdiff
+#############################################################
+tdiff(X,Y,alpha, T,p,df,D,d,n) = do(
+#############################################################
+      print(" _____ paired t-test _____"),
+      n  = dim(X),  -- = dim(Y)
+      df = n-1,
+      D  = X-Y,
+      sum1 = sum(D),
+      sum2 = dot(D,D),
+      d  = sqrt((sum2-sum1^2/n)/(n*(n-1.))),
+      T  = sum1/(n*d),
+      pValue = min( 2*tCDF(T,df), 2*(1-tCDF(T,df)) ),
+      test(pValue < 0.975, print("..... accept H0"), 
+                           print("..... reject H0")),
+      (("T:","p-value:"),(T,pValue)) )   
+
+######################################################## END
+
+-- Check:
+
+tdiff(X,Y,0.05)
+"ok"
+
+-- helper
+max(v, i,m,n) = do( n = dim(v), m = v[1],    -- G. Weigt 19.7.2025
+                    for(i, 2, n, test(v[i] > m, m = v[i])), m)
+
+meanD = mean(D)
+meanD
+
+maxD = max(D)
+maxD
+
+sigmaD = sd(D)
+sigmaD
+
+maxD/sigmaD
+
+-- RESULT: 
+-- The mean value of the differences is here muD = 3.8 mm with the 
+-- standard deviation Sigma = 13.4. The largest difference 30.5 in the 
+-- rainfall amount occurs in May and is equal to 2.36 * sigmaD.
+
+
+"--- 2. --- EXERCISE"
+
+-- Do BEISPIEL 2 (= EN: EXAMPLE 2) of
+-- https://de.wikipedia.org/wiki/Zweistichproben-t-Test#Zweistichproben-t-Test_für_abhängige_Stichproben
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

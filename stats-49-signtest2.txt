@@ -1,0 +1,173 @@
+##| TWO-Sample sign test  with Eigenmath    - Ch. 4.9 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+
+------ Prerequisites:
+    min(a,b) = test(a<=b, a,b)
+    binoPDF(k,n,p) =            choose(n,k)*p^k*(1-p)^(n-k)
+    binoCDF(k,n,p) = sum(j,0,k, choose(n,j)*p^j*(1-p)^(n-j) )
+--........................................................... END
+
+
+##############################################
+"--- 1. --- EXAMPLE: Weights and Intelligence"
+##############################################
+
+-- PROBLEM: cf. Herrmann [6, p.142]
+-- Given is following observation table of weights and intelligence 
+-- quotients (IQ) of single twins 
+--   IGh:  97,79,100,100,100,100,124,95,80,91,108,91,90,104,119
+--   IQl:  97,70,101,106,85,123,84,70,84,106,97,90,92,104
+-- Test the null hypothesis that the IQ scores of the twins are 
+-- independent of their birth weight. 
+
+-- SOLUTION:
+
+-- FIRST we do a step-by-step solution.
+ 
+IGh = (97,79,100,100,100,124,95,80,91,108,91,90,104,119)
+IQl = (97,70,101,106,85,123,84,70,84,106,97,90,92,104)
+
+m = dim(IGh)
+m
+n = dim(IQl)                          -- must be the same
+n
+
+D = IGh - IQl
+D
+ 
+# Calculate total number of trials with equal scores
+n0 = sum(i,1,n, D[i] == 0)            -- don't use X[i]=26
+n0
+
+nt = dim(D) - sum(i,1,n, D[i] == 0)   -- n - sum(D == 0)
+nt                                    -- reduced data dim
+
+# Calculate number of scores greater than zero
+s = sum(i,1,n, D[i] > 0)         -- i.e. sum(diff > 0)
+s
+
+s0 = sum(i,1,n, D[i]<0)          -- we do not need s0, FYIO
+s0
+
+
+# Calculate total number of trials excluding scores equal to 26
+ntotal = sum(i,1,n, not(D[i] = 0))     -- same as nt, FYIO
+ntotal
+
+-- We have:  N+ = 9 = s, N- = 3, N°0 = 2, NTotal = 12 = nt
+-- Now we can calculate the p-value in the case "both-sided":
+
+p1 = sum(i,0,s,  binoPDF(i,nt, 0.5)) 
+p1
+
+p2 = 1 - sum(i,0,s-1, binoPDF(i,nt, 0.5))
+p2
+
+p = min(2 * p1, 2 * p2) 
+p
+"ok"                       
+
+-- RESULT:
+-- We count 9 differeneces with a positive sign.
+-- The test statistics is therefore T = sign = 9.
+-- The probality p for T = 9 is 0.1459 > 0.05.
+
+-- INTERPRETATION:
+-- The null hypothesis, Ho: "IQ independent of weight", can not be 
+-- rejected with a 5 % probability of error. 
+
+
+"--- 2. ---  function signtest2 in Eigenmath"
+-- We implement this procedure as function signtest2 in Eigenmath.
+
+### --------------------------------------------------------------
+###        signtest2(X,Y, method)     
+###                       method = "left","right","both"
+### --------------------------------------------------------------
+
+signtest2(X,Y,method,  n,p,p1,p2,s,nt) = do(
+  print(" ___ signtest2 ___"),
+  n  = dim(X),
+  D = X-Y, 
+  nt = sum(i,1,n, not( D[i] = 0)),     
+  s  = sum(i,1,n,      D[i] > 0),   -- success; test value T=s
+  test(method="both",
+               do(p1 = sum(i,0,s,  binoPDF(i,nt,0.5)),
+                  p2 = 1-sum(i,0,s-1, binoPDF(i,nt,0.5)),
+                  p  = min(2 * p1, 2 * p2) ),
+       method="right",
+               do( p = 1-sum(i,0,s-1, binoPDF(i,nt,0.5))),
+       method="left",
+               do( p = sum(i,0,s,  binoPDF(i,nt,0.5))), p),
+  -- ("stats: T, p", s, p) )
+     (("T", "p"), (s, p)) )
+-------------------------------------------------------------END
+
+-- Check the experiment:
+
+IGh = (97,79,100,100,100,124,95,80,91,108,91,90,104,119)
+IQl = (97,70,101,106,85,123,84,70,84,106,97,90,92,104)
+
+signtest2(IGh, IQl, "both")   
+
+"ok"
+
+-- We sum up:
+-- We count 9 differeneces with a positive sign.
+-- The test statistics is therefore T = 9.
+-- The probality p for T = 9 is 0.1459 > 0.05.
+
+-- INTERPRETATION:
+-- The null hypothesis, Ho: "IQ independent of weight", can not be 
+-- rejected with a 5 % probability of error. 
+
+
+"--- 3. ---   REMARK and SURPLUS"
+
+-- We can do the decision about the H0 using alpha-quantiles
+-- of the binomial distribution, see the script.
+-- Therefore we use our function binoINV():
+
+--................................... binoINV - Binomial INVerse
+  binoINV(alpha,n,p, x,k) = do( k=0,         -- p probability
+               loop(k=k+1, x=binoCDF(k,n,p), test(x>alpha, break))
+               x,k)
+--................................... END binoINV - Binomial INVerse
+
+alpha = 0.05
+nt  = 12                                -- n total
+T   = 9                                 -- T=s test statistic
+qt1 = binoINV(alpha/2, nt, 0.5)         -- alpha quantile
+qt1
+
+qt2 = binoINV(1-alpha/2, nt, 0.5)       -- alpha quantile
+qt2
+
+--       5   3    5   9
+test( or(T < qt1, T > qt2), "reject H0", "accept H0")
+"ok"
+-- REMARK
+-- Octave prints the decision as "h=0" instead of "accept H0".
+
+
+"--- 4. ---   EXERCISE Fig. 33"
+
+-- Do the sign test for the data of Fig.33, i.e. 
+-- X=(7.8, 6.6, 6.5, 7.4, 7.3, 7.0, 6.4, 7.1, 6.7, 7.6, 6.8)
+-- Y=(7.0, 7.6, 6.5, 9.0, 7.3, 6.0, 4.4, 8.1, 4.2, 7.8, 5.8)
+-- . Check the differences on the plot.
+-- . How to determine the test statistic T on the graph?
+
+
+"--- 5. ---   EXERCISE from MATLAB"
+
+-- Do the example from the MATLAB documentation in Eigemath:
+--    https://de.mathworks.com/help/stats/signtest.html
+--    using the data from section 'Medians of Paired Samples'.
+-- a. Test the hypothesis of zero median for the difference between 
+--    the two paired samples using the exact methods.
+-- b. z-Statistic: For a large sample, signtest uses the z-statistic 
+--    to approximate the p-value. Program the z-statistic in Eigenmath
+-- c. Check the z-statistic for the data aus a.

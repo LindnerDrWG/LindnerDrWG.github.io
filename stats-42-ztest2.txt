@@ -1,0 +1,445 @@
+##| Two Sample Z - Test with Eigenmath    - Ch. 1.4 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+-- REMARK 
+-- To calculate the Z-TEST score 'T' we need the functions
+-- stdnormCDF() and stdnormINV() as helper: 
+
+--................................................. stdnormCDF/INV
+
+   stdnormCDF(x)       = 1/2*erfc(-x/sqrt(2))
+
+   normCDF(x,mu,sigma) = stdnormCDF((x-mu)/sigma)
+
+   stdnormINV(x, a,b,k,t,y) = test(x=0, "-Inf", x=1, "+Inf",
+                 and(0<x,x<1),
+                  do( a = -10, b = 10,         -- x in [a,b]
+                    for(k,1,100, 
+                         t = (a+b)/2,
+                         y = stdnormCDF(t),
+                     test(abs(x-y)<0.0000001, break, y<x,a=t, b=t)
+                    ), float(t) ))
+
+--................................................ END helpers
+
+""
+"============================ procedure two sample Z-TEST"
+"--- 1. ---  EXAMPLE: BOYS AND GIRLS"
+--=========================================================
+
+-- We start with an example from the STATISTICS TUTORIAL
+-- https://statstutorial.com/two-sample-z-test-in-r-with-examples/
+-- to have a reference solution.
+
+-- Lets take IQ levels among boys and girls in 10th class are known 
+-- to be normally distributed each with population standard deviations 
+-- of 25. A teacher wants to know if the mean IQ level between girls
+-- and boys in class are different, so she selects a two random 
+-- samples of boys and girls each of size 40 from the class and 
+-- records their IQ levels.
+-- Lets perform the two sample z-test in R to determine if the mean
+-- IQ level is different between boys and girls with 5% level of 
+-- significance.
+
+-- SOLUTION:
+
+-- We will calculate the test statistic T (aka 'Z-score') by using 
+-- a two sample z-test for the mean.
+-- The procedure for Two Sample Z-Test for mean is as follows
+-- Step 1: Define the Null Hypothesis and Alternate Hypothesis.
+-- Step 2: Decide the level of significance α (alpha).
+-- Step 3: Calculate the test statistic T.
+-- Step 4: Interpret the two sample z-test results.
+-- Step 5: Determine the rejection criteria for the given confidence 
+--         level and conclude the result
+
+# Define the datasets for boys and girls
+
+-- boys data
+X = (79,118,99,117,98,102,112,111,102,73,114,97,114,122,90,115,
+84,105,84,126,83,96,111,151,147,103,104,118,132,108,95,118,121,88,94,
+92,94,109,105,123.)    -- we write '123.' to get float values
+
+-- girls data
+Y = (99,128,89,107,99,104,119,112,105,93,84,91,113,129,100,105,
+94,115,114,106,113,116,116,131,117,123,134,128,112,101,105,
+89,101,118,124,72,104,119,145,133.)
+
+# Perform the two sample z-test
+
+"-a.- H0: muBoys = muGirls"
+
+D = 0  -- = muX - muY
+
+nX  = dim(X)
+nY  = dim(Y)
+
+sigmaX = 25             -- known std.dev. for the boys
+sigmaY = 25             -- known std.dev. for the girls
+
+"-b.- level of significance alpha = 0.05"
+
+alpha = 0.05
+
+"-c.- calculate z-statistics T"
+
+mean(X) = sum(X)/dim(X)                  -- sample mean
+mean(X)
+mean(Y)
+
+T = ((mean(X)-mean(Y))-D)/sqrt(sigmaX^2/nX+sigmaY^2/nY)
+T                                   -- the Z-score
+"ok"
+
+Zcrit = stdnormINV(1-alpha/2)       -- alpha-quantile
+Zcrit                               -- 'critical value'
+
+# Calculate p-value if hypothesis is 'two.sided'
+
+min(a,b) = test(a<=b, a,b)
+
+p  = min( 2 * stdnormCDF(T), 2 * (1-stdnormCDF(T)))
+p
+
+-- or shorter
+
+pvalue = 2 * stdnormCDF(-abs(T))
+pvalue  
+"ok"
+
+# Confidence interval CI 
+
+SEdiff = sqrt(sigmaX^2/nX + sigmaY^2/nY)  -- std.error of mean
+
+CI = ((mean(X)-mean(Y)) - Zcrit*SEdiff, 
+      (mean(X)-mean(Y)) + Zcrit*SEdiff)
+CI
+
+-- CI is for the difference D=mu1-mu2, NOT for the means itself!
+-- The formula is based on the difference between sample statistics,
+-- plus or minus the critical z-value multiplied by  
+-- the standard error of the difference. 
+
+-- RESULTS
+
+-- data: boys_dataset and girls_dataset
+-- z = -0.68424, p-value = 0.4938
+-- alternative hypothesis: true difference in means is not equal to 0
+-- at 95 percent confidence interval:  -14.781532 7.131532
+-- sample estimates:  mean of boys  mean of girls
+--                    106.350       110.175
+
+"-d.-  Interpretation of result and decision about H0"
+
+-- Compare Z-score 'T' with critical value and decide
+
+test( abs(T) > Zcrit, "Reject the null hypothesis.",
+                      "Accept the null hypothesis.")
+
+-- Since the p-value[ 0.4938] is greater than the level of 
+-- significance (α) = 0.05, we fail to reject the null hypothesis.
+-- This means we have sufficient evidence to say that IQ level for 
+-- boys and girls are equal in 10th class.
+
+
+"--- 2. ---"
+
+-- We now abstract the above procedure to a function  ztest2:
+
+# PROCEDURE 
+"============================ FULL AUTOMATIC two sample Z-TEST"
+   min(a,b) = test(a<=b, a,b)
+   mean(X)  = sum(X)/dim(X)        
+
+############################################################
+ztest2(X,Y, muX, muY, sigmaX, sigmaY, alpha, altHyp,  M) =
+############################################################
+   # output: (Z-value, quantile, ConfidenceInterval, p-value)
+   do(print(" __ two sample Z-test __"), 
+   nX  = dim(X),
+   nY  = dim(Y),
+   Z = ((mean(X)-mean(Y))-(muX-muY))/sqrt(sigmaX^2/nX+sigmaY^2/nY),
+   Z = float(Z),
+   SEdiff = sqrt(sigmaX^2/nX + sigmaY^2/nY), -- std.error diff
+   test( altHyp == 0,                        -- two-sided test
+         do(
+            Zcrit = stdnormINV(1-alpha/2),   -- alpha-quantile
+            CI = ((mean(X)-mean(Y)) - Zcrit*SEdiff, 
+                  (mean(X)-mean(Y)) + Zcrit*SEdiff),
+            p  = min( 2 * stdnormCDF(Z), 2 * (1-stdnormCDF(Z))), 
+            p
+            )),
+   test( altHyp == 1,                    -- one-sided test greater
+         do( print("exercise for you :)") )),
+   test( altHyp == -1,                   -- one sided smaller
+         do( print("exercise for you :)") )),
+   test( abs(Z) > Zcrit, print("Reject the null hypothesis."),
+                         print("Accept the null hypothesis.") ),
+   M = zero(5,2),
+   M[1,1] = "Z",
+   M[2,1] = "Z score",
+   M[3,1] = "CI.left",
+   M[4,1] = "CI.right",
+   M[5,1] = "p",
+   M[1,2] = Z,
+   M[2,2] = Zcrit,
+   M[3,2] = CI[1], 
+   M[4,2] = CI[2],
+   M[5,2] = p,
+   M
+)
+-------------------------------------------------- END two Z-test
+
+# Repeat the datasets for boys and girls and do the Z-test
+
+boys= (79,118,99,117,98,102,112,111,102,73,114,97,114,122,90,115,
+84,105,84,126,83,96,111,151,147,103,104,118,132,108,95,118,121,88,94,
+92,94,109,105,123.) 
+
+girls =(99,128,89,107,99,104,119,112,105,93,84,91,113,129,100,105,
+94,115,114,106,113,116,116,131,117,123,134,128,112,101,105,
+89,101,118,124,72,104,119,145,133.)
+
+# Perform the two sample z-test
+
+ztest2(boys,girls, 0,0, 25,25, 0.05, 0) 
+"ok"
+
+
+############################################################
+"--- 3. --- EXAMPLE: THE TWO URNS from ch.4.2 of the script"
+############################################################
+
+-- the data
+X=(47,37,46,38,35,38,40,37.)     -- . to get float values
+Y=(59,56,61,59,65,56,57,59.)     -- or do X=float(X)
+
+-- a.  doing step wise
+
+# Calculating statistics
+
+m=dim(X)
+m
+n=dim(Y)
+n
+
+mean(X) = sum(X)/dim(X)                  -- sample mean
+mu1 = mean(X)
+mu1
+
+mu2 = mean(Y)
+mu2
+
+var(X) = sum((X-mean(X))^2) / dim(X)     -- sample variance
+sd(X)  = sqrt(var(X))                    -- std.deviation s
+
+sigma1 = sd(X)
+sigma1
+
+sigma2 = sd(Y)
+sigma2
+
+alpha = 0.05
+alpha
+
+# Calculate Z statistic aka T aka z-score
+
+zstat = (mu1 - mu2) / sqrt(sigma1^2 / m + sigma2^2 / n)
+zstat
+
+Zcrit = stdnormINV(1-alpha/2)        -- quantile aka critical value
+Zcrit
+
+# Calculate p-value for hypothesis 'two.sided'
+
+pvalue = 2 * stdnormCDF(-abs(zstat))
+pvalue  
+
+# Confidence interval CI
+
+SEdiff = sqrt(sigma1^2/m + sigma2^2/n)
+SEdiff
+
+CI = ((mu1-mu2) - Zcrit*SEdiff, (mu1-mu2) + Zcrit*SEdiff)
+CI
+
+-- b.  automatic solution using ztest2 function with above data
+
+X=(47,37,46,38,35,38,40,37.)     -- . to get float values
+Y=(59,56,61,59,65,56,57,59.)     -- or do X=float(X)
+
+--     X,Y, muX, muY, sigmaX,  sigmaY,  alpha, altHyp,
+ztest2(X,Y, 0,     0, 4.11552, 2.78388, 0.05,  0)         
+"ok"
+
+
+"--- 4. ---  EXERCISE"
+
+-- Do example 1 and example 2 in
+-- http://www.countbio.com/web_pages/left_object/R_for_biology/R_biostatistics_part-1/two_sample_Z_test.html
+
+
+"--- 5. --- OPEN EDUCATOR example"
+
+##
+## OPEN EDUCATOR Two Sample T-Test Equal Variance STEPS
+## 
+-- https://www.theopeneducator.com/doe/hypothesis-Testing-Inferential-Statistics-Analysis-of-Variance-ANOVA/Two-Sample-Z-Test
+
+" SPERLING DATA"
+-- US
+X =(69.12,66.88,74.82,67.00,69.12,65.00,71.00,66.76,72.12,72.94,
+    69.18,66.18,64.94,71.76,70.12,71.00,71.88,65.24,70.06,71.94,
+    72.12,66.88,73.82,74.00,71.18,67.88,65.94,68.88,68.00,75.12)
+-- Sweden
+Y =(74.56,71.89,73.00,67.78,72.22,68.00,73.56,75.00,68.22,69.00,
+    68.00,72.00,73.56,72.56,75.00,68.33,71.67,72.44,75.00,71.89,
+    72.00,70.00,69.22,74.44,68.00,73.89,70.00,70.44,70.22,73.33)
+      
+-- samples X and Y
+-- population mean   69.98  70.43
+-- stdDevs           3.12   2.44
+
+dim(X)
+
+mean(X) = sum(X)/dim(X)                  -- sample mean
+mu1 = mean(X)  -- US male POP !!
+mu1
+
+mu2 = mean(Y)  -- SW male POP !!
+mu2
+
+var(X) = sum((X-mean(X))^2) / dim(X)     -- sample variance
+sd(X)  = sqrt(var(X))                    -- std.deviation s
+
+sigma1 = sd(X)
+sigma1
+
+sigma2 = sd(Y)
+sigma2
+
+alpha = 0.05
+
+sdX = sqrt(256)
+sdY = sqrt(256)
+sdY
+
+# Calculate Z statistic
+--                    given
+zstat = ((mu1 - mu2)-(69.98-70.43)) / sqrt(3.12^2/m + 2.44^2/n)
+zstat                                 --   variance
+-- -2.51 ??
+
+# Calculate p-value
+# if alternative hypothesis is 'two.sided'
+
+pvalue = 2 * stdnormCDF(-abs(zstat))
+pvalue    -- 0.0122 
+
+-- automatic solution with ztest2() function
+-- population mean 69.98  70.43
+-- stdDev     s     3.12   2.44
+
+muX = 69.98
+muY = 70.43
+sigmaX =3.12
+sigmaY = 2.44
+alpha = 0.05
+altHyp = 0
+
+ztest2(X,Y, muX, muY, sigmaX, sigmaY, alpha, altHyp,  M) 
+
+
+"--- 6. ---  TWO MEDICATIONS"
+
+-- https://www.geeksforgeeks.org/data-science/z-test/
+
+-- EXAMPLE (Two MEDICATIONS in g4g > 2. Two-sampled z-test)
+-- A researcher wants to compare the effectiveness of two different 
+-- medications for reducing blood pressure. Medication A is tested on
+-- 50 patients, resulting in a mean reduction of 15 mmHg with a
+-- standard deviation of 3 mmHg.
+-- Medication B is tested on 60 patients, resulting in a mean
+-- reduction of 13 mmHg with a standard deviation of 4 mmHg.
+-- At a 1% significance level, is there a significant difference 
+-- between the two medications?
+
+-- SOLUTION
+
+n1 = 50
+x1 = 15
+s1 = 3
+
+n2 = 60
+x2 = 13
+s2 = 4.
+
+# Step 1: State the hypotheses
+D = 0        -- D = mu1-mu2 =0 is H0
+
+alpha = 0.01
+
+# Step 2: Calculate the Z-score
+zscore = ((x1 - x2) - D)/sqrt((s1^2/n1) + (s2^2 / n2))
+abs(zscore)
+
+# Step 3: Find the critical value (two-tailed test at 1% significance)
+zcrit = stdnormINV(1 - alpha/2)       -- crit Z score
+zcrit
+
+#Step 4: Compare Z-score with critical value and decide
+test( abs(zscore) > zcrit, "Reject the null hypothesis.")
+
+
+-- EXERCISE
+-- Do the example in
+-- https://teflpedia.com/Independent_two-sample_z-test
+-- https://www.stata.com/manuals/rztest.pdf ex2, ex3 >> ttest !!
+-- https://statisticsbyjim.com/hypothesis-testing/z-test/
+
+
+"--- 7. ---  EXAMPLE from REAL STATISTICS"
+
+-- https://real-statistics.com/sampling-distributions/comparing-two-means-with-known-variancesi/
+
+X=(82.67,90.11,89.20,119.15,83.01,93.61,88.42,97.02,126.11,127.96,
+89.03,94.51,93.32,89.26,110.36,92.52,112.87,64.05,80.06,74.13,
+109.13,81.59,94.99,101.34,104.82,106.92,80.50,106.31,85.46,103.69)
+
+Y=(106.18,100.86,129.85,100.30,87.56,96.87,112.57,148.36,131.62,
+114.60,95.47,108.66,83.32,117.64,96.90,66.46,87.80,115.52,102.34,
+97.01,117.51,115.64,97.22,131.04,101.58,103.80,111.99,119.34,95.10,
+107.62)
+
+dim(X)
+dim(Y)
+
+mean(X) = sum(X)/dim(X)                  -- sample mean
+mu1 = mean(X)
+mu1
+
+mu2 = mean(Y)
+mu2
+
+var(X) = sum((X-mean(X))^2) / dim(X)     -- sample variance
+sd(X)  = sqrt(var(X))                    -- std.deviation s
+
+sigma1 = sd(X)
+sigma1
+
+sigma2 = sd(Y)
+sigma2
+
+alpha = 0.05
+
+sdX = sqrt(256)
+sdY = sqrt(256)
+sdY
+
+-- Check with ztes2():
+--     X,Y, muX, muY, sigmaX, sigmaY, alpha, altHyp,
+ztest2(X,Y, mu1, mu2, sdX, sdY, 0.05,  0)        
+ztest2(X,Y, mu1, mu2, sigma1, sigma2, 0.05,  0)         
+ 
+"ok"

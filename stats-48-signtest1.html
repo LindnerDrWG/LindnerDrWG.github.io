@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+##| One-Sample sign test  with Eigenmath    - Ch. 4.8 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+-- Prerequisites
+--.........................................................
+    min(a,b) = test(a<=b, a,b)
+    binoPDF(k,n,p) =            choose(n,k)*p^k*(1-p)^(n-k)
+    binoCDF(k,n,p) = sum(j,0,k, choose(n,j)*p^j*(1-p)^(n-j) )
+--......................................................... END
+
+
+######################################
+"--- 1. ---  EXAMPLE:  FIRST MARRIAGE"
+######################################
+
+-- We use the example 9.1 from Herrmann [6, p.135].
+-- PROBLEM: The following table 
+--    year    1971  1972  1973  ..
+--    age    (26.0, 25.6, 25.5, 25.6, 25.3, 25.6, 25.7, 25.9, 
+--            26.0, 26.1, 26.3, 26.6, 26.9, 27.0)
+-- shows the average age of men at first marriage (Federal Republic 
+-- of Germany, 1971-1984). The table is to be examined for a trend.
+-- Check, if the age of 1st marriage has median 26.
+-- Use the one-sample-sign-test to analyze the experiment.
+
+-- SOLUTION:
+
+"FIRST we do a step-by-step solution."
+ 
+X = (26.0, 25.6, 25.5, 25.6, 25.3, 25.6, 25.7, 25.9, 26.0, 26.1, 
+     26.3, 26.6, 26.9, 27.0)            -- the data
+
+n = dim(X)
+n
+
+md = 26                              -- hypo. median
+md 
+
+D = X-26
+D
+
+# Calculate total number of trials with scores equal to md 26
+n26 = sum(i,1,n, X[i] == 26)          -- don't use X[i]=26
+n26
+
+nt = dim(X) - sum(i,1,n, X[i] == 26)  -- n - sum(D == 0)
+nt                                    -- reduced data dim
+
+# Calculate number of successes of scores greater than md=26
+s = sum(i,1,n, X[i]>26)         -- i.e. sum(diff > 0)
+s
+
+s0 = sum(i,1,n, X[i]<26)        -- we do not need s0, FYIO
+s0
+
+
+# Calculate total number of trials excluding scores equal to 26
+ntotal = sum(i,1,n, not(X[i] == 26))     -- same as nt, FYIO
+ntotal
+
+-- We have:  N+ = 5 = s, N- = 7, N°26 = 2, NTotal = 12 = nt
+-- Now we can calculate the p-value in the case "both-sided":
+
+p1 = sum(i,0,s,  binoPDF(i,nt, 0.5)) 
+p1
+
+p2 = 1 - sum(i,0,s-1, binoPDF(i,nt, 0.5))
+p2
+
+p = min(2 * p1, 2 * p2)    -- 3rd case?, (.,.,1) with min.extended
+p
+"ok"                       -- same result using R
+
+-- RESULT:
+-- We count 5 differences with a positive sign.
+-- The test statistics T is therefore s = 5.
+-- The probality p for s = 5 is 0.7744 > 0.05.
+
+-- INTERPRETATION:
+-- The null hypothesis, Ho: x_0.5=median=26, can be 
+-- rejected with a 21.2 % probability of error. 
+
+
+"--- 2. --- abstract to function signtest in Eigenmath"
+-- We implement this procedure as function signtest in Eigenmath.
+
+### --------------------------------------------------------------
+###        signtest(X,medium0, method)     
+###                            method = "left","right","both"
+### --------------------------------------------------------------
+
+signtest(X,med,method,  n,p,p1,p2,s,nt) = do(
+  print(" ___ signtest ___"),
+  n  = dim(X),
+  nt = sum(i,1,n, not( X[i] = med)),     
+  s  = sum(i,1,n,      X[i] > med),   -- success; test value T
+  test(method="both",
+               do(p1 = sum(i,0,s,  binoPDF(i,nt,0.5)),
+                  p2 = 1-sum(i,0,s-1, binoPDF(i,nt,0.5)),
+                  p  = min(2 * p1, 2 * p2) ),
+       method="right",
+               do( p = 1-sum(i,0,s-1, binoPDF(i,nt,0.5))),
+       method="left",
+               do( p = sum(i,0,s,  binoPDF(i,nt,0.5))), p),
+  (("s", "p"), (s, p)) )
+
+-------------------------------------------------------------END
+
+-- Check the experiment:
+X = (26.0, 25.6, 25.5, 25.6, 25.3, 25.6, 25.7, 25.9, 26.0, 26.1, 
+     26.3, 26.6, 26.9, 27.0)            -- the data
+
+medium0 = 26.0               -- hypo. median
+signtest(X, 26.0, "both")   
+
+"ok"
+
+-- We look up:
+-- We count 5 differences with a positive sign.
+-- The test statistics is therefore s = 5.
+-- The probability p for s = 5 is 0.7744 > 0.05.
+
+-- INTERPRETATION:
+-- The null hypothesis, Ho: x_0.5=median, can be 
+-- rejected with a 21.2 % probability of error. 
+
+-- Check in R:
+-- .. s = 5, p-value = 0.7744
+-- .. alternative hypothesis: true median is not equal to 26
+-- .. 95 percent confidence interval:
+--               25.60000 26.34978
+-- .. sample estimates: median of x 
+-- ..                   25.95 
+
+
+"--- 3. ---   REMARK and SURPLUS"
+
+-- We can do the decision about the H0 using alpha-quantiles
+-- of the binomial distribution, see the script.
+-- Therefore we cite function binoINV():
+
+---------------------------------------- binoINV - Binomial INVerse
+  binoINV(alpha,n,p, x,k) = do( k=0,        -- p probability
+               loop(k=k+1, x=binoCDF(k,n,p), test(x>alpha, break))
+               x,k)
+---------------------------------------- END
+
+alpha = 0.05
+nt  = 12                                -- n total
+T   = 5                                 -- T=s test statistic
+qt1 = binoINV(alpha/2, nt, 0.5)         -- alpha quantile
+qt1
+
+qt2 = binoINV(1-alpha/2, nt, 0.5)       -- alpha quantile
+qt2
+
+--       5   3    5   9
+test( or(T < qt1, T > qt2), "reject H0", "accept H0")
+"ok"
+
+
+"--- 4. ---   EXERCISE by SPRENT"
+
+-- Do the example of sign test for median of a single sample in
+--    https://en.wikipedia.org/wiki/Sign_test
+-- in Eigemath.
+
+
+"--- 5. ---   EXERCISE from R"
+
+-- Do the following example from R documentation in Eigemath:
+-- R> x <- c(7.8, 6.6, 6.5, 7.4, 7.3, 7., 6.4, 7.1, 6.7, 7.6, 6.8)
+-- R> SIGN.test(x, md = 6.5)
+-- Verify:
+--    s = 9, p-value = 0.02148
+--    alternative hypothesis: true median is not equal to 6.5
+--    95 percent confidence interval:
+--       6.571273 7.457455
+--    sample estimates: median of x 
+--                      7 
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

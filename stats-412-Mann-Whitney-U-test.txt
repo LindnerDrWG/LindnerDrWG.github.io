@@ -1,0 +1,276 @@
+##| MANN-WHITNEY-U-test  with Eigenmath    - Ch. 4.12 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+
+--................................. Prerequisites: sort, Rank etc.
+min(a,b) = test(a<=b, a,b)
+
+median(X, xmed,Xs,n2,n2p) = do(
+          Xs   = sort(X),
+          n2   = floor(dim(X)/2),  
+          n2p  = n2+1,
+          xmed = test( not(mod(dim(X),2)=0), Xs[n2p], 
+                       0.5*(Xs[n2]+Xs[n2p])), float(xmed))
+
+stdnormCDF(x)  = 1/2*erfc(-x/sqrt(2))
+
+sort(v,i,k,n,t) = do( n = dim(v),     -- by G. Weigt, 19.7.2025
+     loop( test(n < 2, break), k = 1,
+           for(i, 1, n - 1,
+               test(v[i] > v[i + 1], 
+                 do( t = v[i], v[i] = v[i + 1], v[i + 1] = t,
+                     k = i ))), n = k), v)
+
+Rank(W, i,j,k,n,t, Srank) = do(       -- by G. Weigt 8/25  
+         j = 1, n = dim(W), Srank = 0,
+         loop( test(j > n, break),
+               k = j + 1,
+               loop( test(k > n, break, W[j]==W[k], k=k+1, break)),
+               t = 0.5*(j + k - 1),
+               for(i, j, k-1, W[i] = t),
+               t = k - j,
+               Srank = Srank + t^3 - t,
+               j = k), Srank,W)
+
+correspond(X,sX, M) = do(   -- X and sorted X, by W. Lindner '25
+    M=zero(dim(X)),
+    for(j,1,dim(X),
+    for(i,1,dim(X), test(sX[i]==X[j], M[j]=Rank(sX)[i]))), M)
+--............................................................ END
+
+#####################################
+"--- 1. --- EXAMPLE: butterflies"
+#####################################
+
+-- PROBLEM: (cited from Zoefel [19, p.103])
+-- As part of a biological study, butterflies were observed at various 
+-- times within a fixed timeframe. 
+-- The weather conditions were recorded, with a general 
+-- classification into sunny and cloudy periods. 
+-- The results are shown in the table:
+--     sunny : 6 15 35 35 62 73 98 112
+--     cloudy: 1  4  8 17 23 34 43
+
+-- An U test should explain whether the difference between the two 
+-- median values of the samples is significant.
+
+-- SOLUTION:
+
+"FIRST: We do a step-by-step solution."
+
+X = (6, 15, 35, 35, 62, 73, 98, 112)
+Y = (1, 4, 8, 17, 23, 34, 43)
+
+median(X)  -- 48.5
+median(Y)  -- 17
+
+-- rank.ing the data by eye
+TX    = zero(4, 11)
+TX[1] = ("sun:", 6, 15, 35, 35, 62, 73, 98, 112, "", "sum:")
+TX[2] = ("rank:",3,5,9.5,9.5,12,13,14,15,"___", "")
+TX[3] = ("cloud:", 1, 4, 8, 17, 23, 34, 43,"", "", "")
+TX[4] = ("rank:", 1,2,4,6,7,8,11,"","___", 0 )
+TX[2,11] = sum(j,2,9, TX[2,j])
+TX[4,11] = sum(j,2,8, TX[4,j]) 
+transpose(TX)
+
+-- We now create the process from column to column.
+-- First collect data X and Y in one sample Z
+
+Z= zero(dim(X)+dim(Y))       
+   for(i,1,dim(X), Z[i]=X[i])
+   for(i,1,dim(Y), Z[i+dim(X)]=Y[i])
+Z 
+
+Zs = sort(Z)    
+Zs
+
+-- establish a correspondence between Z and the sorted Zs 
+-- which gives the rank numbers for each entry of Z
+
+Zc = correspond(Z,Zs)         -- ok
+Zc 
+
+-- now add the ranks of entrys in X and Y by splitting Z -> X,Y
+
+R1 = sum(i,1,dim(X), Zc[i])          -- rank sum of X
+R1
+
+R2 = sum(i,1,dim(Y), Zc[i+dim(X)])   -- rank sum of y
+R2
+
+-- now calculate the U statistic
+
+n1 = dim(X)
+n1
+n2 = dim(Y)
+n2
+
+-- alternative determination of the ranks using 'eye' table TX
+-- R1 =  sum(j,2,8, TX[4,j])   
+-- R1
+-- R2 =  sum(j,2,9, TX[2,j]) 
+-- R2
+
+n = n1+n2
+n
+
+U1 = R1 - n1*(n1+1)/2
+U1
+
+U2 = R2 - n2*(n2+1)/2
+U2
+
+-- critical value U to test is the minimum of U1 and U2
+
+U = min(U1,U2)      
+U
+
+## To check the hypothesis we need the Wilcoxon-Mann-Whitney table
+## see e.g. https://chem.pg.edu.pl/documents/175361/28234418/U.pdf
+## https://lesn.appstate.edu/olson/stat_directory/Statistical%20procedures/Mann_Whitney%20U%20Test/Mann-Whitney%20Table.pdf
+
+-- To facilitate we present the table here as Eigenmath matrix
+-- for alpha level 0.05
+
+## U(n1,n2) table of critical values for n1=col, n2=row
+
+U05 = 
+(("-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-","-",
+  "-","-","-"), -- 21 entries
+ ("-","-","-","-","-","-","-",0,0,0,0,1,1,1,1,1,2,2,2,2),      -- 1
+ -- 1, 2,  3,  4, 5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+ ("-","-","-","-",0,1,1,2,2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8),
+ ("-","-","-",0,1,2, 3,4,4,5,6,7,8,9,10,11,11,12,13,14),
+ ("-","-",0,1,2,3,5, 6,7,8,9,11,12,13,14,15,17,18,19,20),      -- 5
+ ("-","-",1,2,3,5,6, 7,10,11,13,14,16,17,19,21,22,24,25,27),
+ ("-","-",1,3,5,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34),
+ ("-",0,2, 4,6,7,10,13,15,17,19,22,24,26,29,31,34,36,38,41),
+ ("-",0,2, 4,7,10,12,15,17,20,23,26,28,31,34,37,39,42,45,48),
+ ("-",0,3, 5,8,11,14,17,20,23,26,29,33,36,39,42,45,48,52,55),  --10
+ ("-",0,3, 6,9,13,16,19,23,26,30,33,37,40,44,47,51,55,58,62),
+ ("-",1,4, 7,11,14,18,22,26,29,33,37,41,45,49,53,57,61,65,69),
+ ("-",1,4, 8,12,16,20,24,28,33,37,41,45,50,54,59,63,67,72,76),
+ ("-",1,5, 9,13,17,22,26,31,36,40,45,50,55,59,64,67,74,78,83),
+ ("-",1,5,10,14,19,24,29,34,39,44,49,54,59,64,70,75,80,85,90), -- 15
+ ("-",1,6,11,15,21,26,31,37,42,47,53,59,64,70,75,81,86,92,98),
+ ("-",2,6,11,17,22,28,34,39,45,51,57,63,67,75,81,87,93,99,105),
+ ("-",2,7,12,18,24,30,36,42,48,55,61,67,74,80,86,93,99,106,112),
+ ("-",2,7,13,19,25,32,38,45,52,58,65,72,78,85,92,99,106,113,119),
+ ("-",2,8,13,20,27,34,41,48,55,62,69,76,83,90,98,105,112,119,127), --20
+ ("-",3,8,15,22,29,36,43,50,58,65,73,80,88,96,103,111,119,126,134),
+ ("-",3,9,16,23,30,38,45,53,61,69,77,85,93,101,109,117,125,133,141),
+ ("-",3,9,17,24,32,40,48,56,64,73,81,89,98,106,115,123,132,140,149),
+ ("-",3,10,17,25,33,42,50,59,67,76,85,94,102,111,120,129,138,147,156),
+ ("-",3,10,18,27,35,44,53,62,71,80,89,98,107,117,126,135,145,154,163),--
+ ("-",4,11,19,28,37,46,55,64,74,83,93,102,112,122,132,141,151,161,171),
+ ("-",4,11,20,29,38,48,57,67,77,87,97,107,117,127,137,147,158,168,178),
+ ("-",4,12,21,30,40,50,60,70,80,90,101,111,122,132,143,154,164,175,186),
+ ("-",4,13,22,32,42,52,62,73,83,94,105,116,127,138,149,160,171,182,193),
+ ("-",5,13,23,33,43,54,65,76,87,98,109,120,131,143,154,166,177,189,200), ("-",5,14,24,34,45,56,67,78,90,101,113,125,136,148,160,172,184,196,208),
+("-",5,14,24,35,46,58,69,81,93,105,117,129,141,153,166,178,190,203,215), ("-",5,15,25,37,48,60,72,84,96,108,121,133,146,159,171,184,197,210,222),
+("-",5,15,26,38,50,62,74,87,99,112,125,138,151,164,177,190,203,217,230),
+("-",6,16,27,39,51,64,77,89,103,116,129,142,156,169,183,196,210,224,237), ("-",6,16,28,40,53,66,79,92,106,119,133,147,161,174,188,202,216,231,245),
+("-",6,17,29,41,55,68,81,95,109,123,137,151,165,180,194,209,223,238,252), ("-",6,17,30,43,56,70,84,98,112,127,141,156,170,185,200,215,230,245,259),
+("-",7,18,31,44,58,72,86,101,115,130,145,160,175,190,206,221,236,252,267), ("-",7,18,31,45,59,74,89,103,119,134,149,165,180,196,211,227,243,258,274)) -- 40
+
+-- the whole U table for alpha = 0.05.
+U05
+
+-- check some U values with U table
+U05[6,6]   -- 5
+U05[7,8]   -- = 10, ok
+U05[17,17] -- ok
+
+critValue = U05[dim(X), dim(Y)]
+critValue
+U
+test( or(U > critValue, U = critValue) , "> reject H0", "> accept H0")
+
+-- RESULT and DECISION:  U > critV(0.05;7,8)=10
+-- We have U = 11 > 10 = U05[7,8] of U table.
+-- The calculated U value has to be smaller/equal than the tabulated U0.
+-- Here the significance is narrowly missed w.r.t. alpha=0.05. 
+
+"ok"
+
+------------------------------------------------------------
+"Calculate the approximative p-value with test statistic T:"
+
+-- REMARK 
+-- calc the approximative p-value using stdnormCDF.
+-- Define the T statistic:
+
+T = (R2-0.5*n2*(n+1))/sqrt(n1*n2*(n+1)/12)
+T
+
+-- pValue = normCDF(mag(T),0,1)
+pValue = stdnormCDF(mag(T))
+pValue
+
+test(pValue < 0.975, "> accept H0", "> reject H0")
+"ok"
+
+
+### CHECK with R
+# > X=c(6, 15, 35, 35, 62, 73, 98, 112)
+# > Y=c(1, 4, 8, 17, 23, 34, 43)
+# > wilcox.test(x = Y,y = X, alternative="two.sided", 
+#                            paired=FALSE, exact = F)
+#
+#	Wilcoxon rank sum test with continuity correction
+#  data:  Y and X
+#  W = 11, p-value = 0.05598
+#  alternative hypothesis: true location shift is not equal to 0
+
+
+"--- 3. --- ranksum (MatLab) alias wilcox.test (R) in EIGENMATH"
+-- function ranksum in Eigenmath to automate the above procedure.
+
+
+################################################################
+          ranksum(X,Y, Z,Zs,Zr, R1,R2,U1,U2) = 
+################################################################
+   do( -- we use pValue criterion instead of Ucritical
+       mX = median(X),  
+       mY = median(Y),  
+       Z  = zero(dim(X)+dim(Y)), 
+             for(i,1,dim(X), Z[i]=X[i]),
+             for(i,1,dim(Y), Z[i+dim(X)]=Y[i]),
+       Zs = sort(Z),      
+       Zc = correspond(Z,Zs),       
+       R1 = sum(i,1,dim(X), Zc[i]),         
+       R2 = sum(i,1,dim(Y), Zc[i+dim(X)]),  
+       n  = dim(X)+dim(Y),
+       U1 = R1 - n1*(n1+1)/2,
+       U2 = R2 - n2*(n2+1)/2,
+       U  = min(U1,U2),      
+       T  = (R2-0.5*n2*(n+1))/sqrt(n1*n2*(n+1)/12),
+       pValue = stdnormCDF(mag(T)),
+       print("  _______ ranksum _______"),
+       Ho = test(pValue < 0.975, "accept H0", "reject H0"),
+      (("U", "p", "Ho"), (U, pValue, Ho )))
+########################################################### END
+
+-- Check:
+
+X = (6, 15, 35, 35, 62, 73, 98, 112)
+Y = (1, 4, 8, 17, 23, 34, 43)
+ranksum(X,Y)
+
+
+"--- 3. --- DO example in Spiegel p. 447, 454"
+
+-- two sorts of alloy
+A1 = (18.3, 16.4, 22.7, 17.8, 18.9, 25.3, 16.1, 24.2)
+A2 = (12.6, 14.1, 20.5, 10.7, 15.9, 19.6, 12.9, 15.2, 11.8, 14.7)
+
+-- Do a MW-test to check if the come from the same poulation.
+
+n1 = dim(A1)
+n2 = dim(A2)
+
+-- ..
+
+-- Result: reject Ho at the 0.05 level.

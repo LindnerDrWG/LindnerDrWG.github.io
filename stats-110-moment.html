@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+##| r-st MOMENT  with Eigenmath    - Ch. 1.10 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+
+-- moment needs function mean as helper
+mean(X)       = float( sum(X)/dim(X) )          -- empir.sample mean
+
+# DEFINITION
+------------------------------------------------------ 
+
+moment(X,r)    = float( sum((X-mean(X))^r)/dim(X) ) -- .. about mean
+moment0(X,r)   = float( sum(X^r) /dim(X) )          -- moment about 0
+
+------------------------------------------------------ END
+-- REMARK: The moment about the _mean(X_) is the default
+
+
+"--- 0. ---"
+
+X = (4, 36, 45, 50, 75)
+moment0(X,1)            
+moment0(X,2)             
+moment0(X-4,3)           
+
+
+"--- 1. ---"
+
+X = (0.5377,1.8339,-2.2588,0.8622,0.3188,-1.3077)
+moment(X,3)              --  -1.1143, R with center=TRUE
+moment0(X,3)             --  -1.1274, R with center=FALSE
+"ok"
+
+
+"--- 2. ---"
+
+-- EXAMPLE Spiegel, p.129, P 5.1 
+-- Calculate the first, second, third and fourth moments of the
+-- data set 2,3,7,8,10.
+-- SOLUTION:
+
+X=(2,3,7,8,10)
+
+mean(X)
+moment0(X,1)
+moment0(X,2)
+moment0(X,3)
+moment0(X,4)
+"ok"
+
+-- Do P 5.2, default moment about the mean
+moment(X,1)
+moment(X,2)
+moment(X,3)
+moment(X,4)
+"ok"
+
+-- P 5.3, calculate moment of X about A=4
+-- we need a variant of moment
+------------------------------------------------------ 
+   momentA(X,A,r) = float( sum((X-A)^r)/dim(X) )   -- .. about A
+------------------------------------------------------ 
+
+momentA(X,4, 1)
+momentA(X,4, 2)
+momentA(X,4, 3)
+momentA(X,4, 4)
+"ok"
+
+
+"--- 3. --- EXAMPLE Spiegel, p.131 P 5.6"
+
+-- EXAMPLE Spiegel, p.131 P 5.6 
+-- Students marks in a class have the following frequency table
+--          class mark:  61 64 67 70 73
+--          frequency :   5 18 42 27  8
+-- i.e. class mark 67 comes with frequency 42.
+-- Task: find the first four moments of the class marks.
+-- SOLUTION: needs meanF for grouped data!
+
+f=( 5,18,42,27, 8)    -- freq
+X=(61,64,67,70,73)    -- marks
+
+-- need a variant of moment w.r.t. mean of grouped data
+------------------------------------------------------ 
+   meanF(X,f)      = float( dot(f,X)/sum(f) )                 
+   momentMF(X,f,r) = float( dot( f, (X-meanF(X,f))^r)/sum(f) ) 
+------------------------------------------------------ 
+
+momentMF(X,f, 1)  -- approx. 0
+momentMF(X,f, 2)  -- 8.52
+momentMF(X,f, 3)  -- -2.69
+momentMF(X,f, 4)  -- 199.37
+"ok"
+
+"--- 4. --- EXAMPLE Spiegel, p.137, P5.27"
+
+-- EXAMPLE Spiegel, p.137 P5.27Í
+-- Task: find the first four moments for the distribution X:f.
+         
+X=(12,14,16,18,20,22)
+f=( 1, 4, 6,10, 7, 2)
+
+-- moment adaption due to frequency f
+momentMF(X,f,1)   -- 0
+momentMF(X,f,2)   -- 5.97
+momentMF(X,f,3)   -- -0.397
+momentMF(X,f,4)   -- 89.22
+"ok. P5.27"
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

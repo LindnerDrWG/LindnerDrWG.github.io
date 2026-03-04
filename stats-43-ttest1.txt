@@ -1,0 +1,287 @@
+##| One Sample t-Test  with Eigenmath    - Ch. 4.3 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+## Hypothesis Tests for One Population Mean when Sigma is Unknown
+
+"--- 0. --- Prerequisites"
+
+-- To calculate the t-TEST score 'T' we need the functions
+-- tCDF() and tINV() from t-distribution.txt as helper, see Ch.3.3 
+
+# DEFINITIONs
+--........................................................ tINV tCDF
+  tCDF(x, df) = tdist(x, df)     
+  tINV(x, df) = tdistinv(x, df)
+--........................................................ END
+
+
+#################################################
+"--- 1. ---  EXAMPLE: STUDENTS WEIGHT in Europe"
+#################################################
+
+-- Source: -- https://www.geo.fu-berlin.de/en/v/soga-r/Basics-of-statistics/Hypothesis-Tests/Hypothesis-Tests-for-One-Population-Mean/Sigma-Is-Unknown/index.html
+ 
+-- A students data set consists of 8239 rows, each of them 
+-- representing a particular student, and 16 columns, each of them 
+-- corresponding to a variable/feature related to that particular 
+-- student. 
+-- We examine the average weight of a random sample of students from 
+-- the students data set and compare it to the average weight of all
+-- European adults. {\sc Walpole} et al. (2012) published data on the 
+-- average body mass (kg) per region, including Europe. 
+-- They report the average body mass for the European adult population 
+-- to be 70.8 kg. We therefore set mu0, the population mean, 
+-- accordingly to mu0=70.8. Further, we take a random sample (X) with
+-- a sample size of n=9. The sample consists of the weights in kg 
+-- of 9 randomly picked students from the students data set.
+
+X = (64.4, 68.5, 64.8, 58.9, 64.5, 68.6, 68.7, 62.9, 73.5)
+
+-- The null hypothesis H_0 states that the average weight of students
+-- equals the average weight of European adults as reported. 
+-- In other words, there is no difference between the mean weight of
+-- students and the mean weight of European adults.
+
+-- SOLUTION
+
+"- a. -    We first do the t-test STEP-BY-STEP with Eigenmath:"
+
+X = (64.4, 68.5, 64.8, 58.9, 64.5, 68.6, 68.7, 62.9, 73.5)
+
+n  = dim(X)
+n
+
+df = n - 1              -- degrees of freedom
+df
+
+mu0   = 70.8            -- the population mean
+mu0
+
+alpha = 0.05            -- set significance level
+alpha
+
+-------.......................................   some definitions
+mean(X) = sum(X)/dim(X)
+sd(X)   = float( sqrt(sum((X-mean(X))^2) /(dim(X)-1)) )
+sd1(X)  = float( sqrt(mean(X^2) - mean(X)^2) )  
+-------..........................................................
+
+xbar = mean(X)
+xbar
+
+s = sd(X)
+
+-- calculate test statistic T
+T = (xbar - mu0) / (s/sqrt(n))       
+T
+
+-- calculate critical value for lower.tail
+critVal = tINV(alpha, df)
+critVal
+    
+-- evaluate rejection region and decide about H0
+test(T > critVal,  print("reject H0"),  print("accept H0")) 
+"ok"
+
+"- b. -   abstract the process 't-test'"
+-- into a function ttest():
+
+# DEFINITION
+#############################################################
+ttest(x, mu0, alpha, method) =
+#################### method = "left","right","both" or -1,1,0
+  do(print("   ______ One Sample t-test ______"),
+     n    = dim(x),
+     df   = n - 1,
+     xbar = mean(x),
+     s    = sd(x),
+
+     # calculate test statistic T
+     tstat = (xbar - mu0) / (s/sqrt(n)),
+
+     # calculate critical value
+     test( method == -1,                   # for left-tailed test
+              do( critval = tINV(alpha, df), 
+                  test(tstat < critval, print("left: reject H0"),  
+                                        print("left: accept H0"))),
+           method == 1,                    # for right-tailed test
+              do( critval = tINV(alpha, df),
+                  test(tstat > critval, print("right: reject H0"),  
+                                        print("right: accept H0"))),
+           method == 0,                    # for two-sided test
+              do( critval = tINV(alpha/2, df), 
+                  test( or( abs(tstat) >  abs(critval), 
+                           -abs(tstat) < -abs(critval)), 
+                        print("both: reject H0"), 
+                        print("both: accept H0")))) ,
+     M = zero(4,2),
+     M[1,1] = "Significance level:",
+     M[2,1] = "Degrees of freedom:",
+     M[3,1] = "Test statistic:",
+     M[4,1] = "Critical value:",
+     M[1,2] = alpha,
+     M[2,2] = df,
+     M[3,2] = tstat, 
+     M[4,2] = critval,
+     M )
+####################################################### ttest END
+
+
+X = (64.4 , 68.5 , 64.8 , 58.9 , 64.5 , 68.6 , 68.7 , 62.9 , 73.5)
+mu0 = 70.8
+alpha = 0.05
+
+ttest(X, mu0, alpha,  0)     
+ttest(X, mu0, alpha,  1)     
+ttest(X, mu0, alpha, -1)  
+
+
+-- If the test statistic and thus the sample mean falls beyond the 
+-- critical value, meaning into the rejection region, we conclude 
+-- that at the 5 % significance level the data does provide 
+-- sufficient evidence to reject 𝐻0.
+
+
+"--- 2. ---  p-value and confidence interval"
+
+-- We calculate also the p-value and the confidence interval CI: 
+
+X = (64.4 , 68.5 , 64.8 , 58.9 , 64.5 , 68.6 , 68.7 , 62.9 , 73.5)
+
+mu0   = 70.8
+alpha = 0.05
+
+n
+df
+alpha
+
+T = (xbar - mu0) / (s/sqrt(n))    -- calculate test statistic T
+T
+                   
+p = tCDF(T,df)                    -- calculate p-value
+p
+
+tquantil = tINV(1-alpha/2, df)    -- method "both sided"
+
+mD = mean(X)
+s  = sd(X)
+
+CI = ( mD - tquantil*s/sqrt(n), mD + tquantil*s/sqrt(n) )
+CI
+
+
+"--- 3. ---  EXAMPLE: N(100,3^2) - distributed sample"
+----         Herrmann [6] p.81, p.96
+-- This is a normal N(100,3^2) - distributed sample of length 100.
+
+X = (96.3, 95.8, 91.7, 91.6, 98.7,
+     105.0, 99.4, 101.1, 92.9, 97.2,
+     110.6, 94.9, 101.2, 92.3, 106.1,
+     96.5, 107.9, 101.5, 99.0, 97.1,
+     90.8, 101.1, 101.0, 100., 106.9,
+     101.2, 95.7, 92.6, 101.1, 104.9,
+     101.1, 104.5, 105.5, 114.1, 91.8,
+     95.8, 93.5, 98.2, 98.8, 98.5,
+     108.1, 99.9, 105.1, 95.6, 98.3,
+     96.5, 94.9, 101.3, 94.7, 103.7,
+     99.0, 98.5, 94.4, 104.7, 93.2,
+     97.3, 104.3, 101.3, 96.9, 107.0,
+     95.0, 101.0, 103.4, 100.5, 100.2,
+     102.3, 95.1, 95.8, 102.9, 95.0,
+     102.7, 101.0, 105.5, 97.9, 104.0,
+     103.3, 97.7, 88.5, 95.5, 100.5,
+     102.3, 101.0, 100.0, 106.0, 102.8,
+     106.7, 106.6, 99.2, 112.2, 100.1,
+     99.3, 100.9, 99.8, 96.0, 97.9,
+     93.0, 93.7, 97.0, 95.8, 99.9)
+
+-------.........................................   some definitions
+mean(X) = sum(X)/dim(X)
+sd(X)   = float( sqrt(sum((X-mean(X))^2) /(dim(X)-1)) )
+sd1(X)  = float( sqrt(mean(X^2) - mean(X)^2) )  
+-------............................................................
+
+n  = dim(X)
+n
+
+df = n-1
+df
+
+xbar = mean(X)
+xbar
+
+s  = 4.1                          -- std.dev. of sample
+s
+
+mu0   = 100                       -- hypo. mean 100
+mu0
+
+alpha = 0.05
+alpha
+
+T = (xbar - mu0)*sqrt(n)/s        -- calculate test statistic T
+T                                 -- Herrmann: 0.518 ??
+                   
+p = tCDF(T,df)                    -- calculate p-value
+p                                 -- value of t-cum.distribution
+
+t95 = tINV(1-alpha/2, df)         -- method "both sided"
+t95                               -- t-quantile 95%
+
+CI = ( xbar - t95*s/sqrt(n), xbar + t95*s/sqrt(n) )
+CI
+
+ttest(X, 100, 4.1, 0.05, 0)       -- t test both-sided
+
+
+"--- 4. ---  EXAMPLE from statstutorial"
+
+-- We do an example from the STATISTICS TUTORIAL
+-- https://statstutorial.com/two-sample-z-test-in-r-with-examples/
+-- to have a reference solution.
+
+-- A random sample of screws have weights
+--          29.99 ,30.01 ,29.97 ,30.11 ,29.99 ,30.02.
+-- Calculate a 95% confidence interval for the population's mean 
+-- weight.
+-- Assume the population is distributed as N(μ, σ^2).
+
+-- SOLUTION
+
+X = (29.99 ,30.01 ,29.97 ,30.11 ,29.99 ,30.02)
+
+n  = dim(X)
+n
+
+df = n-1
+df
+
+-------.......................................   some definitions
+mean(X) = sum(X)/dim(X)
+sd(X)   = sqrt(sum((X-mean(X))^2) /(dim(X)-1.)) 
+-------..........................................................
+
+xbar = mean(X)
+xbar
+
+s  = sd(X)
+s
+
+alpha = 0.05
+alpha
+
+t95 = tINV(1-alpha/2, df)         -- method "both sided"
+t95                               -- t-quantile 95%
+
+CI = ( xbar - t95*s/sqrt(n), xbar + t95*s/sqrt(n) )
+CI
+"ok"
+-- RESULT
+-- If we sampled many times, our interval would capture the true mean 
+-- weight 95% of the time; thus, we are 95% confident that the true 
+-- mean weight of all screws will fall between 29.96 and 30.07.
+
+-- https://conjointly.com/kb/statistical-student-t-test/ >> picture
+
+ttest(X, 30, 0.049^2, 0.05, 0)

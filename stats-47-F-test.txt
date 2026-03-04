@@ -1,0 +1,165 @@
+##| F test   with Eigenmath    - Ch. 4.7 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+--- 0. --- Prerequisites: mean, sd, min, fCDF, fINV
+
+mean(X)  = sum(X)/dim(X)
+sd(X)    = sqrt(sum((X-mean(X))^2) /(dim(X)-1.))
+vari(X)  = sum((X-mean(X))^2) /(dim(X)-1.)         -- variance
+min(a,b) = test(a<=b, a,b)
+
+-- To calculate the F-TEST score 'T' we need the functions
+-- f.CDF() and f.INV() from F-distribution.txt as helper: 
+
+  fPDF(x,f1,f2) = float( sqrt(((f1*x)^f1*f2^f2)/(f1*x+f2)^(f1+f2)) /
+                         (x*Beta(f1/2,f2/2)) )
+  
+  fCDF(t, df1, df2) = fdist(t, df1, df2)
+
+  fINV(x,df1,df2, a,b,k,t,y) = do(
+           a = -10.0, b = 10.0,
+           for(k,1,100,  t = (a + b) / 2,
+                         y = fCDF(t,df1,df2),
+                         test(abs(x - y) < 0.000001, break, 
+                              y < x, a = t, b = t)),  t)  
+-------------------------------------------------------------- END
+
+
+##########################################################
+"--- 1. ---  EXAMPLE:  Groundwater sulfate concentrations"
+##########################################################
+
+-- We use the example from 
+--    https://mgimond.github.io/Stats-in-R/F_test.html
+-- Groundwater sulfate concentrations are monitored at a contaminated
+-- site over the course of a year. Those concentrations are compared
+-- to ones measured at background sites for the same time period. 
+-- We seek to compare the concentration of sulfates between background 
+-- sites and a contaminated well.
+-- Did the two samples have equal variances? 
+-- SOLUTION:
+
+-- WARNING: do not change the order of X and Y! 
+--          See remark 3 in the text!
+
+X = (560, 530, 570, 490, 510, 550, 550, 530)   -- Background
+Y = (600, 590, 590, 630, 610, 630)             -- Contaminated
+
+"--- a.  We do the calculation STEP-BY-STEP to show the procedure."
+
+m = dim(X)                -- length of samples
+m
+
+n = dim(Y)
+n
+
+df1 = m-1                 -- degree of freedom
+df1
+
+df2 = n-1                
+df2
+
+s1 = sd(X)                -- standard deviations
+s1
+
+s2 = sd(Y)
+s2
+
+T = s1*s1/(s2*s2)         -- test statistic; denoted F in R
+T
+
+pValue = min( 2*fCDF(T,df1,df2), 2*(1-fCDF(T,df1,df2)) )
+pValue
+
+-- we now calculate the confidence interval
+
+alpha = 0.05                            -- significance level
+
+critValue = fCDF(alpha/2, df1,df2)      -- critical Value
+critValue
+
+Falpha1 = fINV(alpha/2, df1,df2)         -- F quantile
+Falpha1
+    -- fPDF(Falpha1,df1,df2)
+
+Falpha2 = fINV(1-alpha/2, df1,df2)
+Falpha2
+    -- fPDF(6.853,df1,df2)
+
+lcl = T * 1/fINV(1-alpha/2, df1,df2)    -- lower confidence interval  
+lcl
+
+ucl = T * 1/fINV(alpha/2, df1,df2)      -- upper confidence interval
+ucl
+
+CI =(lcl, ucl)                          -- confidence intervall
+CI
+
+test(pValue < 1-alpha, "accept H0", "reject H0")
+"ok"
+
+-- Recommended YouTube videos for an explanation:
+-- p-value:       https://youtu.be/UsU-O2Z1rAs
+-- CI interval:   https://youtu.be/dx6-_d9CQcM
+
+-- DECISION:
+-- Gimond: "So for a two-tailed test, p = 0.42. With such a high 
+-- value, we cannot reject the null and therefore can state that for
+-- all intents and purposes, the variances between both populations 
+-- are the same, i.e. the observed variability between both s
+-- can be explain by chance alone.
+
+
+"--- b.  abstract above procedure to functon varTest()"
+### --------------------------------------------------------------
+###  varTest(X,Y, s1,s2, n1,n2,df1,df2,T)
+### --------------------------------------------------------------
+
+varTest(X,Y, s1,s2,m,n,df1,df2,T) = do(
+      m = dim(X),                -- length of samples
+      n = dim(Y),
+      df1 = m-1,                 -- degree of freedom
+      df2 = n-1,                
+      s1 = sd(X),                -- standard deviations
+      s2 = sd(Y),
+      T = s1*s1/(s2*s2),         -- test statistic; denoted F in R
+      p = min( 2*fCDF(T,df1,df2), 2*(1-fCDF(T,df1,df2)) ),
+      lCI = T * 1/fINV(1-alpha/2, df1,df2),      
+      uCI = T * 1/fINV(  alpha/2, df1,df2),
+      CI =(lCI, uCI),             -- confidence intervall
+      print(" ____ F-test ____"),
+      test(p < 1-alpha, print("... accept H0"), 
+                        print("... reject H0")),
+      (("T", "p-value", "CI.l", "CI.h"),(T,p,lCI,uCI)) )
+
+### -------------------------------------------------- END varTest
+
+-- Check:
+
+varTest(X, Y)
+"ok"
+
+
+"--- 2. ---"
+### --------------------------------------------------------------
+###               EXERCISE: Prices of shares
+### --------------------------------------------------------------
+-- Do
+-- https://www.statistik-nachhilfe.de/ratgeber/statistik/induktive-statistik/signifikanztests-hypothesentests/pruefung-auf-streuung/f-test
+
+-- The prices of two shares A and B over eleven months at the 
+-- beginning of each month are
+
+-- A  44.32 49.28 65.12 69.44 59.20 70.56
+--    60.60 87.16 102.60 97.96 93.00
+
+-- B  59.35 54.24 59.61 58.68 67.28 60.28
+--    65.93 73.63 82.84 76.01 78.55
+
+-- a. Show:
+-- Your risk when investing in shares B of Bernhard is significantly 
+-- lower than when investing in shares A of Albert.
+
+-- b.
+-- Contol your purchase using R.

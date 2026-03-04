@@ -1,0 +1,182 @@
+##| ONE-WAY ANOVA  with Eigenmath    - Ch. 5.6 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+
+"--- 1. ========== EXAMPLE: Spiegel p.415, p.418"
+
+-- The table X below shows the yields in bushels per acre of a certain
+-- varity of wheat grown in a particular type of soil treated with 
+-- chemicals A,B,C. Do an analysis for the data:
+
+X=((3,4,5,4),(2,4,3,3),(4,6,5,5))
+
+-- SOLUTION: 
+
+"FIRST solution step-by-step following Spiegel"
+
+X                    -- look at the table
+
+X[1]                 -- look at 1st row (treatment)
+sum(X[1])            -- sum of 1st row
+
+T = sum(X)           -- sum of all values in table X
+T
+
+a = dim(X,1)         -- no. of rows alias repetitions
+a
+
+b = dim(X,2)         -- no. of columns alias groups
+b
+
+X^2                  -- look at the squares of the elements
+
+-- calculate (V)ariations total V, between VB and within VW 
+-- using the 'shortcut methods'
+
+V = sum(X^2) - T^2/(a*b)              -- formula (10) in SPIEGEL
+V
+
+VB = 1/b*sum(j,1,a, sum(X[j])^2) - T^2/(a*b)  -- formula (11)
+VB
+
+VW = V-VB                             -- formula (12) ibid.
+VW
+
+-- calculate degres of freedom: between, within and total
+
+dfb = a-1                  
+dfb
+
+dfw = a*(b-1)              
+dfw
+
+dft = a*b-1          
+dft
+
+-- calculate the mean squares MS.
+
+MSb = VB/dfb
+MSb
+float
+
+MSw = VW/dfw
+MSw
+float
+
+-- F test 'statistics' for the Ho hypothesis.
+
+F = MSb/MSw
+F
+float
+
+
+"SECOND solution by abstracting the procedure into function"
+### --------------------------------------------------------------
+###   anova1 : ONE WAY ANOVA  
+###            X k-by-n matrix 
+### --------------------------------------------------------------
+    mean(X)       = float( sum(X)/dim(X) )  
+
+    anova1(X, T,V,VB,VW,MSb,MSw,F) = 
+              do( 
+                  a = dim(X,1), 
+                  b = dim(X,2), 
+                  T = sum(X),
+                  V = sum(X^2) - T^2/(a*b),
+                  VB = 1/b * sum(j,1,a, sum(X[j])^2) - T^2/(a*b),
+                  VW = V-VB,
+                  dfb = a-1,                  
+                  dfw = a*(b-1),        
+                  dft = a*b-1,          
+                  MSb = float(VB/dfb),
+                  MSw = float(VW/dfw),
+                  F   = float(MSb/MSw),
+                  ANOVA = zero(4,5),
+                  ANOVA[1] = ("Source","df","SS","MS","F"),
+                  ANOVA[2] = ("Between",dfb,VB,MSb,F),
+                  ANOVA[3] = ("Within",dfw,VW,MSw,"-"),
+                  ANOVA[4] = ("Total",dfb+dfw,V,"-","ANOVA"),
+                  ANOVA   )
+
+### --------------------------------------------------- END
+
+
+"--- 2. --- EXAMPLE: ANOVA1 table for SPIEGEL example"
+
+X=((3,4,5,4),(2,4,3,3),(4,6,5,5))
+anova1(X)
+"ok"
+
+"--- 3. ========== EXAMPLE: mineral water company"
+
+-- ZOEFEL [19, p.172]: 
+-- A mineral water company claims that its mineral water lowers 
+-- cholesterol levels. Eight test subjects drank this water for three
+-- weeks. The values ​​at the beginning of the trial, as well as after 
+-- one week, two weeks, and three weeks, are included in the 
+-- following table. 
+
+A  =(267,248,321,272,355,264,270,252)  -- values at begin of test
+W1 =(238,232,307,295,348,260,266,249)  -- after 1 week
+W2 =(191,246,295,270,330,262,295,220)  -- after 2 weeks
+W3 =(206,207,282,269,275,281,263,219)  -- after 3 weeks
+
+-- The aim is to determine whether these mean values ​​differ 
+-- significantly from one another, i.e., whether the mineral water 
+-- actually has a significant effect on cholesterol levels. 
+-- These are dependent samples.
+
+-- SOLUTION: 
+-- using 'shortcut method' cf. Spiegel, p.404
+-- a: groups       4
+-- b: repetitions  3
+
+X =(A,W1,W2,W3)
+X
+anova1(X)
+"ok"
+
+# RESULT
+# According to the F-table, this is a significant value at (3,21)
+# degrees of freedom (p < 0.05). Therefore, a significant decrease 
+# in cholesterol levels is observed over the time period.
+
+""
+"DO the following examples in EIGENMATH"
+
+"--- 4. --- EXERCISE: blood pressure"
+
+-- Do the example in 
+-- https://numiqo.com/tutorial/one-factorial-anova
+
+
+"--- 5. --- EXERCISE: salaries of people"
+
+-- Do the example in 
+-- https://www.excel-easy.com/examples/anova.html#google_vignette
+
+
+"--- 6. --- EXERCISE: in www.statsdirect.com"
+
+-- Do the example in 
+-- https://www.statsdirect.com/help/analysis_of_variance/one_way.htm?Highlight=One%20Way%20Analysis%20of%20Variance
+
+
+"--- 7. --- EXERCISE: in g4g"
+
+-- Do the example in 
+-- https://www.geeksforgeeks.org/machine-learning/one-way-anova/
+
+
+"--- 8. --- EXERCISE: in kent.edu"
+
+-- Do the example in 
+-- https://libguides.library.kent.edu/SPSS/OneWayANOVA
+
+
+"--- 9. --- EXERCISE: in statsandr.com"
+
+-- Do the example in 
+-- https://statsandr.com/blog/how-to-one-way-anova-by-hand/
+

@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+##| WEIBULL distribution  with Eigenmath    - Ch. 3.7 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+
+# DEFINITION
+"============================== weibullPDF - prob. density"
+
+  weibullPDF(x,a,b) = test( x<0, 0, 
+                      float( b/a*(x/a)^(b-1)*exp(-(x/a)^b) ))
+
+-------------------------------------------------------------------
+-- a: scale parameter    b: shape parameter
+-- We adpot the MATLAB parameter convention: (x, scale, shape)
+-- R parameter convention: (x, shape, scale)
+-- cf. https://de.mathworks.com/help/stats/wblpdf.html
+-- https://search.r-project.org/CRAN/refmans/ExtDist/html/Weibull.html
+
+
+"--- 1. ---"
+
+-- EXAMPLE: Compute the density of the observed value 3 in the 
+--          Weibull distribution with unit scale and shape.
+-- SOLUTION:
+
+weibullPDF(3,1,1) 
+"ok"
+
+-- R> dweibull(x = 3, shape = 1, scale = 1, log = FALSE)
+--    [1] 0.04978707
+
+
+"--- 2. ---"
+
+-- EXAMPLE: (Matlab)
+-- Compute the density of the observed value 3 in the Weibull 
+-- distributions with scale parameter 2 and shape parameters 1 
+-- through 5.
+
+-- SOLUTION:
+
+shape = (1,2,3,4,5)
+"shape    Weibull(3,2, b=shape)" 
+T = zero(2,5)  
+for(i,1,5, T[1,i] = shape[i])
+for(i,1,5, T[2,i] = float( weibullPDF(3,2,shape[i])) )
+transpose(T)
+"ok"
+
+
+"--- 3. --- Plot of WEIBULL"
+"                      Weibull-PDF for scale=2   shape=2"
+xrange = (0,5)
+yrange = (0,1)
+draw(weibullPDF(x,2,2))
+
+
+# DEFINITION
+"=============================== CDF for Weibull distribution"
+
+  weibullCDF(x,a,b) =  1 - exp(-(x/a)^b)        -- for x>0
+
+----------------------------------------------------------
+-- Cumulative probability function for WEIBULL-distibution
+-- cf. https://de.mathworks.com/help/stats/wblcdf.html
+
+
+"--- 4. ---"
+
+-- EXAMPLE (Matlab)
+-- What is the probability that a value from a Weibull distribution
+-- with parameters a = 0.15 and b = 0.8 is less than 0.5?
+
+-- SOLUTION:
+
+weibullCDF(0.5, 0.15, 0.8)
+"ok"
+
+--   octave:1> pkg load statistics
+--   octave:2> wblcdf(0.5, 0.15, 0.8)
+--                ans = 0.9272
+--   R> pweibull(0.5, 0.8, 0.15)
+--      [1] 0.9271979
+
+
+"--- 5. ---"
+"                      Weibull-CDF for a=2 b=2"
+xrange = (0,5)
+yrange = (0,2)
+draw( weibullCDF(x,2,2))
+
+
+# DEFINITION
+"===================== weibullINV - quantiles of weibullCDF"
+
+   weibullINV(p,a,b) = abs( -a * ( log(1-p) )^(1/b) )
+
+------------------------------------------------------------
+-- Task: find x, given y=p, shape a, scale b, s.t. 
+--       weibullCDF(x,a,b) = p = y.
+-- The result u is the value such that an observation from 
+-- an WEIBULL distribution with parameters a, b will fall in the
+-- range [0,x] with probability p. 
+-- https://de.mathworks.com/help/stats/wblinv.html
+
+
+"--- 6. --- EXAMPLE: lifetimes of light bulbs"
+
+-- (MATLAB): The lifetimes (in hours) of a batch of light bulbs 
+-- has a Weibull distribution with parameters a = 200 and b = 6.
+-- Find the median lifetime of the bulbs.
+
+-- SOLUTION:
+
+"weibullINV(0.5, 200, 6) ="
+weibullINV(0.5, 200, 6)
+"ok"
+
+-- CHECK:
+-- MATLAB> life = wblinv(0.5, 200, 6)
+--         life = 188.1486
+
+-- R> qweibull(0.5, 6, 200)
+--    [1] 188.1486
+
+
+"                     Quantils for Weibull(.,2,2)"
+xrange = (0,1)
+yrange = (0,5)
+draw( weibullINV(p,2,2), p)  --  p as parameter for xrange
+
+
+"--- 7. ---"
+
+abs(weibullCDF(1000, 1500,2))
+float
+weibullINV(0.3588196, 1500, 2)
+"ok"
+
+
+
+# DEFINITION (1st optional parameterization)
+"========================== weibull1 - 1st optional parameterization"
+
+  weibullPDF1(x,k,b) = test( x<0, 0, 
+                      b*k*x^(k-1)*exp(-b*x^k) )
+
+  weibullCDF1(x,k,b) =  1 - exp(-b*x^k)                 -- for x>0
+
+  weibullINV1(p,a,b) = (-1/b * log(1-p))^(1/k) 
+
+-------------------------------------------------------------------
+  ## using transformation b=lambda^(-k), e.g. [6], p.12,64
+  ## https://en.wikipedia.org/wiki/Weibull_distribution
+
+"--- 8. ---"
+-- EXAMPLE:
+-- A particular switch has a Weibull distributed lifetime with 
+-- k:=alpha = 0.01 (1/year) and beta = 2. What guarantee period 
+-- can be given for the switch if the survival probability during 
+-- this time is to be 99%?
+
+-- SOLUTION: cf. [6], p.66
+
+1 - weibullCDF1(1,0.01,2)
+float
+
+
+# DEFINITION (2nd optional parameterization)
+"========================= weibull2 - 2nd optional parameterization"
+ -- using transformation    b=lambda^(-k)
+
+  weibullPDF2(x,k,beta) = test( x<0, 0, 
+                          beta*k*(beta*x)^(k-1)*exp(-(beta*x)^k) )
+
+
+  weibullCDF2(x,k,b) =  1 - exp(-(beta*x)^k)        -- for x>=0
+
+  weibullINV2(p,k,beta) = 1/beta * ( - log(1-p))^(1/k) 
+
+-------------------------------------------------------------------
+## https://en.wikipedia.org/wiki/Weibull_distribution
+
+-- Remark:
+-- The shape parameter k is the same as in the standard case, 
+-- while the scale parameter L (lambda) is replaced with a rate
+-- parameter  beta = 1/L. Then, for x >= 0, ..
+
+"--- 9. ---  EXERCISE"
+
+-- cf. Beucher[1], warning: (a,b) = (b,T)
+-- Translate the following MatLAB/Octave snippet in EIGENMATH!
+
+stop 
+
+x=(0:1:10);               % Wertebereich von x:  0,1,10
+b = 0.444;  T=0.767;      % Parameter der Weibull-Verteilung
+a = 1/(T^b);              % Anpassung der Parameter auf MATLAB 
+                          % Berechnung Weibull-Verteilungsdichte
+pdfwb = wblpdf(x, a, b)
+
+pdfwb =
+
+ Columns 1 through 6:
+   Inf  1.6312e-01  7.8813e-02  4.8763e-02  3.3664e-02  2.4765e-02
+ Columns 7 through 11:
+   1.9002e-02  1.5028e-02  1.2160e-02  1.0018e-02  8.3746e-03
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

@@ -1,0 +1,252 @@
+##| t distribution  with Eigenmath    - Ch. 3.3 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+-- need 2 helper functions: Gammaln() & Beta()
+   Gammaln(x) = log(tgamma(x))
+
+-- Beta function B, noted as \Beta, i.e. greek capital B
+   Beta(a,b) = test( or(a<=0, b<=0), -1,
+                   exp( Gammaln(a)+Gammaln(b)-Gammaln(a+b)) )
+                   -- or: tgamma(a)*tgamma(b)/tgamma(a+b))    
+
+
+# DEFINITION
+"============================== tPDF -  t probability density"
+
+  tPDF(x,f) = 1/(sqrt(f)*Beta(1/2,f/2))*(1+ x^2/f)^(-0.5*(f+1))
+
+  Student(x,f) = tPDF(x,f)                            -- alias
+
+--------------------------------------------------------------
+-- STUDENT t-distribution with degree of freedom f
+-- cf. https://de.mathworks.com/help/stats/tpdf.html 
+-- https://de.mathworks.com/help/stats/students-t-distribution.html
+-- cf. [6] p.52
+
+"--- 1. ---"
+
+"tPDF(1,2) ="
+tPDF(1,2)              -- R> dt(1,2)    [1] 0.1924501
+"ok"
+
+for(i,1,10, print(tPDF(i,3))) 
+
+tPDF(0,3)
+
+"--- 2. ---  pdf at the mode"
+
+-- MATLAB: The value of the pdf at the mode is an increasing function
+-- of the degrees of freedom.
+-- EXAMPLE
+-- The mode of the Student's t distribution is at x = 0. 
+-- Compute the pdf at the mode for degrees of freedom 1 to 6.
+-- SOLUTION: 
+
+--           MATLAB: tpdf(0,1:6)
+--           ans =  0.3183  0.3536  0.3676  0.3750  0.3796  0.3827
+
+"            PDF of t-distribution for f=1..6 " 
+"    f      tPDF(0,f)    " 
+T = zero(2,6)   
+for(f,1,6, T[1,f] = f)
+for(f,1,6, T[2,f] = tPDF(0,f))
+transpose(T)
+"ok"
+
+
+"                     t PDF distribution for f=3, x>0"
+xrange = (0,10)
+yrange = (0,1)        -- negative part missing, cf. [3] p.53
+draw(tPDF(x, 3))
+
+
+
+# DEFINITION
+"============================== tCDF - t cummulative distribution"
+
+  tCDF(x, df) = tdist(x, df)     
+
+------------------------------------------------------------
+-- REMARK
+-- tCDF() is only alias for tdist()
+-- For the source code of tCDF() see below section -9.-
+
+
+"--- 3. ---"
+
+tCDF(0.75,2)      -- R> pt(0.75,2)            [1] 0.7342606
+"ok"              
+
+tdist(0.75,2)
+
+
+"--- 4. --- t distribution converges to stdnormPDF"
+
+-- EXAMPLE: cf. https://de.mathworks.com/help/stats/tcdf.html
+-- The t distribution converges to the standard normal distribution 
+-- as the degrees of freedom approach infinity. 
+-- Compute the difference between the pdfs of the standard normal 
+-- distribution and the Student's t distribution pdf with 30 degrees -- of freedom. Reproduce the difference in Eigenmath.
+-- SOLUTION:
+
+-- octave> -2.5:2.5
+--          ans = -2.5000  -1.5000  -0.5000  0.5000   1.5000  2.5000
+--     difference = tpdf(-2.5:2.5,30) - normpdf(-2.5:2.5)
+--     difference = 0.0035  -0.0006  -0.0042  -0.0042 -0.0006  0.0035
+
+pi = float(pi)
+stdnormPDF(x) = 1/sqrt(2.*pi)/exp(-0.5*(x))
+
+for(i,0,5, print((-2.5+i, tPDF(-2.5+i,30) - stdnormPDF(-2.5+i))))
+"~ ok"
+
+"--- 5. ---"
+
+-- EXAMPLE: cf. https://de.mathworks.com/help/stats/tcdf.html
+-- Determine the probability that an observation from the Student's 
+-- t distribution with degrees of freedom 99 falls on the 
+-- interval [10 Inf]. 
+
+1 - tCDF(10,99)     -- 0, ok
+
+
+# DEFINITION
+"=============================== tINV - quantil of t distribution"
+
+  tINV(x, df) = tdistinv(x, df)
+
+------------------------------------------------------------
+
+"--- 6. ---"
+
+tINV(.99, 3)
+
+tINV(.95, 50)    
+"ok"             -- R>     qt(.95,50)    [1] 1.675905
+
+
+"--- 7. ---"
+
+-- EXAMPLE: cf. https://de.mathworks.com/help/stats/tinv.html
+-- Compute the 99th percentile of the Student's t distribution 
+-- for 1 to 6 degrees of freedom (df).
+-- SOLUTION:
+
+-- MATLAB> percentile = tinv(0.99,1:6)
+--         31.8205  6.9646  4.5407  3.7469  3.3649  3.1427
+
+for(df,1,6, print((df, tINV(.99, df)) ))
+
+"ok"
+
+
+"                     quantils of t-distribution for f=2"
+xrange = (-4,4)
+yrange = (0,10)
+draw(tINV(x,2),x)
+
+"--- 8. ---  Quantils of t distribution"
+
+-- EXAMPLE: cf. [6], p.74 ff
+-- Quantils of t distribution
+
+X=(0.9,0.95,0.975,0.99)
+
+"             quantils of t-distribution for f=1..20 " 
+"     f      0.9            0.95           0.975           0.99" 
+T = zero(5,20)     -- T is a 3x11 table (matrix)
+for(f,1,20, T[1,f] = f)
+for(f,1,20, T[2,f] = tINV(X[1],f))
+for(f,1,20, T[3,f] = tINV(X[2],f))
+for(f,1,20, T[4,f] = tINV(X[3],f))
+for(f,1,20, T[5,f] = tINV(X[4],f))
+transpose(T)
+"ok"
+
+
+"--- 9. --- APPENDIX Source code of tCDF() alias tdist()"
+--[ ..... Skip the code of the following helper functions.........]
+--[ ..... without loss of statistical understanding      .........] 
+--        incomplete Beta function, code by G. Weigt 2025 
+
+stop
+
+Betainc(a,b,x) = test( or(x<0, x>1),      tgamma(0),
+                       x > (a+1)/(a+b+2), 1 - Betainc1(b,a,1-x),
+                       Betainc1(a,b,x) )
+
+Betainc1(a,b,x,c,d,f,i,m,n) = do( 
+         f=1, c=1, d=0,
+         for(i,0,200,
+             m = floor(i/2), 
+             test( i==0,        n = 1,
+                   mod(i,2)==0, n = m*(b-m)*x/(a+ 2*m-1)/(a+2*m),
+                   n = -(a+m)*(a+b+m)*x/(a+2*m)/(a+2*m+1) ),
+             d = 1+n*d,
+             test(abs(d) < 10.0^(-30), d = 10.0^(-30)),
+             d = 1/d,
+             c = 1+n/c,
+             test(abs(c) < 10.0^(-30), c = 10.0^(-30)),
+             f = f*c*d,
+             test(abs(1-c*d) < 10.0^(-8), break)
+             ),
+         m = log(abs(tgamma(a))) + 
+             log(abs(tgamma(b))) - log(abs(tgamma(a + b))),
+         x = float(x),
+         m = exp(log(x)*a + log(1-x)*b-m)/a,
+         test(abs(1-c*d) < 10.0^(-8), m*(f-1), tgamma(0))
+         )
+--  cf. https://de.mathworks.com/help/matlab/ref/betainc.html
+
+tCDF1(t,df) = Betainc(0.5*df, 0.5*df,
+                      (t+sqrt(t*t + df))/(2.0*sqrt(t*t + df)))
+
+tCDF1(0.75,2)
+
+
+-- using the build-in function incbeta we may define shorter
+-- without using Betainc() and Betainc1():
+
+tCDF2(t,df) = incbeta(0.5*df, 0.5*df,
+                      (t+sqrt(t*t + df))/(2.0*sqrt(t*t + df)))
+
+tCDF2(0.75,2)
+
+
+"--- 10. --- APPENDIX Source code of tINV() alias tdistinv()"
+--[ ..... Skip the code of the following helper functions.........]
+--[ ..... without loss of statistical understanding      .........] 
+--        incomplete Beta function, code by G. Weigt 2025 
+
+stdnormINV(x, n,t,z,x1) = 
+       test( or(x<=0, x>=1), -1,
+         do( x1=x,
+             test( x<0.5, x=1-x),
+             t = sqrt(-2.*log(1.-x)),
+             z = 2.515517 + t*(0.802853 + 0.010328*t),
+             n = 1.+t*(1.432788+t*(0.189269+0.001308*t)),
+             z = t-z/n,
+             test(x1<0.5, -z, z) ))
+
+
+tINV1(x,f, q,c,t) =               -- 0<x<1
+     do( PI = 3.1415926535898,
+       test( f==1, tan(PI*(x-0.5)),
+             f==2, do(t=2.*x-1., sqrt(2.)*t/sqrt(1.-t*t) ),
+             do( 
+                 q = stdnormINV(x),
+                 c = f -2/3 + 1/(10*f),
+                 c = (f-5/6)/(c*c),
+                 t = sqrt(f*exp(c*q*q)-f),
+                 test(x>0.5, t, -t) )))
+
+------------------------------------------------------------
+-- cf.: C code in [6], p.71, after Preizer & Pratt
+-- cf.: https://de.mathworks.com/help/stats/tinv.html
+
+-- check: approximatly ok
+
+tINV1(.95, 50)    -- MATLB> tinv(.95,50)  ans = 1.6759
+"~ ok"            -- R>     qt(.95,50)    [1] 1.675905
+

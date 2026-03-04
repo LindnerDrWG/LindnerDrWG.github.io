@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+##| VARIANCE with Eigenmath  -  Ch. 1.2 of
+##| Book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+
+mean(X) = float( sum(X)/dim(X) )       
+
+# DEFINITION
+----------------------------------------------- var(iance) function
+var(X)  = float( sum((X-mean(X))^2) / (dim(X)-1) ) -- sample var.
+var0(X) = float( sum((X-mean(X))^2) / (dim(X)-0) ) -- population var.
+----------------------------------------------- END
+
+-- MATLAB: By default, the variance VAR is normalized by N-1, 
+--         where N is the number of observations.
+-- We adopt the Matlab convention.
+
+"--- 1. ---"
+
+-- EXAMPLE: calculate var of X=(4,36,45,50,75) with mean(X)=42.
+
+-- calculation by hand
+(4-42)+(36-42)+(45-42)+(50-42)+(75-42)             -- gives 0 :)
+(4-42)^2+(36-42)^2+(45-42)^2+(50-42)^2+(75-42)^2   
+last/5
+float
+
+-- calculation by defining formula
+X=(4,36,45,50,75)
+mean(X)
+var(X)             -- viewed as sample
+var0(X)            -- viewed as population
+
+"--- 2. ---"
+
+X=(0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90)
+mean(X)
+var(X)
+var0(X)
+sqrt(var0(X))
+
+"--- 3. ---"
+
+X=(0,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,90)
+var(X)
+var0(X)
+sqrt(var0(X))
+
+"--- 4. --- compare w. Matlab"
+
+A = (4, -7, 3)
+var(A) 
+var0(A)
+"ok" 
+
+-- MATLAB>> A = [4 -7 3];           -- MATLAB default
+--          var = 37.00         
+
+"--- 5. ---"
+
+-- EXAMPLE: wiki ibid.
+-- For a set of numbers {10, 15, 30, 45, 57, 52, 63, 72, 81, 93, 102,
+-- 105}, if this set is the whole data population for some 
+-- measurement, then variance is the population variance 932.743 as 
+-- the sum of the squared deviations about the mean of this set, 
+-- divided by 12 as the number of the set members. 
+-- If the set is a sample from the whole population, then the unbiased
+-- sample variance can be calculated as 1017.538 that is the sum of
+-- the squared deviations about the mean of the sample, divided by 11 
+-- instead of 12.
+
+-- CHECK:
+
+set =(10, 15, 30, 45, 57, 52, 63, 72, 81, 93, 102, 105)
+var0(set)   -- population variance 932.7
+var(set)    -- sample variance     1017.5
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

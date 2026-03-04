@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+##| PARETO distribution with Eigenmath    - Ch. 3.6 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+
+# DEFINITION
+"============================== paretoPDF - prob. density"
+
+  paretoPDF(x, m, a) = test( x<m, 0, 
+                       float( a * m^a / x^(a+1) ))
+
+-------------------------------------------------------------------
+-- where m='mu'=location and a='alpha'=shape parameter
+-- https://search.r-project.org/CRAN/refmans/EnvStats/html/Pareto.html
+-- We adpot the R convention.
+
+paretoPDF(3, 2, 5) 
+
+"--- 1. ---"
+
+-- EXAMPLE: Calculate the Density of a Pareto distribution with 
+-- parameters location=1 and shape=1, evaluated at 2, 3 and 4.
+-- SOLUTION:
+
+paretoPDF(2, 1,1) 
+paretoPDF(3, 1,1) 
+paretoPDF(4, 1,1) 
+"ok"
+
+-- R> dpareto(2:4, 1, 1) 
+--    [1] 0.2500000 0.1111111 0.0625000
+
+
+"--- 2. ---"
+
+-- EXAMPLE: (Matlab)
+-- Compute the density of the observed value 3 in the Pareto 
+-- distributions with scale parameter 2 and shape parameters 1 
+-- through 5.
+-- SOLUTION:
+
+shape = (1,2,3,4,5)
+"shape  |  paretoPDF(3,2,shape)" 
+T = zero(2,5)  
+for(i,1,5, T[1,i] = shape[i])
+for(i,1,5, T[2,i] = paretoPDF(3,2,shape[i])) 
+transpose(T)
+"ok"
+
+
+"--- 3. ---"
+"                      Pareto-PDF for a=2 b=2"
+xrange = (0,5)
+yrange = (0,2)
+draw(paretoPDF(x,2,2))
+
+
+# DEFINITION
+"=============================== CDF for PARETO distribution"
+
+  paretoCDF(x,m,a) = test( x<m, 0, 
+                     float( 1 - (m/x)^a  ))
+-------------------------------------------------------------
+
+1 - paretoCDF(5, 1, 2.5)
+
+"--- 4. ---"
+
+-- EXAMPLE (R)
+-- The cdf of a Pareto distribution with parameters location=2 and 
+-- shape=1, evaluated at 3, 4, and 5 is 
+-- SOLUTION:
+
+paretoCDF(3, 2,1) 
+paretoCDF(4, 2,1) 
+paretoCDF(5, 2,1) 
+"ok"
+
+-- R>  ppareto(3:5, 2, 1) 
+--     [1] 0.3333333 0.5000000 0.6000000
+
+
+"--- 5. ---"
+"                      Pareto-CDF for a=2 b=2"
+xrange = (0,5)
+yrange = (0,2)
+draw( paretoCDF(x,2,2))
+
+
+# DEFINITION
+"===================== paretoINV - quantiles of paretoCDF"
+
+   paretoINV(p,m,a) = float( m * (1-p)^(-1/a)  )
+
+------------------------------------------------------------
+-- Task: find x, given y=p, shape m, scale a, s.t. 
+--       paretoCDF(x,m,a) = p =y.
+-- The result u is the value such that an observation from 
+-- an PARETO distribution with parameters a, m will fall in the
+-- range [0,x] with probability p. 
+
+
+"--- 6. ---"
+
+-- EXAMPLE (MATLAB): 
+-- The 25'th percentile of a Pareto distribution with parameters 
+-- location=1 and shape=1.
+-- SOLUTION:
+
+paretoINV(0.25, 1,1)
+"ok"
+paretoINV(0.25, 1,2)      -- and with shape 2
+
+
+-- R> qpareto(0.25, 1, 1) 
+--    [1] 1.333333
+
+"                     Quantils for pareto(.,2,2)"
+xrange = (0,1)
+yrange = (0,10)
+draw( (paretoINV(x,2,2)), x)  
+ 
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

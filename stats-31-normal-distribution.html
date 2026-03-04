@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+##| NORMAL Distribution  with Eigenmath    - Ch. 3.1 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+pi = float(pi)
+
+# DEFINITION
+"==================================  normCDF -  normal density"
+
+  normPDF(x,mu,sigma) = 
+              1/sqrt(2.*pi)/sigma*exp(-0.5*((x-mu)/sigma)^2)
+
+  phi(x,mu,sigma) = normPDF(x,mu,sigma)      -- classic notation
+
+------------------------------------------------------------ END
+-- We adopt the notation of MatLab.
+
+"--- 1. ---"
+
+-- look at the defintion in fine i.e. LaTeX print
+phi = phi(x,mu,sigma)
+phi
+
+--      x, mu, sigma)
+normPDF(1, 0,  1    )           -- see fig.17 left
+
+normPDF(82, 78,  12)
+
+normPDF(1.7214, 0,1)
+
+1 - normPDF(1.7214,0,1)
+
+"--- 2. --- Check with R"
+
+-- R> # Create 10 numbers between 0 and 2 incrementing by 0.1:
+-- R> x <- seq(0, 1, by = .1)
+-- R> # Choose the mean as 0 and standard deviation as 1:
+-- R> dnorm(x, mean = 0, sd = 1)
+--    [1] 0.39894228 0.39695255 0.39104269 0.38138782 0.36827014 ..
+-- We collect these values in vector R to compare with Eigenmath.
+
+R = (0.39894228, 0.39695255, 0.39104269, 0.38138782, 0.36827014, 
+     0.35206533, 0.33322460, 0.31225393, 0.28969155, 0.26608525, 
+     0.2419707)
+
+"            normal distribution for z = 0.0, 0.1, 0.2, .., 1.0" 
+"     i      Em               R                 Em=Eigenmath" 
+T = zero(3,11)     -- T is a 3x11 table (matrix)
+for(i,1,11, T[1,i] = 0.1*(i-1))
+for(i,1,11, T[2,i] = normPDF((i-1)*0.1,0,1))
+for(i,1,11, T[3,i] = R[i])
+transpose(T)
+"ok"
+
+-- for(i,1,20, print((normPDF(i*0.1,0,1))) )  -- as simple sequence
+
+
+"--- 3. ---"
+
+"                      PDF of Standard Normal distribution"  
+f = normPDF(x,0,1)
+xrange = (-5,5)
+yrange = (0,1)
+draw(f,x)
+
+
+# DEFINITION
+"============================== normCDF - normal cumulative"
+
+  normCDF(x, mu,sigma) = 
+                  1/2 + 1/2*float(erf((x-mu)/(sqrt(2)*sigma)))
+
+  stdnormCDF(x) = normCDF(x, 0,1)          -- standard normal CDF
+  Phi(x)        = stdnormCDF(x)            -- classic notation
+
+--------------------------------------------------------------
+-- ok for Eigenmath version 3.42 above due to erf(.)
+-- https://de.wikipedia.org/wiki/Fehlerfunktion
+-- https://en.wikipedia.org/wiki/Error_function
+
+"--- 4. ---"
+
+-- look at the defintion in fine i.e. LaTeX print
+Phi(x) = stdnormCDF(x)
+Phi
+
+
+normCDF(1., 0,1)
+
+-- construct a table for normCDF for x = -2,-1,0,1,2
+X = (-2,-1,0,1,2)
+p = (normCDF(-2,2,1), normCDF(-1,2,1), normCDF(0,2,1), 
+     normCDF( 1,2,1), normCDF( 2,2,1))
+(X,p)   
+"ok"
+
+-- CHECK
+-- MatLAB> x = [-2,-1,0,1,2]; mu = 2; sigma = 1;
+--       > p = normcdf(x,mu,sigma)
+--         p = 1×5
+--             0.0000    0.0013    0.0228    0.1587    0.5000
+
+
+"--- 5. ---"
+
+-- EXAMPLE: 
+-- A manufacturer fills sugar in packs, which have a distribution of -- N(1000,12^2). What percentage of the packs meet the printed 
+-- minimum weight of 980 g?                   Cf. [4, p.50: 0.95221]
+
+-- SOLUTION:  We have    PR(X>=980) = 1 - Pr(X<980) =
+
+1 - normCDF(980, 1000, 12) 
+"ok"
+
+
+"--- 6. --- EXAMPLE"
+
+-- R: Calculate the probability of a value less than or equal to 1.96
+-- in a standard normal distribution.
+-- R> pnorm(1.96)
+--    [1] 0.9750021
+
+Phi(1.96)
+"ok"
+
+-- R: Probability of a value less than or equal to 2 in a normal 
+-- distribution with mean 1 and standard deviation 0.5?
+-- R> pnorm(2, mean = 1, sd = 0.5)
+--    [1] 0.9772499
+
+normCDF(2, 1.0,0.5)
+"ok"
+
+
+"--- 7. ---"
+
+"                      CDF of standard Normal distribution"  
+xrange = (-5,5)
+yrange = (0,1)
+draw( stdnormCDF(x), x)
+
+"                      CDF of Normal distribution N(1,2)"  
+xrange = (-5,5)
+yrange = (0,1)
+draw( normCDF(x,1,2), x)
+
+
+"--- 8. ---  EXAMPLE: resistors I"
+
+-- A factory produces 100 Ω resistors, distributed via
+-- N(100,6^2). What proportion of the resistors have 
+-- a maximum deviation of 10% from the mean value? Cf.[4], p.51
+
+-- SOLUTION:  result: 0.90442, i.e. 90,4% are first class.
+--            Pr(90<X<110) = Pr(X<110) - Pr(X<90) =
+
+Phi((110-100)/6) - Phi((90-100)/6)
+
+normCDF(110,100,6) - normCDF(90,100,6) 
+
+"ok"     
+
+
+# DEFINITION Calculate Pr( a<=X<=b )
+--------------------------------------------------- normCDF2
+
+normCDF2(a,b,mu,sigma) = 
+             1/2 * float( erf( (b-mu)/(sigma*sqrt(2)) )) -
+             1/2 * float( erf( (a-mu)/(sigma*sqrt(2)) ))
+
+------------------------------------------------------------
+
+--       a b  mu sigma
+normCDF2(1,2, 0, 1)
+
+"--- 9. --- EXAMPLE: resistors II"
+---- same as ---8.---
+-- SOLUTION:  Pr(90<X<110) = 
+
+normCDF2(90,110,  100,6)
+"ok"
+
+
+"--- 10. --- EXAMPLE: screws"
+
+-- From an assortment of screws distributed via N(10,0.3^2) in a  
+-- all screws larger than 10.5 mm or smaller than 9.5 mm are 
+-- removed. What is the probability that one of the remaining screws 
+-- is smaller than 10.3 mm?         Cf. [4, p.51: 0.8333 ??]
+
+-- SOLUTION:  P(X<10.3)
+
+a = Phi((10.3-10)/0.3) - Phi((9.5-10)/0.3)
+b = Phi((10.5-10)/0.3) - Phi((9.5-10)/0.3)
+a/b
+
+PX = normCDF2(9.5,10.3, 10, 0.3) / normCDF2(9.5,10.5, 10, 0.3)
+PX
+
+
+"--- 11. --- EXAMPLE: men's height"
+
+-- When measuring men, the mean height was 1.73 cm with a spread 
+-- of 7 cm. Men between the heights of 166 cm and 180 cm are therefore 
+-- considered to be of 'normal' height. 
+-- What is the probability that a man is shorter than 1.85 m 
+-- according to this distribution?    Cf.[4,p.50,Ex.4.1: 0.95741 ??]
+
+-- SOLUTION: P(X<185) =
+
+normCDF(185,173,7)   
+# or
+Phi( (185-173)/7 )
+"ok"
+
+
+-- EXCURS alternativ definition of standard normal distribution
+--        using build-in complementary error function 'erfc'
+# DEFINITION
+------------------------------------------ stdnormCDF.1 via erfc
+
+    stdnormCDF1(x)       = 1/2*erfc(-x/sqrt(2))
+    
+    normCDF1(x,mu,sigma) = stdnormCDF1((x-mu)/sigma)
+
+------------------------------------------------------------
+-- https://de.mathworks.com/help/stats/normcdf.html
+-- MatLab normcdf() uses the complementary error function erfc. 
+
+"--- 11.a ---"
+
+stdnormCDF1( (185-173)/7 )
+normCDF1(185,173,7)     
+"ok"
+
+"--- 12. ---"
+
+-- construct a table for x = -2,-1,0,1,2
+x = (-2,-1,0,1,2)
+p = (normCDF1(-2,2,1), normCDF1(-1,2,1), normCDF1(0,2,1), 
+     normCDF1( 1,2,1), normCDF1( 2,2,1))
+(x,p)   
+"ok"
+
+-- CHECK
+-- MatLAB> x = [-2,-1,0,1,2]; mu = 2; sigma = 1;
+--       > p = normcdf(x,mu,sigma)
+--         p = 1×5
+--             0.0000    0.0013    0.0228    0.1587    0.5000
+
+
+-- STDNORMINV:
+-- We implement the inverse of the standard cumulative normal 
+-- distribution using an iterativ bisection method.
+-- An Excurs shows a implementation using inverse error 
+-- function erfINV
+
+# DEFINITION
+"=============================== normINV - quantiles of normCDF"
+   stdnormINV(x, a,b,k,t,y) = test(x=0, "-Inf", x=1, "+Inf",
+                 and(0<x,x<1),
+                  do( a = -10, b = 10,         -- x in [a,b]
+                    for(k,1,100, 
+                         t = (a+b)/2,
+                         y = stdnormCDF(t),
+                     test(abs(x-y)<0.0000001, break, y<x,a=t, b=t)
+                    ), float(t) ))
+
+   normINV(x,mu,sigma) = mu + sigma*stdnormINV(x)        -- (+)
+
+-------------------------------------------------------------- END
+-- https://de.mathworks.com/help/matlab/ref/erfcinv.html
+
+-- REMARK Proof of (+): 
+--       y=PHI((x-mu)/sigma) <==> PHIinv(y) = (x-mu)/sigma
+--                           <==> sigma*PHInv(y) = x-mu
+--                           <==> mu + sigma*PHInv(y) = x     q.e.d.
+
+-- The inverse normal distribution or normINV allows you to find the
+-- value of x of a normal distribution given a probability p, 
+-- the mean μ, and the standard deviation σ of the distribution. 
+-- Simply put, it works backward from the area under the normal 
+-- distribution curve to find the x-value corresponding to that area.
+
+-- There is no simple algebraic formula; instead, the function uses an
+-- iterative search technique to find the x that satisfies 
+--           p=normCDF(x,mu,sigma). The standard normal version is 
+-- a special case where the mean is 0 and the standard deviation is 1.
+
+
+"--- 13. ---"
+
+stdnormINV(0.8)
+stdnormINV(0.9)
+
+normINV(0.8, 0,1)
+normINV(0.6, 0,1)
+
+normINV(0.80, 170, 5)
+
+-- CHECK
+-- R> qnorm(p=0.8)
+--    [1] 0.8416212
+--  > qnorm(p=0.6)
+--    [1] 0.2533471
+"ok"
+
+
+"--- 14. --- EXAMPLE (MatLab: norminv)"
+
+-- Compute the inverse of cdf values evaluated at the probability 
+-- values in p for the normal distribution with mean mu=2 and standard 
+-- deviation sigma=1.
+-- SOLUTION
+
+p = (0, 0.25, 0.5, 0.75, 1)       -- p=0:0.25:1
+for(i,1,5, print( normINV(p[i],2,1)) )
+
+-- CHECK with MatLAB
+--     p = 0:0.25:1; mu = 2; sigma = 1;
+--     norminv(p,mu,sigma)
+--     ans = -Inf  1.3255   2.0000   2.6745    Inf
+"ok"
+
+
+"--- 15. ---"
+
+-- EXAMPLE (MatLab)
+-- Compute the inverse of cdf values evaluated at 0.5 for various 
+-- normal distributions with different mean parameters at sigma=1.
+-- SOLUTION
+
+mu = (-2,-1,0,1,2)     
+for(i,1,5, print( normINV(0.5,mu[i],1)) )
+
+-- CHECK
+--    mu = [-2,-1,0,1,2];  sigma = 1;
+--    norminv(0.5,mu,sigma)
+--    ans =    -2    -1     0     1     2
+"ok"
+
+
+"--- 16. --- Compare with R qnorm list"
+
+-- CHECK
+-- R> # Create 10 numbers between 0 and 2 incrementing by 0.1.
+-- R> x <- seq(0, 1, by = .1)
+-- R> # Choose the mean as 0 and standard deviation as 1.
+-- R> qnorm(x, mean = 0, sd = 1)
+--   [1] -Inf -1.2815516 -0.8416212 -0.5244005 -0.2533471  0.0 ..
+-- We collect these values in vector R to compare with normINV/1:
+
+R = (-Inf, -1.2815516, -0.8416212, -0.5244005, -0.2533471,  0.0,
+    0.2533471,  0.5244005,  0.8416212,  1.2815516,  Inf)
+
+"     inverse std. normal table for z = 0.0, 0.1, 0.2, .., 1.0" 
+"     i         normINV             R" 
+T = zero(3,11)                      -- T is a 3x11 table (matrix)
+for(i,1,11, T[1,i] = 0.1*(i-1))
+for(i,1,11, T[2,i] = normINV((i-1)*0.1,0,1))  
+for(i,1,11, T[3,i] = R[i])
+transpose(T)
+"ok"
+
+
+"--- 17. --- EXAMPLE: 95% intervall"
+
+-- Find an interval that contains 95% of the values from a standard 
+-- normal distribution.
+-- SOLUTION
+                        
+stdnormINV(0.025)       
+stdnormINV(0.975)       
+                        
+
+-- CHECK
+-- Matlab> x = norminv([0.025     0.975])
+--         x = 1×2     -1.9600    1.9600
+--                     Interval =[-1.96, 1.96] 
+"ok"
+
+
+"--- 18. ---  EXAMPLE: Quantile table, boxplot values"
+
+-- Compute the inverse of cdf values evaluated at the probability 
+-- values in p=0,0.25,0.5,0.75,1 for the normal distribution with 
+-- mean=2 and standard deviation sigma=1.
+
+P = (0,0.25,0.5,0.75,1)
+X = (normINV(0, 2,1),    normINV(0.25, 2,1), normINV(0.5 ,2,1), 
+     normINV(0.75, 2,1), normINV(1,2,1))
+(P,X)   
+
+-- MATLAB check
+-- p = 0:0.25:1; mu = 2; sigma = 1;
+-- x = norminv(p,mu,sigma)
+-- x = 1×5
+--    -Inf    1.3255    2.0000    2.6745     Inf
+"ok"
+
+
+"--- 19. ---"
+
+"                  some Quantile of normal/GAUSS distribution:"
+X = ("X:", 0.9,0.95,0.975,0.99)
+R = ("R:", 1.281552, 1.644854, 1.959964, 2.326348)  -- results R
+(X,R)
+
+"      p           stdNinv     R"
+X = (0.9,0.95,0.975,0.99)
+R = (1.281552, 1.644854, 1.959964, 2.326348)  -- results R
+T = zero(3,4)     
+for(i,1,4, T[1,i] = X[i])
+for(i,1,4, T[2,i] = stdnormINV(X[i]))
+for(i,1,4, T[3,i] = R[i])
+transpose(T)
+"ok"
+
+"      p           normINV     R"
+T = zero(3,4)     
+for(i,1,4, T[1,i] = X[i])
+for(i,1,4, T[2,i] = normINV(X[i],0,1))
+for(i,1,4, T[3,i] = R[i])
+transpose(T)
+"ok"
+
+
+"--- 20. ---"
+"                      INVerse of standard Normal distribution"  
+xrange = (0,1)
+yrange = (-5,5)
+draw( stdnormINV(x), x)
+
+"                      INVerse of Normal distribution"  
+xrange = (0,1)
+yrange = (-5,5)
+draw( normINV(x,3,2), x)
+
+
+"--- 21. ---  EXAMPLE: The 68-95-99.7 rule"
+
+-- Let us determine the area under the std normal curve for 
+-- ±1 standard deviation, for ±2 standard deviations, and 
+-- for ±3 standard deviations.
+
+-- SOLUTION: remember Phi() = stdnormCDF().
+
+Phi(1) - Phi(-1)       # 1 standard deviation
+                       # 0.6826894921370859
+Phi(2) - Phi(-2)       # 2 standard deviations
+                       # 0.9544997361036416
+Phi(3) - Phi(-3)       # 3 standard deviations
+                       # 0.9973002039367398
+"ok"
+
+-- Awesome, we just confirmed the Empirical Rule, also known as the 
+---68-95-99.7 rule, which relates to the Chebyshev's theorem. 
+-- For a bell-shaped distribution the 3 rules are, that approximately
+-- 68% of the observations lie within   1 st.deviation of the mean,
+-- 95% of the observations lie within   2 st.deviations of the mean, 
+-- 99.7% of the observations lie within 3 st.deviations of the mean.
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

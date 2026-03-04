@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+##| The JACKKNIFE  with Eigenmath    - Ch. 5.10 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+
+-- We first follow the jackknife procedure with the small data sample
+-- used in the script.
+
+### --------------------------------------------------------------
+    "--- 1. ==========  EXAMPLE: jackknife step-by-step"
+### --------------------------------------------------------------
+
+"- a.-  CALCULATE THE CI USING SE (std.error.of.mean)"
+mean(X) = float( sum(X)/dim(X))    -- average of sample X
+
+X = (1,2,3,4)      -- the small data sample of the script
+
+n = dim(X)
+n
+
+M   = zero(n)      -- container for the means 
+
+mX = mean(X)       -- mean of X, 10/4 =2.5  ok
+mX
+
+-- Using a 'video' (i.e. a for loop ;) to watch how the sample X
+-- is repeatedly '1-deleted' and the correspondent means recorded in M
+
+for(i,1,n, print("---------- new X '1-deleted'"), print(i),
+           h = X[i], -- save X[i] in helper h 
+           X[i] = 0, 
+                     -- print(mean(X)),
+           M[i] = n/(n-1)*mean(X),  
+                     -- i=1:  X=(0,2,3,4)  mean(X)= 4/3*2.25
+                     -- i=2:  X=(1,0,3,4). mean(X)
+                     -- i=3:  X=(1,2,0,4). mean(X)
+                     -- i=4:  X=(1,2,3,0). mean(X)
+                     -- i.th element of X becomes 0, i.e. 'deleted'
+                     -- and afterwards reconstructed
+                     -- container M collects new Means                 
+           print((X,M)),  
+                     -- 1st row: X with one entry 'deleted'
+                     -- 2nd row: mean of the 1st row
+           X[i] = h  -- restore X[i] from helper h           
+           )
+
+"... the Jackknife means collected in M:"
+M
+(X,M)            -- X and M as a 2 x 4 matrix, X 1st row, M 2nd row
+
+"... the mean of the Jackknife means of M:"
+  
+theta = mean(M)              -- theta is mean of means in M
+theta    
+        
+jac = n*mX  - (n-1)*theta    -- mean of the means
+jac                     
+
+"... calculate the pseudovariables Ji"
+
+JCK = zero(n)    -- container vector for the pseudovariables Ji
+    for(i,1,n, JCK[i] = n*mX - (n-1)*M[i] )
+JCK         
+
+D  = jac - JCK
+D
+
+su = sum(D^2)
+su
+
+sigma = float( sqrt(su/(dim(X)-1)))  
+sigma
+
+"... calculate standard error of mean"
+
+SE = sigma/sqrt(n)        -- or: se = sqrt(var(JCK)/n)
+SE                        -- using var(iance)
+
+"... calculate Confidence Interval CI using std.error (SE) of mean"
+
+CIm = mean(JCK) - SE
+CIm
+
+CIp = mean(JCK) + SE
+CIp
+
+CI = (CIm, CIp)
+
+"RESULT: mean 2.5 is between 1.85 and 3.14, ok"
+
+-- We give an alternative calculation of the confidence interval
+-- using quantils of the t-distribution (tINV)
+
+"- b.-  CALCULATE THE CI USING tINV QUANTILS"
+
+"... calculate CI via critical values and tINV quantils"
+-- To calculate the confidence interval CI we need tINV.
+--------------------------------------------------------------
+   tINV(x, df) = tdistinv(x, df)
+--------------------------------------------------------------
+
+X  = (1,2,3,4)                   -- the sample from above
+n  = dim(X)
+nu = n - 1                       -- Degree of freedom
+
+conf  = 0.95                     -- confidence level 95 %
+alpha = 1 - conf
+pLo   = alpha/2
+pLo
+pUp   = 1 - alpha/2
+pUp
+
+"... Compute the critical values for the confidence bounds"
+-- critical values via tINV quantiles
+
+crit = ( tINV(pLo, nu), tINV(pUp, nu) )
+crit   
+
+SE                               -- cite std.error of mean
+
+ci = tINV(1-alpha/2,n-1)*SE
+ci
+
+jac                              -- cite the bootstrap mean
+
+CI = (jac - ci, jac + ci)        -- confidence interval
+CI
+
+"ok"
+
+### --------------------------------------------------------------
+"--- 2. ========== EXAMPLE: birthday"    
+### --------------------------------------------------------------
+-- PROBLEM   cf. HERRMANN [6, p. 212]
+-- The birth weights of 72 boys and 48 girls born in the first half of
+-- 1981 at the Freiburg (Germany) clinic were examined. 
+-- From a sample of size 120, there are 120 jackknife samples 
+-- generated and their mean is determined. 
+-- This is intended to provide a non-parametric 95% confidence 
+-- interval for the sample mean. 
+-- > The available point estimate for the mean is 3352.8. 
+-- > The non-parametric 95% confidence interval for the mean is 
+--   [3267.9, 3437.7].
+
+-- SOLUTION:  procedure step-by-step without comment ;)
+
+-- the data
+X = (2990,3700,3800,3040,3080,3350,2930,3355,3360,3170.0,
+     3220,3850,3080,3440,3840,3320,2640,3020,2850,3700,
+     4630,3670,3400,3580,3270,3360,3600,3220,4060,2670,
+     3550,3690,2510,1980,3700,3730,3170,3580,3720,2910,
+     3500,3430,3510,1520,3420,4630,3470,3400,3290,3250,
+     2420,3580,3100,3480,3830,3050,3680,3330,3650,3200,
+     3810,3350,3390,3550,3350,3200,4190,3050,4020,2880,
+     3020,3010,3560,3030,3200,2830,3120,3000,4010,3050,
+     3980,3530,3245,3415,3660,4350,3740,3220,3350,3350,
+     3780,3620,3310,3630,3290,3800,4130,3380,3100,3430,
+     3620,3060,2610,3560,3720,3030,3630,3400,3580,3700,
+     3470,2810,2330,1960,3300,2880,3660,3150,3160,3300)
+
+mean(x) = float( sum(x)/dim(x) )
+
+mu = mean(X)
+n  = dim(X)
+M  = zero(n)       
+mX = mean(X)       
+
+for(i,1,n, h=X[i], X[i]=0, M[i] = n/(n-1)*mean(X),  
+           X[i]=h )
+
+theta = mean(M)         
+jac   = n*mX  - (n-1)*theta                       
+
+JCK   = zero(n)    
+for(i,1,n, JCK[i] = n*mX - (n-1)*M[i] ) 
+
+D     = jac - JCK
+su    = sum(D^2)
+sigma = float( sqrt(su/(dim(X)-1)) )  
+SE    = sigma/sqrt(n) 
+
+CIm = mean(JCK) - SE
+CIp = mean(JCK) + SE
+CI  = (CIm, CIp)        -- confidence interval using SE
+
+"... CI mit tINV"
+
+conf  = 0.95
+alpha = 1 - conf
+
+pLo   = alpha/2
+pLo
+
+pUp   = 1 - alpha/2
+pUp
+
+"...  Compute the critical values for the confidence bounds"
+
+nu = n - 1                                -- D.o.freedom
+crit = ( tINV(pLo, nu), tINV(pUp, nu) )
+crit
+
+SE                                        -- see above
+ci = tINV(1-alpha/2,n-1)*SE
+ci
+
+CI = (jac - ci, jac + ci)
+CI
+"ok"
+
+## Results:
+## mean.ext 3352.8    ok: theta = jac =m1
+## 3437.71  3267.88   here and C program by HERRMANN
+## 3437.69  3267.89   jknife, R code
+## 3458.1   3297.3    parametric CI cf. HERRMANN
+
+
+
+"--- 4. ========== ALGORITHM: Jackknife method 1-deleted."
+----    We abstract the procedure to function jack().
+
+### --------------------------------------------------------- jack
+###     Jackknife method 1-deleted
+### --------------------------------------------------------------
+
+jack(X, jac,d,m1,m2,sig,h,M,JCK) = do(
+        alpha = 0.05,
+        n = dim(X),
+        M = zero(n), 
+        mX = mean(X),
+        for(i,1,n, h=X[i], X[i]=0, M[i] = n/(n-1)*mean(X), X[i]=h),
+        mM  = mean(M),            
+        jac = n*mX - (n-1)*mM,    
+        JCK = zero(n),      
+        for(i,1,n, JCK[i] = n*mX - (n-1)*M[i]),
+        D   = jac - JCK,
+        su  = sum(D^2),
+        sigma = float( sqrt(su/(dim(X)-1))),  
+        SE  = sigma/sqrt(n),   
+        ci = tINV(alpha/2,n-1)*SE,
+        print("The nonparametric 'leave-one-out' jackknife algorithm")
+        print(" __________  jackknife  _________"),
+        (("SE", "CI.l", "CI.h"), (SE, jac - ci, jac + ci )))
+### ---------------------------------------------------------- END
+
+-- Check with jack
+X = (1,2,3,4)
+jack(X)
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

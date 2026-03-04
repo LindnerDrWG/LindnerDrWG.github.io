@@ -1,0 +1,70 @@
+##| MEDIAN with Eigenmath    - Ch. 1.7 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+
+-- the definition of median needs a sort function.
+-- helper function SORT by G. Weigt, 19.7.2025:
+
+sort(v,i,k,n,t) = do( n = dim(v),       
+     loop( test(n < 2, break), k = 1,
+           for(i, 1, n - 1,
+               test(v[i] > v[i + 1], 
+                 do( t = v[i], v[i] = v[i + 1], v[i + 1] = t,
+                     k = i ))), n = k), v)
+
+
+# DEFINITION
+--------------------------------------------------- 
+
+median(X, xmed,Xs,n2,n2p) = do(
+          Xs   = sort(X),
+          n2   = floor(dim(X)/2),  
+          n2p  = n2+1,
+          xmed = test( not(mod(dim(X),2)=0), Xs[n2p], 
+                       0.5*(Xs[n2]+Xs[n2p])), float(xmed))
+
+--------------------------------------------------- END 
+
+"--- 1. --- EXAMPLE"
+
+X = (1,2,3,4,  5,  6,7,8,9)
+    -- 4 elem. ^   4 elements right
+median(X)  
+"ok: 5"
+
+median((36,4,75,45,50))    -- sorted: 4,36,45,50,70 -> 45
+"ok"
+
+X = (0,5,10,15,20,25,30,35,40,  45,  50,55,60,65,70,75,80,85,90)
+--   ----------- 9 -----------       ------------- 9 ----------
+median(X)
+"ok : 45"
+
+"--- 2. ---"
+
+X = (0,2,1,4)
+median(X)
+
+-- check with Octave
+-- Matlab>  A = [0; 2; 1; 4]
+--          M = median(A)
+--          M = 1.5000 
+
+
+"--- 3. ---"
+
+X = (0,3,3,2)
+median(X)
+
+
+"--- 4. --- EXAMPLE in R-manual"
+
+-- https://stat.ethz.ch/R-manual/R-devel/library/stats/html/median.html
+-- R> median(1:4)       # = 2.5
+--    [1] 2.5
+
+median( (1,2,3,4) )
+"ok"
+
+

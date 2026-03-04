@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+##| KENDALL rank correlation tau (τ)  with Eigenmath  - Ch. 5.3 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+
+-- In this script we demonstrate the determination of Kendall's
+-- rank correlation coefficient tau τ in three phases:
+
+-- FIRSTLY  we calculate τ manually with Eigenmath
+-- SECONDLY we calculate rho semi-automatic using two helper
+--          functions sort(), Rank() and correspond(ence)
+-- THIRDLY  we calculate τ fully automatic using function 
+            kendall()          
+
+-- we need 3 helper functions: sort, Rank, correspond
+-----..................................................... SORT 
+sort(v,i,k,n,t) = do( n = dim(v),         -- by G. Weigt 7/2025
+     loop( test(n < 2, break), k = 1,
+           for(i, 1, n - 1,
+               test(v[i] > v[i + 1], 
+                 do( t = v[i], v[i] = v[i + 1], v[i + 1] = t,
+                     k = i ))), n = k), v)
+
+sort1(v,i,k,n,t) = do( n = dim(v),         -- by me wL
+     loop( test(n < 2, break), k = 1,
+           for(i, 1, n - 1,
+               test(v[i] < v[i + 1], 
+                 do( t = v[i], v[i] = v[i + 1], v[i + 1] = t,
+                     k = i ))), n = k), v)
+
+Rank(W, i,j,k,n,t, Srank) = do(           -- by G. Weigt 8/25  
+         j = 1, n = dim(W), Srank = 0,
+         loop( test(j > n, break),
+               k = j + 1,
+               loop( test(k > n, break, W[j]==W[k], k=k+1, break)),
+               t = 0.5*(j + k - 1),
+               for(i, j, k-1, W[i] = t),
+               t = k - j,
+               Srank = Srank + t^3 - t,
+               j = k), W)
+
+correspond(X,sX, M) = do(         -- X and sortedX by wL 7/25
+    M=zero(dim(X)),
+    for(j,1,dim(X),
+    for(i,1,dim(X), test(sX[i]=X[j], M[j]=Rank(sX)[i]))),
+    M)
+
+----..................................................... END 
+
+
+"--- 1. ==================== EXAMPLE from numiqo.com"
+         
+-- PROBLEM: we follow > https://numiqo.com/tutorial/kendalls-tau
+-- Suppose two doctors rank 6 patients by descending physical health.
+-- One of the two doctors, in this case the female, is now defined as
+-- the reference and the patients are sorted from 1 to 6.
+
+-- We calculate Kendall's Tau τ with this formula:
+--              τ = (C-D)/(C+D)
+-- where C is the number of 'concordant' pairs ('inversions')  
+-- and   D is the number of 'discordant' pairs.
+-- Kendall's Tau τ lies between -1 and +1.
+
+-- SOLUTION: 
+
+"FIRSTLY  we calculate tau manually with Eigenmath"
+"Look at this 'video':"
+-- we follow the example step by step using Eigenmath
+-- we show the steps by means of a 'video in scenes'
+
+X=(1,2,3,4,5,6)
+Y=(3,1,4,2,6,5)
+
+n=dim(Y)
+p=0
+q=0
+w=0
+
+for( i,2,n, 
+--     for( j,1,(i − 1),
+        do(
+          w = sgn(X[i] - X[1]) * sgn(Y[i] - Y[1]),
+          test(w > 0, p=p+1),     -- p ++
+          test(w < 0, q=q+1)      -- p ++
+        ))
+--)
+
+p
+q
+".. ok  3,2"
+
+for( i,3,n, 
+--     for( j,1,(i − 1),
+        do(
+          w = sgn(X[i] - X[1]) * sgn(Y[i] - Y[1]),
+          test(w > 0, p=p+1),     -- rise p 
+          test(w < 0, q=q+1)      -- rise q 
+        ))
+--)
+-- 3,1
+
+p
+q
+".. ok 3,1"
+
+for( i,4,n, 
+--     for( j,1,(i − 1),
+        do(
+          w = sgn(X[i] - X[1]) * sgn(Y[i] - Y[1]),
+          test(w > 0, p=p+1),     -- p ++
+          test(w < 0, q=q+1)      -- q ++
+        ))
+--)
+-- 2,1
+
+p
+q
+".. ok  2,1"
+
+for( i,5,n, 
+--     for( j,1,(i − 1),
+        do(
+          w = sgn(X[i] - X[1]) * sgn(Y[i] - Y[1]),
+          test(w > 0, p=p+1),     -- P ++
+          test(w < 0, q=q+1)     -- Q ++
+        ))
+--)
+-- 2,0
+
+p
+q
+".. ok 2,0"
+
+
+for( i,6,n, 
+--     for( j,1,(i − 1),
+        do(
+          w = sgn(X[i] - X[1]) * sgn(Y[i] - Y[1]),
+          test(w > 0, p=p+1),     -- P ++
+          test(w < 0, q=q+1)     -- Q ++
+        ))
+--)
+-- 1,0
+
+p
+q
+".. ok  1,0"
+
+-- OK by now, we read p=11 & q=4 
+
+tau = (11-4)/(11+4)
+tau
+float
+"ok"
+
+"> now we do this process in one step:"
+
+p=0
+q=0
+w=0
+
+for(j,1,n,
+   for( i,j,n, 
+        do(
+          w = sgn(X[i] - X[j]) * sgn(Y[i] - Y[j]),
+          test(w > 0, p=p+1),     -- P ++
+          test(w < 0, q=q+1)      -- Q ++
+        )))
+
+p
+q
+
+"> here is the summary of the process as table (matrix):"
+
+TX = zero(4, 8)
+TX[1] = ("doc1:", 1,2,3,4,5,6,  "")
+TX[2] = ("doc2:", 3,1,4,2,6,5,  "")
+TX[3] = ("p:",    3,3,2,2,1,    "__", "")
+TX[4] = ("q:",    2,1,1,0,0,    "__", "")
+TX[3,8]=sum(j,2,6, TX[3,j])
+TX[4,8]=sum(j,2,6, TX[4,j])
+transpose(TX)
+
+C = TX[3,8]    -- sum of the p
+D = TX[4,8]    -- sum of the q
+
+tau = (C-D)/(C+D)
+tau
+float
+
+-- CHECK with R
+-- > X=c(1,2,3,4,5,6)
+-- > Y=c(3,1,4,2,6,5)
+-- > cor(X,Y, method="kendall")
+-- [1] 0.4666667
+
+"ok w.r.t. numiqo.com"
+
+
+##--------------------------------------------------------------
+"--- 2. ========================= EXAMPLE from Zoefel"
+##--------------------------------------------------------------
+
+-- PROBLEM  (Zoefel, p.129 ff)
+-- The table compares the league standings X of the clubs with their 
+-- stadium sizes Y. - The aim is to check whether stadium size 
+-- correlates with league position. 
+
+X = (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18)
+Y = (30,72,65,80,72,25,41,45,59,15,70,23,58,24,64,22,26,28) -- in 10^3
+
+-- We cite Zoefel, a.a.o.
+-- According to KENDALL, the first step is to write down the ranking 
+-- of the first variable X in ascending order and assign the other 
+-- accordingly. In this context, one speaks of an anchor row (X) and a 
+-- comparison row (Y). In the example, the league position already 
+-- noted in ascending order is the anchor row. The comparison row Y 
+-- consists of the outermost positions in terms of stadium size. 
+-- It is that the largest stadium is assigned to rank no 1.
+
+-- With a positive correlation, the comparison series is expected to 
+-- rise in a similarly monotonic manner as the anchor series. 
+-- The number of disturbances ('inversion' w.r.t to this monotonicity) 
+-- represents a progression for the strength of the correlation, 
+-- since such a disturbance occurs when a lower ranking follows a 
+-- higher ranking in the comparison series. 
+-- e.g. This happens ten times for the club in first place and three
+-- times for the club in third place.
+
+-- The number of inversions is entered in the column labeled I, 
+-- the number of proversions is entered in the column labeled P, 
+-- meaning that in the comparison series, a single-place entry follows -- the higher one.
+
+-- Now the sums of I and P are calculated and this gives the 
+-- KENDALL TAU as   tau := sum(P) - sum(I)
+
+--SOLUTION
+
+X = (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18)
+Y = (30,72,65,80,72,25,41,45,59,15,70,23,58,24,64,22,26,28)
+
+-- ranks of Y by hand and eye:
+rY = (11, 2.5, 5, 1, 2.5, 14, 10, 9, 7, 18, 4, 16, 8, 15, 6, 17,13,12)
+
+-- then we have 
+n=dim(Y)
+n
+p=0
+q=0
+w=0
+
+for( i,2,n, 
+--     for( j,1,(i − 1),
+        do(
+          w = sgn(X[i] - X[1]) * sgn(rY[i] - rY[1]),
+          test(w > 0, p=p+1),     -- rise P
+          test(w < 0, q=q+1)      -- rise Q 
+        ))
+--)
+
+p
+q
+".. ok  7,10"
+
+p=0
+q=0
+w=0
+
+for( i,3,n, 
+--     for( j,1,(i − 1),
+        do(
+          w = sgn(X[i] - X[1]) * sgn(rY[i] - rY[1]),
+          test(w > 0, p=p+1),     -- P ++
+          test(w < 0, q=q+1)      -- Q ++
+        ))
+--)
+-- 7,9
+p
+q
+".. ok  7,10"
+
+
+"> now in on step with 2nd for loop:"
+---  sgn is +1/-1
+p=0
+q=0
+w=0
+
+for(j,1,n,
+   for( i,j,n, 
+        do(
+          w = sgn(X[i] - X[j]) * sgn(rY[i] - rY[j]),
+          test(w > 0, p=p+1),     -- P ++
+          test(w < 0, q=q+1)      -- Q ++
+        )))
+
+p
+q
+"ok"
+
+-- OK by now 
+
+tau = (99-53)/(99+53)
+tau
+float
+"ok"
+
+
+"--- 3. =========================  KENDALL by hand"
+----    using the ZOEFEL example
+
+-- rank.ing by eye
+TX = zero(5, 21)
+TX[1] = ("place:", 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18, 
+         "", "")
+TX[2] = ("big:", 30,72,65,80,72,25,41,45,59,15,70,23,58,24,64,
+                 22,26,28,  "", "")
+TX[3] = ("rank:", 11,2.5,5,1,2.5,14,10,9,7,18,4,16,8,15,6,17,
+                  13,12, "", "")
+TX[4] = ("I:", 10,1.5,3,0,0,8,5,4,2,8,0,5,1,3,0,2,1,"", "__", "")
+TX[5] = ("P:", 7,14.5,12,14,13,4,6,6,7,0,7,1,4,1,3,0,0,"",
+                "__", "")
+TX[4,21]=sum(j,2,18, TX[4,j])
+TX[5,21]=sum(j,2,18, TX[5,j])
+transpose(TX)
+
+S = sum(j,2,18, TX[5,j]) - sum(j,2,18, TX[4,j])
+S
+
+n = 18
+tau = 2*S/n/(n-1)
+tau
+
+-- or
+
+tau = (53.5-99.5)/(53.5+99.5)
+tau
+
+"ok"
+
+
+"--- 4. =================== KENDALL by sort1, Rank & correspond"
+--      using the ZOEFEL example
+
+-- we start
+X = (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18)
+Y = (30,72,65,80,72,25,41,45,59,15,70,23,58,24,64,22,26,28)
+
+-- we need:
+-- Y = (30,72,65,80,72,25,41,45,59,15,70,23,58,24,64,22,26,28)
+--      |   ???
+--      v
+-- Yr= (11, 2.5, 5, 1, 2.5, 14, 10, 9, 7,18,4,16,8,15,6,17,13,12)
+
+-- The idea is to invert the sort() by: test(v[i] < v[i + 1],
+-- i.e. to use sort< (see above sort1) in Rank instead of sort>
+
+Y = (30,72,65,80,72,25,41,45,59,15,70,23,58,24,64,22,26,28) -- in 10^3
+
+sY = sort1(Y)             -- sort Y using .<. instead of .>.
+rY = Rank(sY)             -- rank <-sorted Y to give rY
+cY = correspond(Y, sY)    -- now correspondence Y ~ sort1(Y)
+cY
+
+-- our aim:
+Yaim = (11, 2.5, 5,1, 2.5, 14,10,9,7,18,4,16,8,15,6,17,13,12)
+
+"the rows cY, Y.aim:"
+(cY, Yaim)
+"ok"
+
+-- now we do again
+p=0
+q=0
+w=0
+
+for(j,1,n,
+   for( i,j,n, 
+        do(
+          w = sgn(X[i] - X[j]) * sgn(cY[i] - cY[j]),
+          test(w > 0, p=p+1),     -- P ++
+          test(w < 0, q=q+1)      -- Q ++
+        )))
+
+p
+q
+
+tau = (p-q)/(p+q)
+tau
+float
+
+"ok"
+
+"--- 5. ================================= KENDALL function"
+-- we abstract the whole process/procedure into a function.             
+
+### --------------------------------------------------------------
+### FUNCTION kendall : general function KENDALL's tau
+### --------------------------------------------------------------
+    kendall(X,Y, n,sX,sY,cY,p,q,w) = do(
+                 n  = dim(X),
+                 sX = sort(X),
+                 sY = sort1(Y),
+                 cY = correspond(Y, sY),
+                 p=0, q=0, w=0,
+
+                 for(j,1,n,
+                   for(i,j,n, 
+                       do( w = sgn(sX[i]-sX[j])*sgn(cY[i] - cY[j]),
+                          test(w > 0, p=p+1), 
+                          test(w < 0, q=q+1) ))),
+                 tau = (q-p)/(p+q),
+                 -- tau = 2*(p-q)/n/(n-1),      -- alternative
+                 print("___ KENDALL tau ___"),
+                 (("C","D","tau"), (q,p,float(tau)))  )
+### ---------------------------------------------------------- END
+
+
+"--- 6. --- some checks"
+
+-- EXAMPLE from numiqo.com, see above 5.3.1
+X=(1,2,3,4,5,6)
+Y=(3,1,4,2,6,5)
+kendall(X,Y)
+"ok"
+
+"--- 7. --- EXAMPLE by Zoefel"
+
+X = (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18)
+Y = (30,72,65,80,72,25,41,45,59,15,70,23,58,24,64,22,26,28)
+
+kendall(X,Y)
+"ok"
+
+-- CHECK with R:
+-- automatic calculation of KENDALL TAU with R using Zoefel data
+-- > X = c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18)
+-- > Y = c(30,72,65,80,72,25,41,45,59,15,70,23,58,24,64,22,26,28)
+-- > cor(X,Y, method="kendall")
+-- [1] -0.301641
+
+
+"--- 8. ---   EXERCISE: significance"
+--  USE the FACT
+##  The test for significance of KENDALL TAU τ use the statistics
+##
+##      Z = |tau| / sqrt( (2*(2*n+5)/(9*n*(n-1) ) 
+##
+##  which is std.normal-distributed.
+--  and do an F test for the significance of the tau. 
+
+-- SOLUTION: ...
+
+
+
+"SOLUTION should be 1.74 for the ZOEFEL example."
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

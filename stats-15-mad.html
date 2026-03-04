@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+##| mad  - mean absolute deviation with Eigenmath   - Ch. 1.5 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+
+mean(X) = float( sum(X)/dim(X) )          
+
+# DEFINITION
+----------------------------------------------- mad, m.abs.dev.
+  
+mad(X)  = mean(mag(X - mean(X)))            
+
+--------------------------------------------------------
+
+"--- 1. ---"
+
+-- EXAMPLE, wiki ibid.
+-- For example, for the data set {2, 2, 3, 4, 14} the MAD is
+
+set = (2, 2, 3, 4, 14)
+mad(set)                     -- mean absolute deviation
+
+
+"--- 1.a. --- mad w.r.t other central points "
+
+-- REMARK 
+-- Sometimes we need the (m)ad w.r.t. m = median or m = mode.
+-- Therefore we need helper functions to calculate other 
+-- possible central points of a data set ('distribution').
+-- See later sections for details.
+
+######################### you may skip the understanding of 
+  sort(v,i,k,n,t) = do( n = dim(v),    -- by G. Weigt, 7/2025
+     loop( test(n < 2, break), k = 1,
+           for(i, 1, n - 1,
+               test(v[i] > v[i + 1], 
+                 do( t = v[i], v[i] = v[i + 1], v[i + 1] = t,
+                     k = i ))), n = k), v)
+
+  median(X, xmed,Xs,n2,n2p) = do(      -- needs sorted data
+          Xs   = sort(X),
+          n2   = floor(dim(X)/2),  
+          n2p  = n2+1,
+          xmed = test( not(mod(dim(X),2)=0), Xs[n2p], 
+                       0.5*(Xs[n2]+Xs[n2p])), float(xmed))
+
+  mode(v, i,j,k,m,n) =                 -- mode by G. Weigt 8/2025
+    do( n = 0,
+      for(i,1,dim(v), k = 0,
+          for(j,1,dim(v), test(v[i] == v[j], k = k + 1)),
+          test(or(k > n, and(k == n, v[i] < m)), 
+               do(n = k, m = v[i]))), m)
+####################################### helper functions 
+
+
+# DEFINITION : (m)ad w.r.t. median resp. mode
+--------------------------------------------------------
+
+mad1(X) = mean(mag(X - median(X)))      -- w.r.t. median
+mad2(X) = mean(mag(X - mode(X)))        -- w.r.t. mode
+
+--------------------------------------------------------
+-- [+] https://en.wikipedia.org/wiki/Average_absolute_deviation
+
+-- EXAMPLE
+
+mad(  (4,36,45,50,75))       -- default = mean
+mad1( (4,36,45,50,75) )      -- w.r.t. median
+mad2( (4,36,45,50,75) )      -- w.r.t mode
+ 
+-- we calculate for the contrast to the mean absolute deviation
+-- the MEAN SQUARED deviation 'dsquare' by hand:
+
+X=(4,36,45,50,75) 
+mX = mean(X)
+mX
+
+Xbar = X-mX
+Xbar
+
+Xbar2 = Xbar^2
+Xbar2
+
+dsquare = sum(Xbar^2)/dim(X)
+dsquare
+
+"--- 2. ---"
+
+-- EXAMPLE, wiki ibid.
+-- For example, for the data set {2, 2, 3, 4, 14} the MAD's are
+
+set = (2, 2, 3, 4, 14)
+mad(set)        -- default w.r.t. mean
+mad1(set)       -- w.r.t   median
+mad2(set)       -- w.r.t   mode
+"ok"
+
+
+"--- 3. --- Median abs.dev. around the median"
+
+-- EXAMPLE, wiki ibid.
+-- # Median absolute deviation around the median.
+-- For the example {2, 2, 3, 4, 14}: 3 is the median, so the absolute
+-- deviations from the median are {1, 1, 0, 1, 11} 
+-- (reordered as {0, 1, 1, 1, 11}) with a median of 1, 
+-- in this case unaffected by the value of the outlier 14, 
+-- so the median absolute deviation is 1.
+
+-- SOLUTION: we define the following version of mad:
+
+# DEFINITION
+--------------------------------------------------------
+mad3(X) = median(mag(X - median(X)))  -- med.abs.dev. w.r.t. median
+--------------------------------------------------------
+
+Y = (2, 2, 3, 4, 14)
+mad3(Y)
+"ok"
+
+
+"--- 4. ---"
+
+mad( (1,2,3,4,5,6,7,8,9) )       -- default = mean
+"ok"
+
+mad3( (1,2,3,4,5,6,7,8,9) )   -- median abs.dev. around the median
+"ok - gives 2"
+
+-- R> mad(c(1:9), constant=1)
+--    [1] 2
+
+
+"--- 5. --- EXAMPLE: a descriptive statistics"
+
+-- EXAMPLE (Beucher p.174)
+-- Here is a sample X=(0,1,5,10).
+-- Calculate dim, mean, variance, std.dev, median, range, m.a.d.
+
+-- SOLUTION:
+
+-- we calculate the range of the number list using
+-- vectorized versions of min() and max():
+
+# DEFINITION
+----------------------------------------- max, min, range
+max(v, i,m,n) = do( n = dim(v), m = v[1],    -- G. Weigt 7/2025
+                    for(i,2,n, test(v[i]>m, m=v[i])), m)
+
+min(v, i,m,n) = do( n = dim(v), m=v[1],      -- by wL
+                    for(i,2,n, test(v[i]< m, m=v[i])), m)
+
+range(X) = max(X) -  min(X)
+--------------------------------------------------------
+
+sd(X)  = sqrt(sum((X-mean(X))^2) /(dim(X)-1))   -- std.deviation s
+var(X) = sd(X)^2
+
+X=(0,1,5,10)
+
+-- construct the value table
+measure = ("VARIABLE:", "N", "Mean", "Variance", "St.Dev", "Median", 
+                        "Range", "m.a.d.")
+score   = ("SCORE:",  dim(X), mean(X), var(X),    sd(X),   median(X), 
+                     range(X), mad(X))
+(measure, score)
+
+
+"--- 6. ---"
+
+-- EXAMPLE: (Beucher p.176, P 64)
+-- For 40 test vehicles of one car type, the fuel consumption X was 
+-- determined in liters per 100 km of driving in the city center. 
+-- This sample yielded the following results (table TX with 5 rows). 
+
+TX = zero(5, 8)
+TX[1] = (10.1,10.6,10.9,10.0,10.4,10.5,9.7,10.5)
+TX[2] = (10.4,10.1,10.8, 9.2,10.2,10.3,10.5,9.2) 
+TX[3] = (10.2,10.5,9.4,10.2,9.6,10.2,9.7,10.2)
+TX[4] = (10.8,9.9,10.5,10.6,9.8,10.7,11.2,10.8)
+TX[5] = (9.9, 10.0,10.5,10.4,11.4,10.4,10.1,10.4)
+TX
+
+-- TASK:
+-- Divide the sample into the following five approx. equidistance 
+-- characteristic classes: 
+--      "<9.5", "9.5-10.0", "10.0-10.5", "10.5-11.0", ">11.0"
+-- a. Determine the list of absolute and relative frequencies. 
+-- b. Determine the empirical distributions corresponding to the class
+--    classification and represent this in a histogram.
+-- c. Collect the known 'measures of dispersion' i.e. mean, std.dev.,
+--    median, range, m.a.deviation, moment and percentile in a
+--    'score table. 
+
+-- SOLUTION using Eigenmath
+
+-- First define the sample
+X = (10.1, 10.6, 10.9, 10.0, 10.4, 10.5,  9.7, 10.5,
+     10.4, 10.1, 10.8,  9.2, 10.2, 10.3, 10.5,  9.2,
+     10.2, 10.5,  9.4, 10.2,  9.6, 10.2,  9.7, 10.2,
+     10.8,  9.9, 10.5, 10.6,  9.8, 10.7, 11.2, 10.8,
+      9.0, 10.0, 10.5, 10.4, 11.4, 10.4, 10.1, 10.4)
+
+min(X)
+max(X)
+
+"--- a. ---"
+
+-- we use the classes
+--       "<9.5", "9.5-10.0", "10.0-10.5", "10.5-11.0", ">11.0"
+-- to determine the absolute 'AFi' and relative frequencies
+
+aF1 =0
+for(i,1,dim(X), test( X[i]<=9.5, aF1=aF1+1), aF1)
+aF1
+
+aF2 =0
+for(i,1,dim(X), test(and(9.5<X[i],X[i]<=10.0), aF2=aF2+1), aF2)
+aF2
+
+aF3 =0
+for(i,1,dim(X), test(and(10.0<X[i],X[i]<=10.5), aF3=aF3+1), aF3)
+aF3
+
+aF4 =0
+for(i,1,dim(X), test(and(10.5<X[i],X[i]<=11.0), aF4=aF4+1), aF4)
+aF4
+
+aF5 =0
+for(i,1,dim(X), test(X[i]>11.0, aF5=aF5+1), aF5)
+aF5
+
+relativeFreqencies = (aF1, aF2,aF3,aF4,aF5)/ dim(X) 
+float(relativeFreqencies)
+
+"--- b. ---"
+
+## empirical frequency and cumulative distribution
+
+"                       empirical relative frequency"
+y = (aF1,aF2,aF3,aF4,aF5)/ dim(X)
+yrange = (0,1)
+xrange = (1,6)
+draw(y[floor(x)],x)
+
+## cumulative distribution
+cumsum(X, Xc,n) = do( n=dim(X), Mc = zero(n),
+                      for(i,1,n, Mc[i]= sum(j,1,i, X[j])), Mc)
+
+float(cumsum((aF1,aF2,aF3,aF4,aF5)/ dim(X)))
+
+"                       empirical cumulative frequency"
+y = cumsum((aF1,aF2,aF3,aF4,aF5)/ dim(X))
+yrange = (0,1)
+xrange = (1,6)
+draw(y[floor(x)],x)
+
+"--- c. ---"
+
+-- mean, std.dev., median, range, m.a.deviation are shown,
+-- the definitions of moment and percentile are given later.
+-- Reference values with MatLAB are given.
+
+TX = zero(3, 8)
+measure = ("VARIABLE:", "N", "Mean", "Variance", "St.Dev", "Median", 
+                        "Range", "m.a.d.")
+score   = ("SCORE:",    dim(X), mean(X), var(X), sd(X), median(X), 
+                        range(X), mad(X))
+TX[1] = measure   
+TX[2] = score 
+TX[3] = ("MATLAB:", 40, 10.247,0.2703,0.5199,10.35,2.4,0.3951)
+transpose(TX)
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

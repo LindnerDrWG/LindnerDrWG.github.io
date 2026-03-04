@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+##| MODE with Eigenmath    - Ch. 1.8 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+
+# DEFINITION
+--------------------------------------------- mode
+  mode(v, i,j,k,m,n) =      --  by G. Weigt 8/2025
+    do( n = 0,
+      for(i,1,dim(v),
+          k = 0,
+          for(j,1,dim(v), test(v[i] == v[j], k = k + 1)),
+          test(or(k > n, and(k == n, v[i] < m)), 
+               do(n = k, m = v[i]))),  m )
+--------------------------------------------- END
+
+"--- 1. ---"
+
+mode( (4, 36, 45, 50, 75))
+
+mode((1, 3, 6, 6, 6, 6, 7, 7, 12, 12, 17)) 
+
+mode((1, 2, 2, 3, 4, 7, 9))
+
+mode(( 1, 1, 2, 4, 4))
+
+
+"--- 2. ---"
+
+X = (0,2,2,1,4)
+mode(X)
+
+-- check with Octave
+-- Matlab>  A = [0, 2, 2, 1,4]
+--       >  mode(A)
+--          ans = 2
+
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

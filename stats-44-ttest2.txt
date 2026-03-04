@@ -1,0 +1,238 @@
+##| Two Sample t-Test for Eigenmath    - Ch. 4.4 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+## Hypothesis Tests for two sample means
+
+-- To calculate the t-TEST score 'T' we need the functions
+-- tCDF() and tINV() from T-distribution.txt as helper: 
+
+# DEFINITIONs
+--........................................................ tINV tCDF
+  tCDF(x, df) = tdist(x, df)     
+
+  tINV(x, df) = tdistinv(x, df)
+--........................................................ END
+
+
+#################################################
+"--- 1. ---  EXAMPLE: STUDENTS SCORE"
+#################################################
+
+-- https://statistiknachhilfe.ch/2024/02/26/wie-man-einen-t-test-in-r-durchfuehrt-ein-umfassender-leitfaden/
+-- Suppose we have data from two groups (Group A and Group B), 
+-- each representing the test scores of different students.
+-- We want to know if there is a significant difference between the 
+-- mean test scores of the two groups.
+
+A = (88, 92, 94, 78, 88, 95.)
+B = (75, 80, 79, 88, 85, 92.)             -- . to get float results
+
+--  The null hypothesis $H_0$ states that the mean test score of the 
+--  two student groups $A$ and $B$ are equal
+
+-- SOLUTION
+
+"--- a. --- We first do the t-test STEP-BY-STEP with Eigenmath"
+
+-------.....................................   some definitions
+mean(X) = sum(X)/dim(X)
+sd(X)   = float( sqrt(sum((X-mean(X))^2) /(dim(X)-1)) )
+-------.........................................................
+
+alpha = 0.05
+alpha
+
+n1 = dim(A)
+n2 = dim(B)
+
+m1 = mean(A)
+m1
+
+m2 = mean(B)
+m2
+
+s1 = sd(A)
+s1
+
+s2 = sd(B)
+s2
+
+-- calculate the test statistic T
+s1 = 1/n1*s1*s1
+s2 = 1/n2*s2*s2
+df = (s1+s2)^2/(s1^2/(n1-1) + s2^2/(n2-1))   -- float value w/ R
+-- df = floor(f+0.5)                         -- if you want integer
+df
+
+T = (m1-m2)/sqrt(s1+s2)
+T
+"ok"
+
+-- calculate critical value for lower.tail
+critVal = tINV(alpha/2, df)
+critVal
+    
+-- evaluate rejection region and decide about H0
+test(T > critVal,  print("reject H0"),  print("accept H0")) 
+"ok"
+
+t95 = tINV(1-alpha/2, df)         -- method "both sided"
+t95
+
+
+F = sqrt(n1*n2/(n1+n2))
+N = sqrt(((n1-1)*s1^2+(n2-1)*s2^2)/(n1+n2-2))
+
+tquantil = tINV(1-alpha/2,df)
+tquantil
+
+CI  = (mean(A)-mean(B)-tquantil*N/F,
+       mean(A)-mean(B)+tquantil*N/F)
+CI
+
+-- pValue needs min()
+min(a,b) = test(a<=b, a,b)
+
+pValue = min( 2*tCDF(T,df), 2*(1-tCDF(T,df)) )
+pValue
+"ok"
+    
+-- evaluate rejection region and decide about H0
+test(T > critVal,  print("reject H0"),  print("accept H0")) 
+print("true difference in means is not equal to 0!")
+"ok"
+
+-- DECISION
+-- ERGO the alternative hypothesis is true: 
+--      true difference in means is not equal to 0!
+
+
+"--- b. --- full automatic solution"
+
+############################
+ttest2(A,B, alpha, method) =
+############################ method = "left","right","both" or -1,1,0
+  do(print("   ______ Two Sample t-test ______"),
+     n1 = dim(A),
+     n2 = dim(B),
+     m1 = mean(A),
+     m2 = mean(B),
+     s1 = sd(A),
+     s2 = sd(B),
+     s1 = 1/n1*s1*s1,
+     s2 = 1/n2*s2*s2,
+     df = (s1+s2)^2/(s1^2/(n1-1) + s2^2/(n2-1)),
+     T  = (m1-m2)/sqrt(s1+s2),
+
+     t95 = tINV(1-alpha/2, df), 
+     F  = sqrt(n1*n2/(n1+n2)),
+     N  = sqrt(((n1-1)*s1^2+(n2-1)*s2^2)/(n1+n2-2)),
+     CI  = (mean(A)-mean(B)-t95*N/F,
+            mean(A)-mean(B)+t95*N/F),
+     min(a,b) = test(a<=b, a,b),
+     pValue = min( 2*tCDF(T,df), 2*(1-tCDF(T,df)) ),
+     tstat = T ,
+     test( method == -1,                   # for left-tailed test
+              do( critval = tINV(alpha, df), 
+                  test(tstat < critval, print("left: reject H0"),  
+                                        print("left: accept H0"))),
+           method == 1,                    # for right-tailed test
+              do( critval = tINV(alpha, df),
+                  test(tstat > critval, print("right: reject H0"),  
+                                        print("right: accept H0"))),
+           method == 0,                    # for two-sided test
+              do( critval = tINV(alpha/2, df), 
+                  test( or( abs(tstat) >  abs(critval), 
+                           -abs(tstat) < -abs(critval)), 
+                        print("both: reject H0"), 
+                        print("both: accept H0")))) ,
+     M = zero(9,2),
+     M[1,1] = "Significance level:",
+     M[2,1] = "Degrees of freedom:",
+     M[3,1] = "Test statistic:",
+     M[4,1] = "Critical value:",
+     M[5,1] = "CI left:",
+     M[6,1] = "CI right:",
+     M[7,1] = "mean A:",
+     M[8,1] = "mean B:",
+     M[9,1] = "p-value:",
+
+     M[1,2] = alpha,
+     M[2,2] = df,
+     M[3,2] = tstat, 
+     M[4,2] = critval,
+     M[5,2] = CI[1],
+     M[6,2] = CI[2],
+     M[7,2] = mean(A),
+     M[8,2] = mean(B),
+     M[9,2] = pValue,
+     M )
+######################################################## ttest END
+
+-- Check:
+
+A = (88, 92, 94, 78, 88, 95.)
+B = (75, 80, 79, 88, 85, 92.)    -- . to get float results
+alpha = 0.05
+
+ttest2(A, B, alpha,  0)     
+ttest2(A, B, alpha,  1)     
+ttest2(A, B, alpha, -1)  
+
+
+"--- 2. ---  OCTAVE t test tutorial"
+-- Reproduce the following tutorial in Eigenmath
+################### matlab/Octave ####################
+
+stop
+
+% T-test tutorial
+
+% Generate some toy data
+N = 20;
+d = [randn(N,1) randn(N,1)+0.7];      % Each column is one dataset
+
+d =
+  -0.269943   0.727796
+   0.234784   0.656962
+   0.286618   0.107063
+  -0.246098  -0.796628
+  -0.365948   0.844111
+  -0.830328  -0.988360
+   0.555346   1.202737
+  -0.431598   0.282257
+   0.025352   1.049475
+   1.304216  -0.617381
+  -0.511775   0.190412
+  -0.184626   0.299169
+  -0.335331   0.386240
+  -0.149371   0.809719
+  -0.038682   1.536842
+  -0.281365  -0.632293
+  -1.210282   0.250702
+  -0.557427   1.395904
+  -0.203508   0.083293
+   0.050512   0.206742
+
+% Paired-samples t-test
+octave:6>  [h,p,ci,stats] = ttest(d(:,1), d(:,2)); 
+
+octave:7> h
+h = 1
+
+octave:9> p
+p = 0.017092
+
+octave:10> ci
+ci =
+  -0.9143
+  -0.1011
+
+octave:11> stats
+stats =
+  scalar structure containing the fields:
+
+    tstat = -2.6133
+    df = 19
+    sd = 0.8688

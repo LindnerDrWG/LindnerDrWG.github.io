@@ -1,0 +1,114 @@
+##| QUANTILE  with Eigenmath    - Ch. 1.9 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+
+----- quantile needs functions min, max, sort as helper
+
+sort(v,i,k,n,t) = do( n = dim(v),    --by G. Weigt 7/2025
+     loop( test(n < 2, break), k = 1,
+           for(i, 1, n - 1,
+               test(v[i] > v[i + 1], 
+                 do( t = v[i], v[i] = v[i + 1], v[i + 1] = t,
+                     k = i ))), n = k), v)
+
+max(v, i,m,n) = do( n = dim(v), m = v[1],   -- G. Weigt 7/2025
+                    for(i, 2, n, test(v[i] > m, m = v[i])), m)
+
+min(v, i,m,n) = do( n = dim(v), m = v[1],   -- by wL
+                    for(i, 2, n, test(v[i] < m, m = v[i])), m)
+
+
+
+# DEFINITION
+----------------------------------------------- quantile, Q1,Q2,Q3
+
+  quantile(X,p) = test(
+                  p = 100, max(X),
+                  p =   0, min(X),
+                  do( Xs = sort(X),                 -- pick sorted
+                      i  = ceiling(dim(X)*p/100),   -- always round
+                      float(Xs[i])) )               -- return value   
+                    --  float((Xs[i]+Xs[i+1])/2)) ) -- alternative
+
+  percentile(X,p) = quantile(X,p)  -- alias for Matlab compatibility
+
+  Qp(X,p) = quantile(X,p)          -- relax notation        
+----------------------------------------------- END
+
+-- REMARK 
+-- We use the 'nearest-rank method' for calculating the quantile.
+-- prctile(A,p) returns percentiles of elements in input data A 
+-- for the percentages p in the interval [0,100].
+-- We use the notation of R.
+
+-- Define the 5-value-summary (Tukey) and boxplot()
+
+# DEFINITION
+----------------------------------------------- Q0,Q1,Q2,Q3.Q$
+Q0(X) = quantile(X,0)        --   0% quartile
+Q1(X) = quantile(X,25)       --  25% quartile, i.e. lower Q
+Q2(X) = quantile(X,50)       --  50% quartile, i.e. median
+Q3(X) = quantile(X,75)       --  25% quartile, i.e. upper Q
+Q4(X) = quantile(X,100)      -- 100% quartile
+
+boxplot(X) = (( "0%", "25%", "50%", "75%", "100%"),
+                (Q0(X), Q1(X), Q2(X), Q3(X), Q4(X)))
+----------------------------------------------- 
+
+"--- 1. ---"
+
+-- EXAMPLE (MATLAB)
+-- Calculate the quantile of data set X for percentage p = 42%.
+-- X: 0.5377  1.8339  -2.2588  0.8622  0.3188  -1.3077  -0.4336
+-- Attention: we are using the simple nearest-rank method !
+-- The returned value is therefore always an element of the set!
+-- R and Matlab use other algorithms, so they get often other results.
+
+X = (0.5377, 1.8339, -2.2588, 0.8622, 0.3188, -1.3077, -0.4336)
+quantile(X,42)      -- should be -0.1026 or -0.0424 w.r.t. 1/0
+
+-- Check with R
+-- R>  X = c(0.5377, 1.8339, -2.2588,0.8622,0.3188,-1.3077,-0.4336)
+--     quantile(X, .42) 
+--     [1] -0.042352 
+
+
+"--- 2. ---"
+
+-- MATLAB:  Do example, if A is [6 3 2 10 1].
+A = (6, 3, 2, 10, 1)
+percentile(A,40)
+Qp(A,40)
+boxplot(A)
+"ok"
+
+-- R>  df<-c(6, 3, 2, 10, 1)
+--  >  quantile(df)
+--     0%  25%  50%  75% 100% 
+--     1    2    3    6   10 
+--  > quantile(df,.4)
+--             40% 
+--             2.6 , which is NOT in the data !
+
+
+"--- 3. ---"
+
+df = (12,3,4,56,78,18,46,78,100)
+dfs = sort(df)
+dfs
+
+boxplot(df)
+"ok"
+
+"--- 4. --- cf. DIALEKT p.16"
+
+df = (3,4,3,5,5,2,4,5,2,5,1,3,4)
+dfs = sort(df)
+dfs
+
+boxplot(df)
+
+quantile(df,20)
+quantile(df,40)
+quantile(df,90)

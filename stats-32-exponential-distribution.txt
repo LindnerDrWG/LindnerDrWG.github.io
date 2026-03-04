@@ -1,0 +1,171 @@
+##| Exponential distribution for Eigenmath    - Ch. 3.2 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+
+# DEFINITION
+"============================== expPDF - exponential prob. density"
+
+    expPDF(x, L) = test( x>=0, L*exp(-L*x), 
+                     x<0 , 0)
+-------------------------------------------------------------------
+-- cf. [3], p.62
+-- .. R> returns the pdf of the exponential distribution with rate L,
+-- .. evaluated at the values in x.
+-- .. MATLAB> returns the pdf of the exponential distribution 
+-- .. with mean (!!) mu, evaluated at the values in x.
+-- https://de.mathworks.com/help/stats/exppdf.html
+-- R> dexp gives the _d_ensity, 
+--    pexp gives the _p_robability function, 
+--    qexp gives the _q_uantile function.
+-- We adopt the convention of R.
+
+"--- 1. ---"
+
+expPDF(5,1/3)
+float
+
+expPDF(5,1/2)      -- L=2, i.e mean = 1/2
+float
+
+-- R> dexp(5,1/2)
+--    [1] 0.0410425
+
+"--- 2. ---"
+
+"                      exp-PDF for L=1/2"
+L = 1/2
+f = L*exp(-L*t) 
+xrange = (0,5)
+yrange = (0,1)
+draw(f,t)
+
+"--- 3. --- lifetime of a product"
+
+-- EXAMPLE: cf. [1], p.68
+-- The lifetime of a product with the parameter L=1/2
+-- is exponentially distributed. What is the probability that 
+-- the product will fail in a period between three and five years?
+-- SOLUTION: 
+-- Y=life_time, Pr(3<Y<5) =: P3Y5 =
+
+L = 1/2
+P3Y5 = defint( L*exp(-L*t), t,3,5)    -- solution with integral 
+P3Y5
+float
+
+
+# DEFINITION
+"=============================== CDF for exp distribution"
+
+  expCDF(x, L) = test( x>=0, 1-exp(-L*x), 
+                       x <0, 0)
+
+----------------------------------------------------------
+-- Cumulative probability function (cdf) for exp-distibution
+-- https://de.mathworks.com/help/stats/expcdf.html
+-- cf. [3], p.62
+
+"--- 4. ---"
+
+expCDF(4,2)    -- ok
+float
+
+"                      exp-CDF for L=1/2"
+L = 1/2
+xrange = (0,5)
+yrange = (0,1)
+draw(expCDF(x,1/2))
+
+"--- 5. --- lifespan of a light bulb"
+
+-- EXAMPLE, [3] p.63: 
+-- The lifespan of a light bulb is exponentially distributed and 
+-- averages 1,000 hours. What is the probability, that it will 
+-- last 800 hours?
+-- SOLUTION:    Pr(X>800) = 1 - Pr(X<=800) =
+
+1 - expCDF(800, 1/1000)
+float
+-- .. The light blub will last 800 hrs with prob. of 44.9%.
+
+
+"--- 6. --- mean time between failures"
+
+-- EXAMPLE, [3] p.63: 
+-- A printer has a mean time between failures ('MTBF') of 2,000 hours.
+-- What is the probability that the first 500 hours of the trip 
+-- will be trouble-free?
+-- SOLUTION:   
+--            Pr(X<=500) = 
+
+expCDF(10, 1/2000)
+float
+-- .. with 22.2% the printer will work ok.
+
+
+"--- 7. --- refrigeration unit"
+
+-- EXAMPLE, [3] p.63: 
+-- A refrigeration unit has a mean exponentially distributed lifespan 
+-- of ten years. What is the probability that it will last another
+-- five years, if it survives the first five years?
+-- SOLUTION: 
+--            Pr(X>10|X>5) = Pr(X>10)/Pr(X>5) =
+
+lambda = 1/10
+(1-expCDF(10, lambda)) / (1-expCDF(5, lambda))
+float
+-- .. with 60.7% the refrigerator will work ok for another 5 years.
+
+"- 7.a -"
+-- EXAMPLE : alternative solution to Ex.3 with expCDF:
+P3Y5 = expCDF(5, L) - expCDF(3, L)   
+P3Y5
+float
+
+
+# DEFINITION
+"=============================== expINV - quantiles of exp"
+
+   expINV(p,L) = - log(1-p)/L 
+
+------------------------------------------------------------
+-- quantile function (INV) for exp-distibution for 0<p<1.
+-- https://de.mathworks.com/help/stats/expinv.html
+-- MATLAB: The result x is the value such that an observation from 
+-- an exponential distribution with parameter mu will falls in the
+-- range [0,x] with probability p. 
+
+-- known: the quantile function (or inverse CDF) is given by 
+-- F⁻¹(u) = -(1/λ) * ln(1 - u), where 0 < u < 1. This inverse 
+-- function takes a uniform random variable (between 0 and 1) as 
+-- input and produces a value that would be expected from the 
+-- exponential distribution. 
+
+"--- 8. --- median lifetime"
+
+-- EXAMPLE (MATLAB): 
+-- Assume that the lifetime of light bulbs are exponentially
+-- distributed with a mean of 700 hours. 
+-- Find the median lifetime using expinv.
+-- SOLUTION:
+
+-- MATLAB> expinv(0.50,700)
+--         ans = 485.2030
+-- .. Half of the light bulbs will burn out within the first 485 
+-- .. hours of use.
+
+-- R> qexp(0.5, 1/700)
+--    [1] 485.203
+
+"expINV(0.50,1/700) ="
+expINV(0.50,1/700)    
+"ok"
+
+"                        inverse expCDF ~ Quantils for L=2"
+-- F = expINV(p,L)    -- inverse expCDF ~ Quantils for L=2
+xrange = (0,1)
+yrange = (0,3)
+draw(expINV(p,2), p)  --  p as parameter for xrange
+

@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+##| KURTOSIS  with Eigenmath    - Ch. 1.12 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+
+## WARNING: There are different methods to compute the KURTOSIS,
+## which leads to different results. See wiki:KURTOSIS and [+]
+## So we have comment a little about it.
+
+-- KURTOSIS needs these functions as helper
+   mean(X)     = float( sum(X)/dim(X) )          
+   sd(X)       = float( sqrt(sum((X-mean(X))^2) /(dim(X)-1)) ) 
+   moment(X,r) = float( sum((X-mean(X))^r)/dim(X) )
+
+# DEFINITION
+------------------------------------------------------ kurtosis
+
+  kurtosis(X)  = moment(X,4)/moment(X,2)^2
+
+------------------------------------------------------
+
+"--- 0. --- EXAMPLE: experimental data for figure 10"
+
+X=(4,4,4,
+   5,5,5,5,5,5,
+   6,6,6,6,6,6,6,6,6,
+   7,7,7,
+   8,8,8,
+   10,10,10,
+   12,12,12,
+   13,13,13)
+
+kurtosis(X)      -- 2.2958  is kurtosis (org.def.) & R:'moments'
+
+
+############################### REMARK compatibility issues
+-- For compatibility with
+--     MATLAB     no flag       use: kurtosis(X) or kurtosis1(X)
+--     MATLAB     flag =0       use: kurtosis0(X)
+--     R>package "moments"      use: kurtosis(X)
+--     R>package "e1071" typ 1  use: kurtosisR1(X)
+--     R>package "e1071" typ 2  use: kurtosisR2(X)
+--     R>package "e1071" typ 3  use: kurtosisR3(X)
+
+ 
+# DEFINITION (kurtosis in MatLAB flag 0, no flag)
+------------------------------------------------------ kurtosisM
+   kurtosisM(X)  = moment(X,4)/sd(X)^4   -- R'e1071'+3 (=excess)
+------------------------------------------------------ kurtosisM
+
+-- MATLAB: kurtosis(X,flag,..)
+-- When X represents a sample from a population, the kurtosis of X
+-- is biased, meaning it tends to differ from the population kurtosis 
+-- by a systematic amount based on the sample size. 
+-- .. set flag = 0 : to correct for this systematic bias.
+-- .. This bias-corrected equation requires that X contain at 
+--    least four elements.
+
+-- MatLab's kurtosis in explicit expression
+   kurtosis1(X)  = float(dim(X)* sum((X-mean(X))^4) / 
+                                 sum((X-mean(X))^2)^2 )
+
+-- MatLab's kurtosis with flag=0, i.e. bias-corrected equation
+   kurtosis0(X,n) = do( n=dim(X),
+                 test( n<4 , "n must be >=4",
+                 (n-1)/((n-2)*(n-3))*((n+1)*kurtosis(X) -3*(n-1))+3 ))
+
+# DEFINITION (kurtosisR in R type 1,2,3)
+------------------------------------------------------ kurtosisR
+
+   kurtosisR1(X) = moment(X,4)/moment(X,2)^2 - 3  -- type 1
+
+   kurtosisR2(X) = do( n=dim(X),     -- type 2; also SAS, SPSS
+                     ((n+1)*kurtosisR1(X)+6)*(n-1)/((n-2)*(n-3)) )  
+
+   kurtosisR3(X) = moment(X,4)/moment(X,2)^2 *(1 - 1/dim(X))^2 - 3 
+                                     -- type 3; also MINITAB
+------------------------------------------------------ 
+-- kurtosis in R with library 'e1071' comes in 3 types
+-- after Joanes and Gill (1998) three methods for kurtosis
+-- cf.: [+] https://rdrr.io/rforge/e1071/man/kurtosis.html
+
+########################### CHECKS & EXAMPLES
+
+"--- 1. --- experimental data for figure 10"
+
+X=(4,4,4,
+   5,5,5,5,5,5,
+   6,6,6,6,6,6,6,6,6,
+   7,7,7,
+   8,8,8,
+   10,10,10,
+   12,12,12,
+   13,13,13)
+
+kurtosis(X)      -- 2.2958  is kurtosis (org.def.) & R:'moments'
+kurtosis1(X)     -- 2.2958  is kurtosis (explicit def.)
+kurtosis0(X)     -- 2.3827  is Matlab's k0 bias-corrected
+kurtosisM(X)     -- 2.1588  R:'e1071'excess = 0.8411+ 3 
+kurtosisR1(X)
+kurtosisR2(X)
+kurtosisR3(X)    -- -0.8411 R:e1071 Typ 3, default in e1071
+
+-- CHECK with R gives different values using e1071 vs moments
+--    R> library(e1071)
+--     > kurtosis(X)
+--    [1] -0.8411522   wL: with excess -0.8411522+3 = 2.1588
+--    R> library(moments)
+--     > kurtosis(X)
+--    [1]  2.295884 
+-- Using library 'moments' gives same result as kurtosis(). 
+
+
+"--- 2. --- check with R and library(moments)"
+
+data = (2,3,4,4,4,5,6,7,8,9,10)  -- R:e1071:  -1.561
+                                 -- -1.561+3 = 1.439
+                                 -- -1.419+3 = 1.581  kurtosisM
+
+kurtosis(data)      -- 1.9129  R:'moment' & Matlab default
+kurtosis1(data)     -- 1.9129  is kurtosis expression
+kurtosis0(data)     -- 2.0215  Matlab's flag=0
+kurtosisM(data)     -- 1.5809  R:'e1071'excess: -1.41905+3 = 1.5809
+kurtosisR1(data)
+kurtosisR2(data)
+kurtosisR3(data)    -- -1.419  R:e1071, Typ 3
+
+## check with R and library(moments)
+## > X = c(2,3,4,4,4,5,6,7,8,9,10)
+## > library(moments)
+## > kurtosis(X)
+## [1] 1.912949
+
+## check with R and library(e1071)
+## > X = c(2,3,4,4,4,5,6,7,8,9,10)
+## > library(e1071)
+## > kurtosis(X)
+## [1] -1.41905          --> ..+3 = 1.581 
+
+
+"--- 3. --- check with R and library(e1071)"
+
+Y = (4,5,5,6,6,6,7,8,10,12,13)
+
+## check with R
+## > Y = c(4,5,5,6,6,6,7,8,10,12,13)
+## > library(moments)
+## > kurtosis(Y)
+## [1] 2.295884
+
+## > Y = c(4,5,5,6,6,6,7,8,10,12,13)
+## > library(e1071)
+## > kurtosis(Y)
+## [1] -0.1025    
+
+kurtosis(Y)       -- 2.295  
+kurtosis1(Y)      -- 2.295 
+kurtosis0(Y)      -- 2.695  
+kurtosisR3(Y)     -- -0.1025 R:e1071 Typ 3
+
+-- CHECK with MatLAB
+-- MATLAB>> Y = [4, 5, 5, 6, 6, 6, 7, 8, 10, 12, 13]
+--       >> kurtosis(Y)
+--          ans =    2.2959
+--       >> kurtosis(Y,0)
+--          ans =    2.6598
+ 
+
+"--- 4. --- EXAMPLE(from MATLAB)"
+
+X = (0.5377,
+    1.8339,
+   -2.2588,
+    0.8622,
+    0.3188,
+   -1.3077,
+   -0.4336,
+    0.3426,
+    3.5784,
+    2.7694)
+
+kurtosis(X)      --  2.312  R:'moment' = matlab no flag
+kurtosis1(X)     --  2.312  
+kurtosis0(X)     --  2.748  Matlab's flag=0
+kurtosisR3(X)    -- -1.127  R:e1071  Typ 3  
+"ok"
+
+-- R>   X = c(0.5377,1.8339,-2.2588,0.8622,0.3188,-1.3077,-0.4336,
+--            0.3426,3.5784,2.7694)
+--      library(e1071)
+--      e1071::kurtosis(X) 
+--       [1] -1.127177          ## ..+3=1.8728 = kurtosisM(X)
+--
+
+-- MATLAB> X = [0.5377;1.8339;-2.2588;0.8622; 0.3188;
+--               -1.3077; -0.4336;0.3426;3.5784;2.7694]
+--          kurtosis(X)       % flag is 1 by default
+--            ans = 2.3121
+--          kurtosis(X,0)
+--            ans = 2.7482
+
+
+"--- 5. ---  EXAMPLE Spiegel, p.135, P 5.13"
+
+X=(61,64,67,70,73)    -- marks
+f=( 5,18,42,27, 8)    -- freq
+
+-- we adapt the kurtosis to median and frequency of the group
+-------------------------------------------------------------
+meanF(X,f)      = float( dot(f,X)/sum(f) )    
+momentMF(X,f,r) = float( dot( f, (X-meanF(X,f))^r)/sum(f) ) 
+kurtosisMF(X,f) = momentMF(X,f,4)/momentMF(X,f,2)^2 
+-------------------------------------------------------------
+
+kurtosisMF(X,f)       
+"ok"
+
+
+"--- 6. --- EXAMPLE (Spiegel: p.138, P 5.39; gives 2.62)"
+
+X = (12,14,16,18,20,22)
+f = ( 1, 4, 6,10, 7, 2)
+kurtosisMF(X,f)       
+"approx. ok" 
+
+
+"--- 7. ---"
+
+X=(2,5,12,17,14,6,3,1)
+
+kurtosis(X)      --  1.673   moment def, matlab flag 0
+kurtosis0(X)     --  1.613   Matlab's flag=0
+kurtosis1(X)     --  1.673   kurtosis (org.def.)
+kurtosisR3(X)    -- -1.7188  R:e1071 Typ 3
+
+
+"--- 8. --- EXAMPLE (Spiegel p.130 P 5.44)"
+
+X=(10,20,30,40,50,60,70,80,90)    -- marks
+f=(1,2,3,4,30,4,3,2,1)            -- freq
+
+meanF(X,f)      = float( dot(f,X)/sum(f) )                 
+momentMF(X,f,r) = float( dot( f, (X-meanF(X,f))^r)/sum(f) ) 
+kurtosisMF(X,f)       
+"ok"
+
+
+"--- 9. ---  EXAMPLE: left skew data set"
+-- obitage data, Spiegel, data Xleft: p.126 col.5-6
+
+X = (102,55,70,95,73,79,60,73,89,85,   -- 
+         72,92,76,93,76,97,10,70,85,25,83, 
+         58,10,92,82,87,104,75,80,66,93,
+         90,84,73,98,79,35,71,90,71,63,
+         58,82,72,93,44,65,77,81,77)
+
+kurtosis(X)       -- 5.262  moment def, matlab k
+kurtosis1(X)      -- 5.262  kurtosis()
+kurtosis0(X)      -- 5.636  Matlab's k0 
+kurtosisR3(X)     -- 2.054  R:'e1071' Typ 3
+
+--   CHECK:     MINITAB    EXCEL   STATISTIX     SPSS     SAS
+--   kurtosis:     2.64     2.63      2.26       2.63     2.63
+--                           |         |
+--   kurtosisM:              |        2.26 = 5.26-3, excess ok
+--   kurtosis0:    5.63-3 = 2.63      Excel-MiniTAB-SPSS-SAS
+--   cf. Spiegel:  p.127 ff
+--
+--   MATLAB>  kurtosis(X,1)       kurtosis1()
+--            ans = 5.2628       
+--          > kurtosis(X,0)       kurtosis0()
+--            ans = 5.6368
+
+--------------- descriptive statistics - testscore ------------wL
+vari      = ("VARIABLE:","N","Mean","St.Dev","Kurtosis")
+score     = ("SCORE:", dim(X), mean(X), sd(X), kurtosis(X))
+(vari,score)
+--------------------------------------------------------------END
+
+
+"--- 10. ---  EXAMPLE (Spiegel p.67, p.125 (13))"
+
+X = (2,2,5,7,9,9,9,10,10,11,12,18)
+
+kurtosis(X)      --  3.1539  R:'moment' def, matlab k
+kurtosis1(X)     --  3.1539  Matlab's no flag
+kurtosis0(X)     --  3.9778  Matlab's flag=0 
+kurtosisR3(X)    -- -0.3498  R:'e1071' Typ 3
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

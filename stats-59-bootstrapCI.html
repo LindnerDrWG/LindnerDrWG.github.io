@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+##| BOOTSTRAPci for confidence interval for Eigenmath   - Ch. 5.9 of 
+##| book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+
+
+"--- 1. ========== EXAMPLE from AskPython"
+
+-- To understand the need for bootstrap sampling let’s consider an 
+-- example, suppose we want to calculate the average age of 1000 
+-- employees working for a particular company. 
+-- The first approach could be to ask all the 1000 employees their age 
+-- and then calculate the mean age.
+-- This can be a tedious task and a time-consuming approach, 
+-- another method is to consider a sample of 5 employees and collect 
+-- their ages this process can be repeated 20 times, and
+-- then average the collected age data of 100 employees. 
+-- This average age would be the estimate of all 1000 employees.
+
+-- SOLUTION:
+
+"FIRST We follow the example step by step:"
+
+"- a. - calculate the estimated population mean age"
+
+mean(X) = float(sum(X)/dim(X))
+
+-- read data into Eigenmath
+X = (25, 30, 35, 40, 45, 50, 55, 60, 65, 70)
+
+n = dim(X)
+n
+
+-- choose number of bootstrap samples 
+
+numSamples = 3     -- better: 1000, but this runs a minute then..
+
+-- get random index r to resample with replacement from the 
+-- original sample to generate a bootstrap sample.
+
+r = 1 + mod(floor(1+10*rand()),10)    -- starting 'seed' i.e. first
+r                                     -- (r)andom number 
+
+r = 1 + mod(floor(1+10*rand()),10)    -- next (r)andom number ..
+r
+
+-- create a matrix to save the bootstrap results of 10 drawings
+
+M = zero(n)
+
+-- create a matrix as container to save the means of the drawings
+
+bootstrapMeans = zero(numSamples)
+
+-- now resample with replacement from the original sample X to
+-- generate a bootstrap sample in M:
+
+rand( mod(31,117))                   -- start randomly 
+for( j,1,numSamples,                 -- perform bootstrap sampling 
+     for(i,1,n, 
+           r = 1 + mod(floor(1+10*rand()),10),
+           M[i] =  X[r]),
+     print(M),
+     -- Now calculate the mean age of the bootstrap sample M;
+     -- this calculated mean is stored in array bootstrapMeans
+     bootstrapMeans[j]= mean(M))     
+     
+bootstrapMeans   -- show bootstrap means in decimal values
+
+-- Now we calculate the estimated population mean age
+
+estimatedMean = mean(bootstrapMeans)
+estimatedMean
+
+
+"- b. - define a percentile function to calc CI"
+
+-- To calculate the confidence interval with method 'percentile',
+-- we need following helper functions: 
+
+------------------- sort & percentile ------------------------wL
+sort(v,i,k,n,t) = do( n = dim(v),         -- by G. Weigt 7/2025
+     loop( test(n < 2, break), k = 1,
+           for(i, 1, n - 1,
+               test(v[i] > v[i + 1], 
+                 do( t = v[i], v[i] = v[i + 1], v[i + 1] = t,
+                     k = i ))), n = k), v)
+
+  percentile(X, p) = do( Xs = sort(X),
+                         i  = ceiling(dim(X)*p/100),
+                         float((Xs[i])) )
+
+ min(a,b) = test(a<=b, a,b)
+ max(a,b) = test(a<=b, b,a)
+------------------------------------------------------------ END
+
+# REMARK
+# Percentiles divide a ranked data set into 100 equal parts. 
+# Each (ranked) data set has 99 percentiles that divide it into 100
+# equal parts. The 𝑘th percentile is denoted by 𝑃𝑘, where 𝑘 is an 
+# integer in the range 1 to 99. 
+# For instance, the 25th percentile is denoted by 𝑃25.
+# return sorted(data) [int(math.ceil((size * perc) / 100)) - 1]
+
+-- check percentile function:
+percentile((10.0, 9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0), 90)
+-- 9.0
+percentile((142, 232, 290, 120, 274, 123, 146, 113, 272, 119, 124, 277, 207), 50)
+-- 146
+"ok"
+
+"- c. -  Bootstrap Sampling for Confidence Interval (CI)"
+
+-- calc some confidence intervals via percentiles for the
+-- bootstrapMeans
+
+bootstrapMeans = (47, 50, 51.5)         -- fix bsMeans from text
+
+ci1 = percentile(bootstrapMeans, 98.5)  -- 98..91 does not work ??
+ci1                                     -- would like have 98.5 %
+
+ci2 = percentile(bootstrapMeans, 2.5)
+ci2
+
+"... calculate the 90% confidence interval"
+
+ci1 = percentile(bootstrapMeans, (100-90)/2)     -- 5
+ci1                                  
+
+ci2 = percentile(bootstrapMeans, (100+90)/2)     -- 95
+ci2
+
+
+"--- 2. ========== EXAMPLE: Duke Uni example"
+
+-- see: https://www.askpython.com/python/examples/bootstrap-sampling-introduction
+
+-- Ten university students were recruited to play the seminal video 
+-- game pac-man. After equal amounts of practice the students were 
+-- then asked to play the first stage and the time to completion was -- recorded. The following data in seconds were recorded.
+
+X = (63.1,64.6,63.4,65.6,63.4,65.7,64.6,63.1,65.9,63.3)
+
+-- Calculate the 95% confidence interval CI, which catch the true 
+-- population mean.
+
+-- SOLUTON:
+
+-- Because we do not know the population variance, the 
+-- sample standard deviation sd() can be used as a subsitute.
+-- For a finite-length vector X made up of N = dim(X) scalar 
+-- observations, the standard deviation is defined as
+
+sd(X) = float( sqrt(sum((X-mean(X))^2) /(dim(X)-1)) )
+
+sX = sd(X)
+sX              
+-- ok: std.dev. of X = 1.148960883194511
+
+-- now we calculate the confidence interval for the estimated mean
+-- at a significance level alpha = 0.05
+
+alpha = 0.05
+
+-- To calculate the confidence interval CI we need tINV.
+--------------------------------------------------------------
+   tINV(x, df) = tdistinv(x, df)
+--------------------------------------------------------------
+
+interval = tINV(1 - (alpha/2),n-1) * (sX/sqrt(n))
+interval
+
+ci = (mean(X) - interval, mean(X) + interval)
+ci
+
+-- RESULT
+-- We are 95% confident that the true population mean lies 
+-- between 63.45 and 65.09.
+"ok"
+
+"--- 3. ========== abstract procedure in function bootCI"
+----    We abstract the above procedure to a function. 
+
+### --------------------------------------------------------------
+###    bootstrapping for Confidence Inteval CI
+### --------------------------------------------------------------
+
+bootci(X,IT,  r, M, Mboot, estimatedMean) = do(
+              --  IT : number of iterations
+              n = dim(X),             -- number of samples
+              M = zero(IT),           -- container for all samples
+              Mboot = zero(n),        -- save a sample
+              rand( mod(31,117)),     -- start randomly 
+              for(j,1,IT,             -- start bootstrap samples
+                  for(i,1,n,          -- create one resample of X
+                      r = 1 + mod(floor(1+n*rand()),n),
+                      Mboot[i] = X[r] ), -- bootstrap new sample
+                  M[j]= mean(Mboot)      -- j.th bootstrap mean
+                  ),                  -- bootstrap sample mean   
+              estimatedMean = float(mean(M)),
+              ci2 = percentile(M, 68.5),
+              ci1 = percentile(M, 2.5), 
+              print("    _____ bootCI _____"),
+              (("est.Mean", "CI.l", "CI.h"), 
+                (estimatedMean, ci1,ci2)) 
+              -- alternative CI using std.dev.:
+              -- interval = tINV(1 - (alpha/2),n-1) * (sX/sqrt(n)),
+              -- ci = (mean(X) - interval, mean(X) + interval),
+              -- (estimatedMean, ci[1], ci[2]) 
+              )
+               
+---------------------------------------------------------END
+
+-- check with the data from above
+--    1.  2. 3   4.  5   6   7   8   9.  10
+X = (25, 30, 35, 40, 45, 50, 55, 60, 65, 70)
+
+alpha = 0.05
+bootci(X,100)
+"ok"
+
+
+-- sometimes the bootstrap-mean does not fall into the CI ..
+-- percentile CI is bigger 
+
+
+"--- 4. ---  EXAMPLE: cytokine responses"
+
+-- In these data we have reason to believe that the confidence 
+-- intervals will not always be symmetric about . 
+-- We use two methods to illustrate the differences in CI estimates. 
+-- Let the data be the cytokine responses (%) for a sample measured by 
+-- 16 laboratories. For the purposes of this example we will assume 
+-- independence among the samples.
+
+X = (0.4043, 0.5958, 0.5876, 0.5939, 0.6053, 0.4649, 0.5722, 0.6234, 0.5208, 0.6117, 0.6137, 0.7397, 0.6981, 0.7757, 0.7596, 0.532)
+
+bootci(X,100)      -- IT =1000 needs 1 min to calculate 
+
+
+"--- 5. --- EXERCISE: A 95% Confidence Interval for Movie Run Time"
+
+-- EXERCISE  Do the example 'Movie Run Time' of
+-- https://www.usu.edu/math/schneit/StatsStuff/Inference/confidenceintervals
+
+
+"--- 6. ========== CI for correlation coefficient after EFRON"
+
+-- REMARK cf. [Herrmann, p. 209 ff]
+-- The bootstrap method was first applied in determining the 
+-- non-parametric determination of a correlation coefficient. 
+-- In 1973, Efron determined the average grades of all law school 
+-- graduates (great point average, GPA) and at the law school 
+-- admission test (LSAT) at 82 American law schools. 
+-- By means of a random sample with 15 students, the following 
+-- values ​​were obtained. 
+
+-- EXAMPLE (Efron) with the data LSAT and GPA
+
+-- LSAT
+X = (576,635,558,578,666,
+     580,555,661,651,605,
+     653,575,545,572,594)
+-- GPA
+Y = (3.39,3.30,2.81,3.03,3.44,
+     3.07,3.00,3.43,3.36,3.13,
+     3.12,2.74,2.76,2.88,2.96)
+
+-- EFRON developed the idea of ​​repeatedly drawing a random sample from
+-- the given sample to determine the variance. The correlation 
+-- coefficient of 1000 samples he drew had a variance of 0.254. 
+
+-- SOLUTION:
+
+".. FIRST we calculate the parametric PEARSON correlation coefficient"
+-- We cite the PEARSON correlation coefficient definition.
+
+# DEFINITION
+-------------------- Pearson correlation coefficient ------------
+pearson(X,Y, n,rho,f,xo,yo,mx,my) = do(
+             n=dim(X),
+             mx=0, my=0, sx=0, sy=0, c=0,
+             for(k,1,n,  xo = X[k], 
+                         yo = Y[k],
+                         f  = (k-1)/k,
+                         sx = sx + f*(xo-mx)*(xo-mx),       
+                         sy = sy + f*(yo-my)*(yo-my), 
+                         c  = c + f*(xo-mx)*(yo-my),  
+                         mx = f*(mx-xo)+xo,         
+                         my = f*(my-yo)+yo ), 
+             rho=c/sqrt(sx*sy),
+             rho)  -- return value as input for bootci
+------------------------------------------------------------ END
+-- CI for rho
+
+rho = pearson(X,Y)  
+rho
+
+".. SECOND we calculate the Confidence Interval CI for rho:"
+
+-- To calculate the Confidence Interval CI for rho we need
+-- the inverse of the standard normal distribution to
+-- calculate quantiles:
+
+--........................ stdnormINV ....................
+   stdnormCDF(x) = 1/2*erfc(-x/sqrt(2))
+
+   stdnormINV(x, a,b,k,t,y) = test(x=0, "-Inf", x=1, "+Inf",
+                 and(0<x,x<1),
+                  do( a = -10, b = 10,         -- x in [a,b]
+                    for(k,1,100, 
+                         t = (a+b)/2,
+                         y = stdnormCDF(t),
+                     test(abs(x-y)<0.0000001, break, y<x,a=t, b=t)
+                    ), float(t) ))
+--.................................................... END
+
+-- We now define
+
+# DEFINITION
+------------------ confidence interval for PEARSON rho -------
+  CIrho(rho,n,alpha,  r1,r2) = do(
+                      test( or(rho<=0,rho>=1, n<4), break),
+                      z = 0.5*log((1+rho)/(1-rho)),
+                      s = 1/sqrt(n-3),
+                      test(n<=40, do( z = z-(3*z+rho)/(4*n), 
+                                      s = 1/sqrt(n-1))),
+                      q = stdnormINV(1-0.5*alpha),
+                      r1= tanh(z-q*s),  -- FISHER transformation
+                      r2= tanh(z+q*s),
+                      print("CI for rho:"),
+                     (r1,r2))
+--------------------------------------------------------------
+-- REMARK: derivation is e.g. here:
+-- https://advstats.psychstat.org/python/ci/bootstrap.php
+
+-- Now Calculate the CI for rho at level 68.3% for rho = 0.7763:
+
+CIrho(0.776, 20, 1-0.683)      -- confidence level 68.3%, ok
+0.8684 - 0.6337                -- parametric variance for rho
+
+-- RESULT: 0.2347              -- Herrmann [6, p.210]
+"ok" 
+
+".. THIRD we calculate the CI using bootstrap method:"
+
+-- we mow calculate the CI using the bootstrap method.
+-- Therefore we define the following specialized bootstrap function:
+
+# DEFINITION
+### ---------------  bootstrap.CI.rho --------------------
+
+bootCIrho(X,Y, rho,sig, t,z,r,s) = do(
+               z = 1000,
+               n = dim(X),     -- = dim(Y)
+               U = zero(n),
+               V = zero(n),
+               rhoP = pearson(X,Y),       -- original rho
+               r = 0, s = 0,
+               for(i,1,z,      -- z = how many draws?
+                  for(j,1,n,  t = 1 + mod(floor(1+n*rand()), n),
+                              U[j] = X[t], V[j] = Y[t] ),
+                  rho = pearson(U,V),   -- new U, new V, new rho
+                  r   = r + rho,        -- sum rho's
+                  s   = s + rho*rho ),  -- sum sig's
+               rho = r/z,               -- rho 'mean' w.r.t z
+               sig = sqrt( (s-r*r/z)/(z-1)),
+               print("rhoPearson, rhoBoot, 2*sigma:"),
+              (rhoP, rho, 2*sig) )
+
+### ----------------------------------------------------------END
+--  cf. the C code by Herrmann [6, p. 210 ff].
+--  https://projecteuclid.org/journalArticle/Download?urlId=10.1214%2Fss%2F1032280214&isResultClick=False
+
+-- now check bootCIrho on the Efron data
+
+-- LSAT
+X = (576,635,558,578,666,
+     580,555,661,651,605,
+     653,575,545,572,594)
+-- GPA
+Y = (3.39,3.30,2.81,3.03,3.44,
+     3.07,3.00,3.43,3.36,3.13,
+     3.12,2.74,2.76,2.88,2.96)
+
+bootCIrho(X,Y)  
+
+-- RESULT
+-- The parametric range of deviation is 0.2347 and the 
+-- non-parametric bootstrap range is 2*sigma ~ 0.27, which is
+-- a approx. 0.05 greater.
+
+
+
+"--- 7. --- EXAMPLE cholesterol"
+
+-- Serum cholesterol (mmol/L) measured on a sample of 86 stroke 
+-- patients (data of Markus et al., 1995)
+
+X=(3.7, 4.8, 5.4, 5.6, 6.1, 6.4, 7.0, 7.6, 8.7,
+3.8, 4.9, 5.4, 5.6, 6.1, 6.5, 7.0, 7.6, 8.9,
+3.8, 4.9, 5.5, 5.7, 6.1, 6.5, 7.1, 7.6, 9.3,
+4.4, 4.9, 5.5, 5.7, 6.2, 6.6, 7.1, 7.7, 9.5,
+4.5, 5.0, 5.5, 5.7, 6.3, 6.7, 7.2, 7.8, 10.2,
+4.5, 5.1, 5.6, 5.8, 6.3, 6.7, 7.3, 7.8, 10.4,
+4.5, 5.1, 5.6, 5.8, 6.4, 6.8, 7.4, 7.8,
+4.7, 5.2, 5.6, 5.9, 6.4, 6.8, 7.4, 8.2,
+4.7, 5.3, 5.6, 6.0, 6.4, 7.0, 7.5, 8.3,
+4.8, 5.3, 5.6, 6.1, 6.4, 7.0, 7.5, 8.6)
+
+bootci(X,100)
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>
