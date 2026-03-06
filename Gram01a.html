@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+# EIGENMATH 
+GramSchmidt2(v)= do( 
+    u=zero(2,2),          -- u = ((0,0),(0,0))
+    u[1] = v[1],
+    u[2] = v[2] - inner(u[1],v[2]) / inner(u[1],u[1])*u[1],
+    u)
+
+# TEST EXAMPLE
+B = ((1,2),               -- v1 = (1,2)
+     (3,4))               -- v2 = (3,4)
+GramSchmidt2(B)           -- = u
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>
