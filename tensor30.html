@@ -12,15 +12,15 @@
 # EIGENMATH
 i = quote(i)                   -- clear i as global defined imaginary unit ..
 
--- define/calculate tensor elements of T as function values
+-- define/calculate elements of T as function values
 
 Tijk(i,j,k) = i^2*j*k          -- .. otherwise this term would be -jk  
 Tijk                           --(1)
 Tijk(1,2,1)                    --(2)  1,2,1 = 1st matrix, 2nd row, 1st entry
 
--- tensor T as multidimensional 'matrix'
+-- variant T as multidimensional 'matrix'
 
-Tijk = zero(2, 2,2)            -- empty container for tensor T
+Tijk = zero(2, 2,2)            -- empty container for variant T
 for(i,1,2,                     -- three loops to fill container Tijk
   for(j,1,2, 
     for(k,1,2,  Tijk[i,j,k] = i^2*j*k)))
