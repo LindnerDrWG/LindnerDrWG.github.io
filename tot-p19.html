@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+# EIGENMATH
+
+R(theta,phi) = (cos(theta)*cos(phi), cos(theta)*sin(phi),  sin(theta))
+
+Z1 = d( R(theta,phi), theta)
+Z1
+Z2 = d( R(theta,phi), phi)
+Z2
+eval(Z1, theta,pi/4, phi,0)
+eval(Z2, theta,pi/4, phi,0)
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

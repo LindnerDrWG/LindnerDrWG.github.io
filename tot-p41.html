@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+# EIGENMATH
+
+x(r, theta) = r*cos(theta)
+y(r, theta) = r*sin(theta)
+U = (r, theta)                   -- the polar coordinates .. and 
+
+d( x(r,theta), r)                -- the 4 elements of the Jacobean matrix:
+d( x(r,theta), theta)            -- alias the transformation matrix 
+d( y(r,theta), r)                -- from polar (r,theta) 
+d( y(r,theta), theta)            -- to Cartesian (x,y) coordinates. 
+
+"Jacobean of (x,y) w.r.t. each polar variable"
+f(r,theta) = (r*cos(theta), r*sin(theta))
+J(r,theta) = d(f(r,theta), U)
+J(r,theta)
+           -- or: J(r,theta) = (d( x(r,theta), r), d( x(r,theta), theta))
+eval(J(r,theta), r,2, theta, pi/6)
+
+Ex = (1,0)
+Ey = (0,1)
+
+Er = d( x(r,theta), r) * Ex + d( y(r,theta), r) * Ey
+Er
+
+Etheta = d( x(r,theta), theta) * Ex + d( y(r,theta), theta) * Ey
+Etheta
+
+unitvector(v)= v/abs(v)
+
+Eru = simplify( unitvector(Er))
+Eru
+Ethetau = simplify( unitvector(Etheta))
+Ethetau
+
+Er2 = eval(Er, r,2, theta,pi/6)
+Er2
+Etheta30 = eval(Etheta, r,2, theta,pi/6)
+Etheta30
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+# EIGENMATH
+
+e1 = (1, 0)
+e2 = (0, 1)
+b1 = (2.5, 1)
+b2 = (-1, 1.5)
+
+C = (3,5)     -- w.r.t. base e, i.e.:
+
+-- 3*e1 + 5*e2 = u*b1 + v*b2
+-- (3,5) = (2.5*u-v,1.5*v+u)
+-- we solve using inverse matrix
+
+A = ((5/2,  -1),  (1, 3/2))
+A
+inv(A)
+dot( inv(A), C)
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

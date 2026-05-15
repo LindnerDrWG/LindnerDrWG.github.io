@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+# EIGENMATH
+
+u=(1)
+contract(u)
+
+A = ((1, 2, 3),( 4, 5, 6))
+-- contract(A)  -- ERROR: unequal tensor dimensions !
+
+B = ((1,2),(3,4))          -- contract = trace
+contract(B)
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

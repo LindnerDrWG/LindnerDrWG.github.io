@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+# EIGENMATH
+
+R(t) = (t,t^2-1)         --* parametrization of parabola 
+R(t)
+v = d(R(t),t)          --* velocity  
+v
+Tp = eval(v,t,1)      --* tangent vector at [0,1]
+Tp
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

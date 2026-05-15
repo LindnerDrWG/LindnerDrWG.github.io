@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+# EIGENMATH
+
+--         ijk     k j            -- 0. index list by equation (9.2)
+A = outer(eijk, d(F,(x1,x2,x3)))  -- 1. do all element-wise products
+A       -- ..3     4 .  
+B = contract(A,3,4)               -- 2. sum across k
+--         ij.     . j
+B       -- 12.     . 3
+C = contract(B,2,3)               -- 3. sum across j
+C
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>
