@@ -1,0 +1,861 @@
+##| STATSBOX for Eigenmath  -  collection of statisrics functions from
+##| Book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2025
+
+-------------------------------------------- helper functions
+
+  sort(v,i,k,n,t) = do( n = dim(v),     -- by G. Weigt, 7/2025
+     loop( test(n < 2, break), k = 1,
+           for(i, 1, n - 1,
+               test(v[i] > v[i + 1], 
+                 do( t = v[i], v[i] = v[i + 1], v[i + 1] = t,
+                     k = i ))), n = k), v)
+
+  median(X, xmed,Xs,n2,n2p) = do(      -- needs sorted data
+          Xs   = sort(X),
+          n2   = floor(dim(X)/2),  
+          n2p  = n2+1,
+          xmed = test( not(mod(dim(X),2)=0), Xs[n2p], 
+                       0.5*(Xs[n2]+Xs[n2p])), float(xmed))
+
+  mode(v, i,j,k,m,n) =                 -- mode by G. Weigt 8/2025
+    do( n = 0,
+      for(i,1,dim(v), k = 0,
+          for(j,1,dim(v), test(v[i] == v[j], k = k + 1)),
+          test(or(k > n, and(k == n, v[i] < m)), 
+               do(n = k, m = v[i]))), m)
+			   
+  max(v, i,m,n) = do( n = dim(v), m = v[1],    
+                      for(i,2,n, test(v[i]>m, m=v[i])), m)
+
+  min(v, i,m,n) = do( n = dim(v), m=v[1],      
+                      for(i,2,n, test(v[i]< m, m=v[i])), m)
+
+  range(X) = max(X) -  min(X)
+
+  Beta(a,b) = test( or(a<=0, b<=0), -1,  
+			        tgamma(a)*tgamma(b)/tgamma(a+b) )    
+
+  GammaP(x,k) = x^k*exp(-x) * sum(m,0,100, x^m/tgamma(k+m+1))
+                -- alias 'gammainc' (incomplete gamma function)
+
+  Rank(W, i,j,k,n,t, Srank) = do(            -- by G. Weigt 8/25  
+         j = 1, n = dim(W), Srank = 0,
+         loop( test(j > n, break),
+               k = j + 1,
+               loop( test(k > n, break, W[j]==W[k], k=k+1, break)),
+               t = 0.5*(j + k - 1),
+               for(i, j, k-1, W[i] = t),
+               t = k - j,
+               Srank = Srank + t^3 - t,
+               j = k), Srank,W)
+
+  correspond(X,sX, M) = do(      -- X and sortedX, by  W. Lindner 8/25
+         M=zero(dim(X)),
+         for(j,1,dim(X),
+            for(i,1,dim(X), test(sX[i]=X[j], M[j]=Rank(sX)[i]))),  M)
+
+-------------------------------------------- END of helper functions
+
+mean(X)       = float( sum(X)/dim(X) ) 
+
+-- variance
+var(X)  = float( sum((X-mean(X))^2) / (dim(X)-1) ) -- sample var.
+var0(X) = float( sum((X-mean(X))^2) / (dim(X)-0) ) -- population var.
+
+-- standard deviation
+sd(X)  = sqrt(sum((X-mean(X))^2) /(dim(X)-1)) -- sample sd
+sd0(X) = sqrt(sum((X-mean(X))^2) /dim(X))     -- population sd
+
+-- std. error of mean
+sem(X) = sd(X)/sqrt(dim(X))
+
+-- mean absolute deviation
+mad(X)  = mean(mag(X - mean(X)))         -- default: m)ad w.r.t. mean
+mad1(X) = mean(mag(X - median(X)))       -- m)ad w.r.t. median
+mad2(X) = mean(mag(X - mode(X)))         -- m)ad w.r.t. mode
+
+-- root mean square
+rms(X) = float( sqrt(sum(X^2)/dim(X)) )  
+
+-- quantile
+quantile(X,p) = test(
+                  p = 100, max(X),
+                  p =   0, min(X),
+                  do( Xs = sort(X),                 -- pick sorted
+                      i  = ceiling(dim(X)*p/100),   -- always round
+                      float(Xs[i])) )               -- return value   
+                    --  float((Xs[i]+Xs[i+1])/2)) ) -- alternative
+
+percentile(X,p) = quantile(X,p)  -- alias for Matlab compatibility
+
+Qp(X,p) = quantile(X,p)          -- relax notation        
+
+-- moment
+moment(X,r)    = float( sum((X-mean(X))^r)/dim(X) ) -- .. about mean
+moment0(X,r)   = float( sum(X^r) /dim(X) )          -- .. about 0
+momentA(X,A,r) = float( sum((X-A)^r)/dim(X) )       -- .. about A
+
+-- skewness
+skew(X)  = moment(X,3)/ sqrt(moment(X,2)^3)          -- MatLAB
+skewR(X) = sum((X-mean(X))^3)/((dim(X)-1)*sd(X)^3)   -- R
+skew1(X)  = 1/dim(X)* sum(((X - mean(X))/sd(X))^3 )
+skew2(X)  = do(n= dim(X), sqrt( n*(n-1))/(n-2)*skew(X) )
+
+-- kurtosis
+kurtosis(X)   = moment(X,4)/moment(X,2)^2
+kurtosisM(X)  = moment(X,4)/sd(X)^4          
+kurtosis1(X)  = float(dim(X)* sum((X-mean(X))^4) / 
+                              sum((X-mean(X))^2)^2 )
+kurtosis0(X, n) = do( n=dim(X),     -- MatLab's kurtosis with flag=0
+                 test( n<4 , "n must be >=4",
+                 (n-1)/((n-2)*(n-3))*((n+1)*kurtosis(X) -3*(n-1))+3 ))
+kurtosisR1(X) = moment(X,4)/moment(X,2)^2 - 3  -- R type 1
+kurtosisR2(X) = do( n=dim(X),                  -- R type 2; also SAS, SPSS
+                     ((n+1)*kurtosisR1(X)+6)*(n-1)/((n-2)*(n-3)) )  
+kurtosisR3(X) = moment(X,4)/moment(X,2)^2 *(1 - 1/dim(X))^2 - 3 
+                                     -- R type 3; also MINITAB
+
+- covariance 
+cov(X,Y)  = 1/dim(X)     * sum( (X-mean(X)) * (Y-mean(Y)) )
+covR(X,Y) = 1/(dim(X)-1) * sum( (X-mean(X)) * (Y-mean(Y)) )
+                                        
+-- BINOMIAL DISTRIBUTION 
+nCk(n,k)        = tgamma(n+1) / (tgamma(k+1)*tgamma(n-k+1))
+binoPDF(k,n,p)  = choose(n,k)*p^k*(1-p)^(n-k)
+binoCDF(k,n,p)  = sum(j,0,floor(k), choose(n,j)*p^j*(1-p)^(n-j) )
+binoCDF1(k,n,p) = incbeta(1-p, n-k,k+1)
+binoCDF2(k,n,p) = sum(j,0,floor(k), nCk(n,j)*p^j*(1-p)^(n-j) )
+binoINV(alpha,n,p, x,k) = do( k=0,
+               loop(k=k+1, x=binCDF(k,n,p), test(x>alpha, break))
+               x,k)
+
+-- GEOMETRIC Distribution
+geoPDF(k,p)  = float( p*(1-p)^k  )
+geoCDF(n,p)  = float( 1-(1-p)^(n+1) )    -- explicit formula
+geoCDF1(n,p) = sum(k,0,n, geoPDF(k,p))   -- math. definition
+geoINV(u,p)  = ceiling(( log(1-u)/log(1-p) - 1)) 
+
+-- NEGATIVE BINOMIAL Distribution
+nbinPDF(x,r,p) = choose(x+r-1,x)*p^r*(1-p)^x
+nbinPDF1(x,r,p) = tgamma(r+x)/(tgamma(r) * tgamma(x+1)) *
+                  (1-p)^x*p^r
+nbinCDF(x,r,p) = p^r*sum(j,0, floor(x), choose(r+j-1,r-1)*(1-p)^j)
+nbinINV(alpha,r,p, x,k) = 
+      do( k=0, loop(k = k+1, 
+               x = nbinCDF(k,r,p), 
+               x,k, test(x>alpha, break)), x,k)
+			   						   
+-- HYPERGEOMETRIC Distribution
+hgPDF(N,R,n,r) = float( choose(R,r)*choose(N-R, n-r)/choose(N,n) )     
+hgPDF1(r,N,R,n) = float(  hgPDF(N,R,n,r)  )      -- for wikipedia
+hgPDF2(x, n, k, m) = hgPDF(m,k,n,x) -- for EXCEL
+hgCDF(N,R,n, x) = sum(k,0, floor(x), hgPDF(N,R,n,k)) 
+hgINV(alpha,N,R,n, x,k) =  do( k=0,
+     loop(k=k+1, x=hgCDF(N,R,n,k), x,k, test(x>alpha, break)) x, k)
+
+-- POISSON Distribution
+poissonPDF(L, k) = float(  L^k*1/k! * exp(-L)  )
+poissonCDF(L,x) = sum(k,0,floor(x), poissonPDF(L,k) )
+poissonCDF1(lambda,k, p) = 
+               test( or(k<0, lambda <=0), -1,  -- BAD PARAMETER
+                 do( p=-lambda,
+                     for(i,1,k, p = p+log(lambda)-log(i)),
+                     float( exp(p) )))
+poissonINV(alpha,L, x,k) =  do( k=0,
+          loop(k = k+1, x = poissonCDF(L,k), 
+               x,k, test(x>alpha, break)) x,k)
+
+-- NORMAL Distribution
+normPDF(x,mu,sigma) = 
+              1/sqrt(2.*pi)/sigma*exp(-0.5*((x-mu)/sigma)^2)
+phi(x,mu,sigma) = normPDF(x,mu,sigma)      -- classic notation
+normCDF(x, mu,sigma) = 
+                  1/2 + 1/2*float(erf((x-mu)/(sqrt(2)*sigma)))
+stdnormCDF(x) = normCDF(x, 0,1)          -- standard normal CDF
+ Phi(x)       = stdnormCDF(x)            -- classic notation
+normCDF2(a,b,mu,sigma) =        -- Calculate Pr( a<=X<=b )
+             1/2 * float( erf( (b-mu)/(sigma*sqrt(2)) )) -
+             1/2 * float( erf( (a-mu)/(sigma*sqrt(2)) ))
+stdnormCDF1(x)       = 1/2*erfc(-x/sqrt(2))    -- using erfc
+normCDF1(x,mu,sigma) = stdnormCDF1((x-mu)/sigma)
+stdnormINV(x, a,b,k,t,y) = test(x=0, "-Inf", x=1, "+Inf",
+                 and(0<x,x<1),
+                  do( a = -10, b = 10,         -- x in [a,b]
+                    for(k,1,100, t = (a+b)/2, y = stdnormCDF(t),
+                     test(abs(x-y)<0.0000001, break, y<x,a=t, b=t)
+                    ), float(t) ))
+normINV(x,mu,sigma) = mu + sigma*stdnormINV(x)   
+
+-- Exponential distribution
+expPDF(x, L) = test( x>=0, L*exp(-L*x), x<0 , 0)
+expCDF(x, L) = test( x>=0, 1-exp(-L*x), x <0, 0)
+expINV(p, L) = - log(1-p)/L 
+
+-- t distribution
+tPDF(x,f) = 1/(sqrt(f)*Beta(1/2,f/2))*(1+ x^2/f)^(-0.5*(f+1))
+Student(x,f) = tPDF(x,f)                            -- alias
+tCDF(x, df) = tdist(x, df)                          -- alias
+tINV(x, df) = tdistinv(x, df)
+
+-- F distribution
+fPDF(x,f1,f2) = float( sqrt(((f1*x)^f1*f2^f2)/(f1*x+f2)^(f1+f2)) /
+                            (x*Beta(f1/2,f2/2)) )
+fCDF(t, df1, df2) = fdist(t, df1, df2)
+fINV(x,df1,df2, a,b,k,t,y) = do( a = -10.0, b = 10.0,
+           for(k,1,100,  t = (a + b) / 2, y = fCDF(t,df1,df2),
+                         test(abs(x - y) < 0.000001, break, 
+                         y < x, a = t, b = t)),  t)  
+
+-- CHI-SQUARED distribution
+chi2PDF(x,k)  = 1/(2^(k/2)*tgamma(k/2))*x^(k/2-1)*exp(-x/2.)
+chi2CDF(x, k) = test( or(x<=0,k<=0), 0,
+                      float(GammaP(x*0.5, k*0.5 )) )
+chi2INV(x,alp, a,b,k,t,y) = do( a = -30.0, b = 30.0,    -- x in [a,b]
+           for(k,1,100,  t = (a + b) / 2, y = chi2CDF(t,alp),
+                         test(abs(x - y) < 0.000001, break, 
+                         y < x, a = t, b = t)),  t)
+						 
+-- PARETO distribution
+paretoPDF(x,m,a) = test( x<m, 0, float( a * m^a / x^(a+1) ))
+paretoCDF(x,m,a) = test( x<m, 0, float( 1 - (m/x)^a  ))
+paretoINV(p,m,a) = float( m * (1-p)^(-1/a)  )
+
+-- WEIBULL distribution
+weibullPDF(x,a,b) = test( x<0, 0, 
+                    float( b/a*(x/a)^(b-1)*exp(-(x/a)^b) ))
+weibullCDF(x,a,b) =  1 - exp(-(x/a)^b)        -- for x>0
+weibullINV(p,a,b) = abs( -a * ( log(1-p) )^(1/b) )
+##  1st optional parameterization (wikipedia)
+weibullPDF1(x,k,b) = test(x<0, 0, b*k*x^(k-1)*exp(-b*x^k) )
+weibullCDF1(x,k,b) =  1 - exp(-b*x^k)            -- for x>0
+weibullINV1(p,a,b) = (-1/b * log(1-p))^(1/k) 
+## 2nd optional parameterization (wikipedia)
+weibullPDF2(x,k,beta) = test( x<0, 0, 
+                        beta*k*(beta*x)^(k-1)*exp(-(beta*x)^k) )
+weibullCDF2(x,k,b)    =  1 - exp(-(beta*x)^k)       -- for x>=0
+weibullINV2(p,k,beta) = 1/beta * ( - log(1-p))^(1/k) 
+
+-- Z - Test
+
+min(a,b) = test(a<=b, a,b)
+
+--................................................. Z-test
+
+ztest(data, mu0, sigma, alpha, altHyp,  M) =
+
+# input:   data       - sample (vector of values)
+#          mu0, sigma - parameter of normal distribution
+#          alpha      - significance level (0<=alpha<=1)
+#          altHyp     - mode of test
+#                          0 = two sided
+#                          1 = one sided greater
+#                         -1 = one sided smaller
+# output: (Z-value, quantile, ConfidenceInterval, p-value)
+
+do(print("   _______ Z-test ________"), 
+   -- choose default: mu0 = 0; sigma = 1; alpha = 0.05; altHyp = 0
+   n  = dim(data),
+   mD = mean(data),
+   Z  = sqrt(n)*(mD - mu0)/sigma,          -- test statistic
+   test( altHyp == 0,                      -- two-sided test
+         do(
+            quantil = stdnormINV(1-alpha/2),
+            CI = (mD - quantil*sigma/sqrt(n), 
+                  mD + quantil*sigma/sqrt(n)),
+            p  = min( 2 * stdnormCDF(Z), 
+                      2 * (1-stdnormCDF(Z))), 
+            p
+            )),
+
+   test( altHyp == 1,                     -- one-sided test greater
+         do(
+            quantil = stdnormINV(1-alpha),
+            CI = ("Inf", mD - quantil*sigma/sqrt(n)),
+            p  = 1 - stdnormCDF(Z),
+            p
+            )),
+
+   test( altHyp == -1,                    -- one sided smaller
+         do(
+            quantil = stdnormINV(1-alpha),
+            CI = ("-Inf", 
+                  mD + quantil*sigma/sqrt(n)),
+            p = stdnormCDF(Z),
+            p
+            )),
+
+   M = zero(5,2),
+   M[1,1] = "Z",
+   M[2,1] = "quantil",
+   M[3,1] = "CI.left",
+   M[4,1] = "CI.right",
+   M[5,1] = "p",
+   M[1,2] = Z,
+   M[2,2] = quantil,
+   M[3,2] = CI[1], 
+   M[4,2] = CI[2],
+   M[5,2] = p,
+   M
+)
+
+-- Two Sample Z - Test
+
+ztest2(X,Y, muX, muY, sigmaX, sigmaY, alpha, altHyp,  M) =
+   # output: (Z-value, quantile, ConfidenceInterval, p-value)
+   do(print("..... two sample Z-test ......"), 
+   nX  = dim(X),
+   nY  = dim(Y),
+   Z = ((mean(X)-mean(Y))-(muX-muY))/sqrt(sigmaX^2/nX+sigmaY^2/nY),
+   Z = float(Z),
+   SEdiff = sqrt(sigmaX^2/nX + sigmaY^2/nY), -- std.error diff
+   test( altHyp == 0,                        -- two-sided test
+         do(
+            Zcrit = stdnormINV(1-alpha/2),   -- alpha-quantile
+            CI = ((mean(X)-mean(Y)) - Zcrit*SEdiff, 
+                  (mean(X)-mean(Y)) + Zcrit*SEdiff),
+            p  = min( 2 * stdnormCDF(Z), 2 * (1-stdnormCDF(Z))), 
+            p
+            )),
+   test( altHyp == 1,                    -- one-sided test greater
+         do( print("exercise for you :)") )),
+   test( altHyp == -1,                   -- one sided smaller
+         do( print("exercise for you :)") )),
+   test( abs(Z) > Zcrit, "Reject the null hypothesis.",
+                         "Accept the null hypothesis." ),
+   M = zero(5,2),
+   M[1,1] = "Z",
+   M[2,1] = "Z score",
+   M[3,1] = "CI.left",
+   M[4,1] = "CI.right",
+   M[5,1] = "p",
+   M[1,2] = Z,
+   M[2,2] = Zcrit,
+   M[3,2] = CI[1], 
+   M[4,2] = CI[2],
+   M[5,2] = p,
+   M)
+
+-- One Sample t-Test
+
+ttest(x, mu0, alpha, method) = ## method = "left","right","both" or -1,1,0
+  do(print("   .......... One Sample t-test .........."),
+     n    = dim(x),
+     df   = n - 1,
+     xbar = mean(x),
+     s    = sd(x),
+     tstat = (xbar - mu0) / (s/sqrt(n)),
+     test( method == -1,                   # for left-tailed test
+              do( critval = tINV(alpha, df), 
+                  test(tstat < critval, print("left: reject H0"),  
+                                        print("left: accept H0"))),
+           method == 1,                    # for right-tailed test
+              do( critval = tINV(alpha, df),
+                  test(tstat > critval, print("right: reject H0"),  
+                                        print("right: accept H0"))),
+           method == 0,                    # for two-sided test
+              do( critval = tINV(alpha/2, df), 
+                  test( or( abs(tstat) >  abs(critval), 
+                           -abs(tstat) < -abs(critval)), 
+                        print("both: reject H0"), 
+                        print("both: accept H0")))) ,
+     M = zero(4,2),
+     M[1,1] = "Significance level:",
+     M[2,1] = "Degrees of freedom:",
+     M[3,1] = "Test statistic:",
+     M[4,1] = "Critical value:",
+     M[1,2] = alpha,
+     M[2,2] = df,
+     M[3,2] = tstat, 
+     M[4,2] = critval,
+     M )
+
+-- Two Sample t-Test
+
+ttest2(A,B, alpha, method) =
+                ## method = "left","right","both" or -1,1,0
+  do(print("   ______ Two Sample t-test ______"),
+     n1 = dim(A),
+     n2 = dim(B),
+     m1 = mean(A),
+     m2 = mean(B),
+     s1 = sd(A),
+     s2 = sd(B),
+     s1 = 1/n1*s1*s1,
+     s2 = 1/n2*s2*s2,
+     df = (s1+s2)^2/(s1^2/(n1-1) + s2^2/(n2-1)),
+     T  = (m1-m2)/sqrt(s1+s2),
+     t95 = tINV(1-alpha/2, df), 
+     F  = sqrt(n1*n2/(n1+n2)),
+     N  = sqrt(((n1-1)*s1^2+(n2-1)*s2^2)/(n1+n2-2)),
+     CI  = (mean(A)-mean(B)-t95*N/F,
+            mean(A)-mean(B)+t95*N/F),
+     min(a,b) = test(a<=b, a,b),
+     pValue = min( 2*tCDF(T,df), 2*(1-tCDF(T,df)) ),
+     tstat = T ,
+     test( method == -1,                   # for left-tailed test
+              do( critval = tINV(alpha, df), 
+                  test(tstat < critval, print("left: reject H0"),  
+                                        print("left: accept H0"))),
+           method == 1,                    # for right-tailed test
+              do( critval = tINV(alpha, df),
+                  test(tstat > critval, print("right: reject H0"),  
+                                        print("right: accept H0"))),
+           method == 0,                    # for two-sided test
+              do( critval = tINV(alpha/2, df), 
+                  test( or( abs(tstat) >  abs(critval), 
+                           -abs(tstat) < -abs(critval)), 
+                        print("both: reject H0"), 
+                        print("both: accept H0")))) ,
+     M = zero(9,2),
+     M[1,1] = "Significance level:",
+     M[2,1] = "Degrees of freedom:",
+     M[3,1] = "Test statistic:",
+     M[4,1] = "Critical value:",
+     M[5,1] = "CI left:",
+     M[6,1] = "CI right:",
+     M[7,1] = "mean A:",
+     M[8,1] = "mean B:",
+     M[9,1] = "p-value:",
+     M[1,2] = alpha,
+     M[2,2] = df,
+     M[3,2] = tstat, 
+     M[4,2] = critval,
+     M[5,2] = CI[1],
+     M[6,2] = CI[2],
+     M[7,2] = mean(A),
+     M[8,2] = mean(B),
+     M[9,2] = pValue,
+     M )
+
+-- Paired t-Test
+
+tdiff(X,Y,alpha, T,p,df,D,d,n) = do(
+      print(" _____ paired t-test _____"),
+      n  = dim(X),  -- = dim(Y)
+      df = n-1,
+      D  = X-Y,
+      sum1 = sum(D),
+      sum2 = dot(D,D),
+      d  = sqrt((sum2-sum1^2/n)/(n*(n-1.))),
+      T  = sum1/(n*d),
+      pValue = min( 2*tCDF(T,df), 2*(1-tCDF(T,df)) ),
+      test(pValue < 0.975, print("..... accept H0"), 
+                           print("..... reject H0")),
+      (("T:","p-value:"),(T,pValue)) )   
+
+-- vartest alias chi2-test
+
+vartest(X, alpha, sigma0,  T,p,df) = do(
+      print("..... Stats result of CHI^2 variance test:"),
+      n  = dim(X),  
+      df = n-1,
+      -- Xbar = mean(X),
+      s = sd(X),
+      -- variance = s^2
+      T = (n-1)*s*s/(sigma0*sigma0),
+      p = min( 2*chi2CDF(T,df), 2*(1-chi2CDF(T,df))),
+      CI= ( (n-1)*s^2/ chi2INV(1-alpha/2,df),      -- LCL
+            (n-1)*s^2/ chi2INV(  alpha/2,df) ),    -- UCL
+      test(p < alpha, print("..... reject H0"), 
+                      print("..... accept H0")),
+      print(" __________ vartest _________"),
+      ("var, T=chi2, p, alpha, LCL, UCL:",s^2,T,p,alpha,CI[1],CI[2]) )
+
+-- F test
+
+varTest(X,Y, s1,s2,m,n,df1,df2,T) = do(
+      m = dim(X),                -- length of samples
+      n = dim(Y),
+      df1 = m-1,                 -- degree of freedom
+      df2 = n-1,                
+      s1 = sd(X),                -- standard deviations
+      s2 = sd(Y),
+      T = s1*s1/(s2*s2),         -- test statistic; denoted F in R
+      p = min( 2*fCDF(T,df1,df2), 2*(1-fCDF(T,df1,df2)) ),
+      lCI = T * 1/fINV(1-alpha/2, df1,df2),      
+      uCI = T * 1/fINV(  alpha/2, df1,df2),
+      CI =(lCI, uCI),             -- confidence intervall
+      print(" ____ F-test ____"),
+      test(p < 1-alpha, print("... accept H0"), 
+                        print("... reject H0")),
+      (("T", "p-value", "CI.l", "CI.h"),(T,p,lCI,uCI)) )
+
+-- One-Sample sign test
+
+signtest(X,med,method,  n,p,p1,p2,s,nt) = do(
+  print(" ___ signtest ___"),
+  n  = dim(X),
+  nt = sum(i,1,n, not( X[i] = med)),     
+  s  = sum(i,1,n,      X[i] > med),   -- success; test value T
+  test(method="both",
+               do(p1 = sum(i,0,s,  binoPDF(i,nt,0.5)),
+                  p2 = 1-sum(i,0,s-1, binoPDF(i,nt,0.5)),
+                  p  = min(2 * p1, 2 * p2) ),
+       method="right",
+               do( p = 1-sum(i,0,s-1, binoPDF(i,nt,0.5))),
+       method="left",
+               do( p = sum(i,0,s,  binoPDF(i,nt,0.5))), p),
+  (("s", "p"), (s, p)) )
+
+-- TWO-Sample sign test
+
+signtest2(X,Y,method,  n,p,p1,p2,s,nt) = do(
+  print(" ___ signtest2 ___"),
+  n  = dim(X),
+  D = X-Y, 
+  nt = sum(i,1,n, not( D[i] = 0)),     
+  s  = sum(i,1,n,      D[i] > 0),   -- success; test value T
+  test(method="both",
+               do(p1 = sum(i,0,s,  binoPDF(i,nt,0.5)),
+                  p2 = 1-sum(i,0,s-1, binoPDF(i,nt,0.5)),
+                  p  = min(2 * p1, 2 * p2) ),
+       method="right",
+               do( p = 1-sum(i,0,s-1, binoPDF(i,nt,0.5))),
+       method="left",
+               do( p = sum(i,0,s,  binoPDF(i,nt,0.5))), p),
+  -- ("stats: T, p", s, p) )
+     (("T", "p"), (s, p)) )
+
+-- One Sample Wilcoxon Test
+
+  signrank(X,med, n,d,sd,md,cd,Z,ZR) = do(
+     n    = dim(X),
+     sign = zero(n),  sign = sgn(d),
+     d    = zero(n),  d = X - med,
+     md = mag(d),
+     sd = sort(md),
+     cd = correspond(md,sd),
+     Z  = zero(n), for(i,1,n, test(d[i]>0, Z[i]=1)),
+     W = dot(Z,cd),
+     T = (W - n*(n+1)/4)/ sqrt(n*(n+1)*(2*n+1)/24),
+     print(" _ Wilcoxon test _"), 
+     (("W", "T"),(W,T)))
+
+-- signrank2  (WILCOXON two sample signed rank test)
+
+  signrank2(X,Y, n,d,sd,cd,Wp,Wm,T) = do(
+     n    = dim(Y),
+     d    = zero(n),
+     d = X - Y,         
+     md = mag(d),       
+     sd = sort(md),     
+     cd = correspond(md,sd),     
+     Tp = zero(n),       -- T+
+     Tm = zero(n),       -- T-
+     To = zero(n),       -- T0
+     for(i,1,n, test(d[i] >0, Tp[i]=1)),
+     for(i,1,n, test(d[i] <0, Tm[i]=1)),
+     for(i,1,n, test(d[i]==0, To[i]=1)),
+     Wp = dot(Tp,cd),  
+     Wm = dot(Tm,cd),
+     T = min(Wp,Wm),
+     print("___ signrank2 ___"),
+     (("Wp","Wm", "T"),(Wp,Wm,T)) )
+
+-- ranksum alias 'MANN-WHITNEY-U-test'
+
+ranksum(X,Y, Z,Zs,Zr, R1,R2,U1,U2) = 
+   do( -- we use pValue criterion instead of Ucritical
+       mX = median(X),  
+       mY = median(Y),  
+       Z  = zero(dim(X)+dim(Y)), 
+             for(i,1,dim(X), Z[i]=X[i]),
+             for(i,1,dim(Y), Z[i+dim(X)]=Y[i]),
+       Zs = sort(Z),      
+       Zc = correspond(Z,Zs),       
+       R1 = sum(i,1,dim(X), Zc[i]),         
+       R2 = sum(i,1,dim(Y), Zc[i+dim(X)]),  
+       n  = dim(X)+dim(Y),
+       U1 = R1 - n1*(n1+1)/2,
+       U2 = R2 - n2*(n2+1)/2,
+       U  = min(U1,U2),      
+       T  = (R2-0.5*n2*(n+1))/sqrt(n1*n2*(n+1)/12),
+       pValue = stdnormCDF(mag(T)),
+       print("  _______ ranksum _______"),
+       Ho = test(pValue < 0.975, "accept H0", "reject H0"),
+      (("U", "p", "Ho"), (U, pValue, Ho )))
+
+-- chisqTest alias 'PEARSON's Chisquared test'
+
+chisqTest(a,b,c,d,  n,z,chi,p,phi) =
+do( test( or(a<=0, b<=0, c<=0, d<=0), "Error"), --test(n<2, break),
+    n   = a+b+c+d,
+    z   = mag(a*d-b*c) - 0.5*n,   -- with YATES correction
+    chi = z*z*n/((a+b)*(c+d)*(a+c)*(b+d)),
+    p   = 1-chi2CDF(chi,1),
+    phi = sqrt(chi/n),            -- contingency coefficient
+    print(" _____ ChiSquared test ____"),
+    (("Chi", "p", "phi"), (chi, p, phi)) ) -- test statistics
+
+-- Fisher’s exact test 
+
+fishertest(a,b,c,d,  n,p) =
+        do( test( or(a<=0, b<=0, c<=0, d<=0), "Error"),  
+            n = a+b+c+d,
+            p = hgCDF(a, n,a+b,a+c),
+            Ho = test(p < 0.05, 0,1),       -- test of Ho
+            print(" __ FISHER test __"),
+            (("Ho", "p"), (Ho, float(p))) )   
+
+-- mcnemar Test
+
+mcnemarTest(a,b,c,d,method,  n,chi,h,p) = 
+     do(     -- default = "asymptotic"
+       test( or(a<=0, b<=0, c<=0, d<=0), "Error"), 
+       n    = a+b+c+d,
+       test(method = "asymptotic",
+              do( chi = float((b - c)^2 / (b+c)),
+                  p   = 1-chi2CDF(chi, 1) ),
+            method="corrected",     -- YATES correction
+              do( chi = float((mag(b - c) - 1)^2 / (b+c)),
+                  p   = 1-chi2CDF(chi, 1)),
+            method="exact", p = 2*(binoCDF(b, b + c, 0.5))),
+       Ho = test(p < 0.05, 0,1),    -- HORNIK
+       print(" ____ McNEMAR ____"),
+      (("chi", "p", "Ho"), (chi, p, Ho )))  
+      -- in 3rd case there is no chi --> $arg7 :)
+
+-- 
+
+corrcoef(X,Y,  numer,denom, Xm,Ym) = 
+                 do( numer = 0,
+                     Xm = X - mean(X),
+                     Ym = Y - mean(Y),
+                     for(i,1,dim(X), numer = numer + Xm[i]*Ym[i]),
+                     denom = sqrt( sum(Xm^2) * sum(Ym^2)),
+                     numer / denom)
+
+r(x,Y) = corrcoef(X,Y)
+
+-- SPEARMAN rank correlation rho
+
+spearman1(X,Y) = do(
+                   n  = dim(X),
+                   sX = sort(X),
+                   sY = sort(Y),
+                   cX = correspond(X, sX),
+                   cY = correspond(Y, sY),
+                   D  = cX - cY,
+                   rho = 1 - 6*sum(D^2)/n/(n^2-1),
+                   rho) 
+
+spearman(X,Y) = do(
+                n  = dim(X),
+                sX = sort(X),  sY = sort(Y),
+                rX = Rank(sX), rY = Rank(sY),
+                cX = correspond(X, sX), cY = correspond(Y, sY),
+                rhoS = cov(cX,cY)/(sd0(cX)*sd0(cY)),
+                rhoS)           
+
+-- KENDALL rank correlation tau
+
+kendall(X,Y,     n,sX,sY,cY,p,q,w) = do(
+                 n  = dim(X),
+                 sX = sort(X),
+                 sY = sort1(Y),
+                 cY = correspond(Y, sY),
+                 p=0, q=0, w=0,
+
+                 for(j,1,n,
+                   for(i,j,n, 
+                       do( w = sgn(sX[i]-sX[j])*sgn(cY[i] - cY[j]),
+                          test(w > 0, p=p+1), 
+                          test(w < 0, q=q+1) ))),
+                 tau = (q-p)/(p+q),
+                 -- tau = 2*(p-q)/n/(n-1),      -- alternative
+                 print("___ KENDALL tau ___"),
+                 (("C","D","tau"), (q,p,float(tau)))  )
+
+-- icc
+
+icc(X,Y,  Z,T,S,n) = do( 
+          k = 2,
+          n = dim(X),
+          T = zero(dim(X)),
+          Z = (X,Y),
+          S = sum(Z),
+          for(i,1,n, T[i]= X[i]+Y[i]),
+          SAQt = sum(Z^2) - S^2/(k*n),
+          SAQr = 1/k * sum(j,1,n, T[j]^2) - S^2/(k*n),
+          dfr= n-1,
+          MQr = SAQr/dfr,
+          SAQb = SAQtotal - SAQrow,      -- b : between
+          dfb= n*(k-1),
+          MQb = SAQb / dfb,
+          ICC = (MQr -MQb)/(MQr + (k-1)*MQb),
+          float(ICC) )
+
+-- LINEAR REGRESSION 
+
+regression(X,Y,   mX,mY,sX,sY,sXY,a,b) = 
+                    do( 
+                      n   = dim(X),
+                      mX  = mean(X),
+                      mY  = mean(Y), 
+                      sX  = sum((X-mX)^2),
+                      sXY = sum((X-mX)*(Y-mY)),
+                      a   = sXY/sX,                
+                      b   = 1/n*(sum(Y)-a*sum(X)),
+                      print(" _____  y = a*x + b  ____"),
+                      (("a","b"), (a,b)))
+
+lm(X,Y) = regression(X,Y)
+
+-- anova1
+
+anova1(X, T,V,VB,VW,MSb,MSw,F) = 
+              do( 
+                  a = dim(X,1), 
+                  b = dim(X,2), 
+                  T = sum(X),
+                  V = sum(X^2) - T^2/(a*b),
+                  VB = 1/b * sum(j,1,a, sum(X[j])^2) - T^2/(a*b),
+                  VW = V-VB,
+                  dfb = a-1,                  
+                  dfw = a*(b-1),        
+                  dft = a*b-1,          
+                  MSb = float(VB/dfb),
+                  MSw = float(VW/dfw),
+                  F   = float(MSb/MSw),
+                  ANOVA = zero(4,5),
+                  ANOVA[1] = ("Source","df","SS","MS","F"),
+                  ANOVA[2] = ("Between",dfb,VB,MSb,F),
+                  ANOVA[3] = ("Within",dfw,VW,MSw,"-"),
+                  ANOVA[4] = ("Total",dfb+dfw,V,"-","ANOVA"),
+                  ANOVA   )
+
+-- BOOTSTRAP for dependend samples
+
+boot1(X,IT,  r, M, Mboot,Sboot, estM, estS) = do(
+              --  IT : number of iterations
+              n = dim(X),             -- number of samples
+              M = zero(IT),           -- container for all samples
+              S = zero(IT),           -- container for all samples
+              Mboot = zero(n),        -- save a mean sample
+              Sboot = zero(n),        -- save a sd sample
+              rand( mod(31,117)),     -- start randomly 
+              for(j,1,IT,             -- start bootstrap samples
+                  for(i,1,n,          -- create one resample of X
+                      r = 1 + mod(floor(1+n*rand),n),
+                      Mboot[i] = X[r],
+                      Sboot[i] = X[r]
+                      ),              -- bootstrap new sample
+                  M[j] = mean(Mboot), -- j.th bootstrap mean
+                  S[j] = sd(Sboot)    -- j.th bootstrap sd
+                  --,print((M[j],S[j]) -- show intermediate results
+                  ),                    
+              estM = float(mean(M)),  -- bootstrap sample mean/sd 
+              estS = float(sd(S)),    -- i.e. estimated values
+              print("    _____ boot1 _____"),
+              (("est.mean", "est.sd"),(estM, estS)) )
+
+
+-- BOOTSTRAP2 for independent samples 
+
+boot2(X,Y, d,g,r,z,s,t,p) = do(
+           IT=10000,                        -- number of ITerations
+           m = dim(X),
+           n = dim(Y),
+           M = zero(m+n),    -- long vector of dim = n+m
+           z = 0,              
+           s = sum(X), 
+           t = sum(Y),
+           d = s/m - t/n,    -- d = mean(X)-mean(Y)      
+           g = m + n,        -- total dimension of container M
+                             -- append X and Y to M=(X|Y)
+           for(i,1,g, M[i] = test(i<=m, X[i], Y[i-m])),  
+           for(j,1,IT, s = 0, t = 0, -- s,t reset to 0
+              for(i,1,m,             -- choose index r randomly        
+                  r = 1 + mod(floor(1+g*rand()),g), -- 1<=r<=g
+                  s = s + M[r]),     -- sum m elements of M randomly
+              for(i,1,n,           
+                  r = 1 + mod(floor(1+g*rand()),g),  
+                  t = t + M[r]),    -- sum n elements of M randomly
+              s = s/m, t = t/n,     -- new means s and t 
+              test(s-t >= d, z = z + 1) ),
+           p = z/IT,               -- probability
+           ("significance:", float(p)))         
+
+
+-- bootstrap CI
+
+bootci(X,IT,  r, M, Mboot, estimatedMean) = do(
+              --  IT : number of iterations
+              n = dim(X),             -- number of samples
+              M = zero(IT),           -- container for all samples
+              Mboot = zero(n),        -- save a sample
+              rand( mod(31,117)),     -- start randomly 
+              for(j,1,IT,             -- start bootstrap samples
+                  for(i,1,n,          -- create one resample of X
+                      r = 1 + mod(floor(1+n*rand()),n),
+                      Mboot[i] = X[r] ), -- bootstrap new sample
+                  M[j]= mean(Mboot)      -- j.th bootstrap mean
+                  ),                  -- bootstrap sample mean   
+              estimatedMean = float(mean(M)),
+              ci2 = percentile(M, 68.5),
+              ci1 = percentile(M, 2.5), 
+              print("    _____ bootCI _____"),
+              (("est.Mean", "CI.l", "CI.h"), 
+                (estimatedMean, ci1,ci2)) 
+              -- alternative CI using std.dev.:
+              -- interval = tINV(1 - (alpha/2),n-1) * (sX/sqrt(n)),
+              -- ci = (mean(X) - interval, mean(X) + interval),
+              -- (estimatedMean, ci[1], ci[2]) 
+              )
+
+  pearson(X,Y, n,rho,f,xo,yo,mx,my) = do(
+             n=dim(X),
+             mx=0, my=0, sx=0, sy=0, c=0,
+             for(k,1,n,  xo = X[k], 
+                         yo = Y[k],
+                         f  = (k-1)/k,
+                         sx = sx + f*(xo-mx)*(xo-mx),       
+                         sy = sy + f*(yo-my)*(yo-my), 
+                         c  = c + f*(xo-mx)*(yo-my),  
+                         mx = f*(mx-xo)+xo,         
+                         my = f*(my-yo)+yo ), 
+             rho=c/sqrt(sx*sy),
+             rho)  -- return value as input for bootci
+
+  CIrho(rho,n,alpha,  r1,r2) = do(
+                      test( or(rho<=0,rho>=1, n<4), break),
+                      z = 0.5*log((1+rho)/(1-rho)),
+                      s = 1/sqrt(n-3),
+                      test(n<=40, do( z = z-(3*z+rho)/(4*n), 
+                                      s = 1/sqrt(n-1))),
+                      q = stdnormINV(1-0.5*alpha),
+                      r1= tanh(z-q*s),  -- FISHER transformation
+                      r2= tanh(z+q*s),
+                      print("CI for rho:"),
+                     (r1,r2))
+
+-- jackknife
+
+jack(X, jac,d,m1,m2,sig,h,M,JCK) = do(
+        alpha = 0.05,
+        n = dim(X),
+        M = zero(n), 
+        mX = mean(X),
+        for(i,1,n, h=X[i], X[i]=0, M[i] = n/(n-1)*mean(X), X[i]=h),
+        mM  = mean(M),            
+        jac = n*mX - (n-1)*mM,    
+        JCK = zero(n),      
+        for(i,1,n, JCK[i] = n*mX - (n-1)*M[i]),
+        D   = jac - JCK,
+        su  = sum(D^2),
+        sigma = float( sqrt(su/(dim(X)-1))),  
+        SE  = sigma/sqrt(n),   
+        ci = tINV(alpha/2,n-1)*SE,
+        print("The nonparametric 'leave-one-out' jackknife algorithm")
+        print(" __________  jackknife  _________"),
+        (("SE", "CI.l", "CI.h"), (SE, jac - ci, jac + ci )))
+
+------------- you may start your work below this line -----------------------
+" Scroll down to the end of the sheet and then start your work, e.g.:"
+
+mean((1,2,3))
+
+-- Do the examples of
+-- https://ijarcce.com/wp-content/uploads/2022/04/IJARCCE.2022.11357.pdf
+-- using Eigenmath ;)
