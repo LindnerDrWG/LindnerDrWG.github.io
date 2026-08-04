@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 1.7-26
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026
+;                     
+        
+       
+COMMENT ---------------------------------------------
+   We first show an interactive session for the
+   successive construction of function MODE.
+   You may copy & paste the following commands line-by-line
+   into the Input Editor of WebReduce.
+----------------------------------------------------- ;
+
+% we want to have the MODE of list X
+X := {1,3,6,6,6,6,7,7,12,12,17};
+ 
+% this is the fequency list of X 
+L:= {{1,1},{3,1},{6,4},{7,2},{12,2},{17,1}};
+
+COMMENT The idea is to get the maximal value (6,4)
+        of all pairs and choose its first entry 6 as MODE
+        
+% to start we pick the FIRST element of L by part(L,1); or
+first(L);
+
+% this element is our first candidate for the MODE
+maxx:=first(L);
+part(maxx,2);     
+ 
+% we now seek for a better pair 
+for i:=1:6 do if   part(part(L,i),2) > part(maxx,2) 
+              then maxx:=part(L,i) ;maxx;
+ 
+% now we have our maximal pair whose 1st entry is the MODE 
+maxx;
+ 
+COMMENT ---------------------------------------------
+   We abstract this process/procedure to a function MODE:
+----------------------------------------------------- ;
+
+procedure MODE(X);
+begin scalar maxx, L;
+      load_package assist;
+      L := frequency(X);
+      maxx:=first(L);
+      for i:=1:length(L) do 
+          if part(part(L,i),2) > part(maxx,2) 
+          then maxx:=part(L,i);
+      return maxx;
+end;
+
+% test
+
+X := {1,3,6,6,6,6,7,7,12,12,17};
+mode(X);
+
+
+
+ 
+mode:= maxx;
+ 
+mode:= part(maxx,1);
+ 
+
+        load_package assist;
+ 
+frequency(X);
+
+                      
+COMMENT 
+The operator elmult returns an integer which is the multiplicity of its
+first argument inside the list which is its second argument. 
+The operatorfrequency gives a list of pairs whose second element indicates the num-
+ber of times the first element appears inside the original list: ;
+
+
+
+
+load_package assist;
+elmult(x,{a,b,x,f,x}) ==> 2
+frequency({a,b,c,a}); ==> {{a,2},{b,1},{c,1}}
+
+load_package assist;
+elmult(x,{a,b,x,f,x}); % ==> 2
+frequency({a,b,c,a});  % ==> {{a,2},{b,1},{c,1}};
+ 
+load_package assist;
+elmult(x,{a,b,x,f,x}); % ==> 2
+frequency({a,b,c,a});  % ==> {{a,2},{b,1},{c,1}};
+ 
+ 
+ 
++++ error: (99 "End-of-file read") "End-of-file read"
+ 
+ 
++++ error: (99 "End-of-file read") "End-of-file read"
+ 
+X := {1,3,6,6,6,6,7,7,12,12,17};
+list_to_set(X);
+ 
+*** list_to_set declared operator 
+frequency(X);
+ 
+L:= {{1,1},{3,1},{6,4},{7,2},{12,2},{17,1}};
+
+
+elmult(1,X);
+ 
+elmult(2,X);
+ 
+for all x in X do elmult(x,X);
+ 
+for all x in x do elmult(x,x)$$$;
+at line 3
+ 
+***** ; invalid in let statement 
+ 
+for all a in X do elmult(a,X);
+ 
+for all a in x do elmult(a,x)$$$;
+at line 3
+ 
+***** ; invalid in let statement 
+ 
+for i:=1:length(X) do elmult(part(X,i), X);
+ 
+ 
++++ error: (99 "End-of-file read") "End-of-file read"
+ 
+for i:=1:length(X) collect elmult(part(X,i), X);
+
+
+mode(x) := block([],
+            freq : discrete_freq(x),
+            maxfreq : sublist_indices(freq[2], lambda([z], z= lmax(freq[2]))),
+            makelist(freq[1][i], i, maxfreq))$
+
+mode([3,3,2,3,4,5,6,7]);
+
+mode([7,7,2,8,4,5,6,6]);
+
+mode([4, 36, 45, 50, 75]);
+
+
+procedure  median(X);
+begin
+  scalar  Xs,n2,n2p; % local vars
+          Xs   := sortnumlist X; 
+          n2   := floor(length(X)/2);  
+          n2p  := n2+1;
+          if evenp length(X) 
+             then return 0.5*(part(Xs,n2)+part(Xs,n2p))
+             else return  part(Xs,n2p); 
+end;
+
+on rounded $
+precision 5$
+
+X := {4, 36, 45, 50, 75}$
+median(X);
+  
+</textarea>
+</td><td>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

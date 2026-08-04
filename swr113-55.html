@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 1.13-55
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026
+;                     
+                                            
+procedure SUM1(X); 
+          for i := 1:length(X) sum part(X, i)$
+          
+procedure mean(X); 
+          Sum1(X)/length(X)$
+
+procedure cov(X,Y) ;
+begin
+  scalar n, mom;
+  n   := length(X);  
+  mX  := mean(X);
+  mY  := mean(Y); 
+  co := for i := 1:n sum (part(X, i) - mX)*(part(Y, i) - mY);
+  return co/n;
+end;
+
+procedure covR(X,Y) ;   % method 'pearson
+begin
+  scalar n, mom;
+  n   := length(X);  
+  mX  := mean(X);
+  mY  := mean(Y); 
+  co := for i := 1:n sum (part(X, i) - mX)*(part(Y, i) - mY);
+  return co/(n-1);
+end;
+
+on rounded $
+precision 5 $
+
+a := {2,4,6,8,10};
+b := {1,11,3,33,5};
+
+cov(a,b);  
+
+covR(a,b); 
+
+
+</textarea>
+</td><td>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>
