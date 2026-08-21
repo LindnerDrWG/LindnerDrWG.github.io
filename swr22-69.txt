@@ -1,0 +1,33 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 2.2-69
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+
+                    
+
+procedure geoPDF(k,p);
+          p*(1-p)^k $
+
+procedure geoCDF(n,p);
+          1-(1-p)^(n+1) $  
+
+procedure geoINV(u,p);
+          ceiling(( log(1-u)/log(1-p) - 1)) $
+
+
+%   Function: ceiling (x)
+%   When x is a real number, return the least integer 
+%        that is greater than or equal to x. 
+%   Function: log (x)
+%   represents the _natural_ base logarithm of x.
+
+% -------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+geoINV(0.70, 1/6);
+geoINV(0.70, 0.4);
+
+

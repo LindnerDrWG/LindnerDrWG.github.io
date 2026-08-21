@@ -1,0 +1,35 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.3-142
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+
+% found by AI:
+% Without relying on heavy special functions, you can write a small procedure 
+% utilizing the classic Hill and Davis Cornish-Fisher expansion approximation. 
+
+
+procedure tINV_Hill(p, nu);
+begin
+  scalar z, tt, c1, c2, c3;
+  
+  % Step 1: Approximate or provide the inverse normal z-score for probability p
+  %         For exactness, you can use a known z-score, e.g., 1.64485 for p=0.95
+  z := 1.64485362695147; 
+  
+  % Step 2: Apply the Cornish-Fisher expansion for degrees of freedom (nu)
+  c1 := (z^3 + z) / (4 * nu);
+  c2 := (5*z^5 + 16*z^3 + 3*z) / (96 * nu^2);
+  c3 := (3*z^7 + 19*z^5 + 17*z^3 - 15*z) / (384 * nu^3);
+  tt := z + c1 + c2 + c3;
+  return tt;
+end;
+
+% ----------------------- Example usage ----------------
+
+% Task: get function tINV_Hill(p, nu) running ..........
+
+
+on rounded $
+print_precision 5$
+
+tINV_Hill(0.95, 10);        %  reference value: 1.6759...

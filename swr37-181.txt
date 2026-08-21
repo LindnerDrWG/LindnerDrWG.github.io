@@ -1,0 +1,25 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.7-181
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+               
+
+%-- (2nd optional parameterization: weibull2)
+%-- using transformation    b = lambda^(-k) 
+
+procedure weibullPDF2(x,k,beta);
+          if  x<0 then  0.0 else 
+          beta * k * (beta*x)^(k-1) * exp(-(beta*x)^k) $
+
+procedure weibullCDF2(x,k,beta);
+          if x>=0 then ( 1 - exp(-(beta*x)^k) )$  
+
+procedure  weibullINV2(p,k,beta);
+           1/beta * ( - log(1-p))^(1/k) $
+
+% ------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+1 - weibullCDF2(1,0.01,2);   % =  0.36533

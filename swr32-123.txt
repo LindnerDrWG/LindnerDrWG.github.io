@@ -1,0 +1,15 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.2-123
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+
+
+% ------------------- Example usage ---------------------    
+
+on rounded$
+print_precision 5$
+
+L := 1/2;
+P3Y5 := int( L*exp(-L*t), t,0,3);
+

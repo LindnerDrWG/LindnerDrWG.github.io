@@ -1,0 +1,28 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.7-176
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026$
+           
+
+
+procedure weibullCDF(x,a,b);
+          if (x<0) then 0.0 else  1 - exp(-(x/a)^b) $
+
+
+% ------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+weibullCDF(0.5, 0.15, 0.8);
+
+
+COMMENT
+
+/*   Check:
+--   octave:1> pkg load statistics
+--   octave:2> wblcdf(0.5, 0.15, 0.8)
+--                ans = 0.9272
+--   R> pweibull(0.5, 0.8, 0.15)
+--                [1]   0.9271979
+*/

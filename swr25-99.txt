@@ -1,0 +1,21 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 2.5-99
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+
+
+procedure poissonPDF(k, lam);
+          exp(-lam) * lam^k / factorial(k);
+
+procedure poissonCDF(x, lam);
+          for k:=0:floor(x)  sum poissonPDF(k, lam);
+
+
+% -------------------- Example usage ---------------------
+
+on rounded$
+print_precision 5$
+
+for k:=0:10 do write{k, poissonCDF(k,2.5)} ;
+
+

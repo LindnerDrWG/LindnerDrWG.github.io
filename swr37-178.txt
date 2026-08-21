@@ -1,0 +1,26 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.7-178
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $               
+
+
+procedure weibullINV(p,lam,k);
+         abs( lam * ( -log(1-p) )^(1/k) ) $
+
+
+
+% ------------------- Example usage ---------------------
+
+
+% Task: find x, given y=p, shape a, scale b, s.t. 
+%       weibullCDF(x,a,b) = p = y.
+%   The result is the value such that an observation from 
+%   an WEIBULL distribution with parameters a, b will fall in the
+%   range [0,x] with probability p. 
+%   cf. https://de.mathworks.com/help/stats/wblinv.html
+
+
+on rounded $
+print_precision 5$
+
+weibullINV(0.5, 200, 6);      % = 188.15, ok

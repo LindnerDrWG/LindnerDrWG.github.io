@@ -1,0 +1,41 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 1.12-52
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+                    
+                                            
+procedure moment(X,r);
+begin
+  scalar n, mx, sx;
+  n   := length(X);  
+  mx := (for each el in X sum el)/n; % mean
+  sx :=  for each el in X sum (el - mx)^r;
+  return sx/n
+end;
+
+procedure kurtosis(X);
+          moment(X,4)/moment(X,2)^2;   %--- R: with package moments
+    
+procedure kurtosisR3(X);
+          moment(X,4)/moment(X,2)^2 *(1 - 1/length(X))^2 - 3;
+
+% ------------------- Example usage ---------------------
+
+on rounded $
+precision 5 $
+
+Y := {102,55,70,95,73,79,60,73,89,85,
+      72,92,76,93,76,97,10,70,85,25,83,
+      58,10,92,82,87,104,75,80,66,93,
+      90,84,73,98,79,35,71,90,71,63,
+      58,82,72,93,44,65,77,81,77};
+      
+kurtosis(Y);       
+
+% ...
+
+
+
+
+

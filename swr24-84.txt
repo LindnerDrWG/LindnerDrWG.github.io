@@ -1,0 +1,49 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 2.4-84
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+
+               
+
+%  we choose the paramerization w.r.t. the urn model:
+%               N  R  n r
+
+procedure hgPDF(NN,RR,n,r); 
+          binomial(RR,r)*binomial(NN-RR, n-r)/binomial(NN,n)$
+
+
+COMMENT (EXCEL) ---------------------------------------------
+    =HYPGEOM.DIST(x,n,k,m) of Excel is here named hgPDFexcel(x,n,k,m) 
+    respecting the other ordering of the parameter sequence: 
+    EXCEL> = HYPGEOM.DIST(2, 3, 4, 12, FALSE) + 
+             HYPGEOM.DIST(3, 3, 4, 12, FALSE)
+           = 0.218 + 0.18 = 0.236  
+    --------------------------------------------------------- ;
+
+procedure hgPDFexcel(x, n, k, m); 
+          hgPDF(m,k,n,x)$ 
+
+% -------------------- Example usage ---------------------
+
+on rounded$
+print_precision 5$
+
+%---  a.  SOLUTION:
+
+hgPDFexcel(2,3,4,12) + hgPDFexcel(3,3,4,12);
+
+%--- b.   SOLUTION:
+%    We seek the value of k which maximizes the value of 
+%    HYPGEOM.DIST(x,n,k,m, FALSE), i.e. the 'maximum likelihood 
+%    estimate for k'. We create a table with the value 
+%    of k from 0 to 20. (Excel)
+
+
+%                                   x  n  k  m 
+for k:=0:20 do write {k, hgPDFexcel(3,100,k,500)};
+
+% we look at the solution as k=15.
+
+
+

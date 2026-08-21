@@ -1,0 +1,17 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.4-152
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+
+
+procedure fINV(p,df1,df2);
+      << clear x;
+         rhs first num_solve(iBeta( 0.5*df1, 0.5*df2, x/(x+df2/df1)) = p, x=2)
+      >>$
+
+% ------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+for i:=1:10 do write {i*0.1, finv(i*0.1,5,2)};

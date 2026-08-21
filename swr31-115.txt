@@ -1,0 +1,30 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.1-115
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $             
+
+% ---------- normINV via num_solve   ------------------------
+% normINV  version using num_solve   by F.J. Wright
+   
+procedure normINV(q,m,s);
+     if q=0 then  infinity else
+     if q=1 then -infinity else     
+     if 0<q and q<1 then
+     begin scalar y := 2*q-1, xx;
+        if y = 0 then return 0;     % return necessary here
+        clear x;
+        xx := num_solve(erf x = y, x = y); 
+        xx := rhs first xx;
+        return m + sqrt(2) * s * xx
+    end$
+
+procedure stdnormINV(q); normINV(q,0,1) $
+
+
+% -------------------- Example usage ---------------------
+
+
+on rounded $
+print_precision 5$
+
+for k:=1:9 do write {k*0.1, stdnormINV(k*0.1)};

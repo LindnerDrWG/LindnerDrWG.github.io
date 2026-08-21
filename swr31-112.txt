@@ -1,0 +1,28 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.1-112
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $             
+
+
+procedure normCDF(x,m,s); 
+          1/2+erf((x-m)/(s*sqrt(2)))/2 $
+
+procedure stdnormCDF(x); normCDF(x, 0,1)$    % standard normal CDF 
+procedure Phi(x);        stdnormCDF(x)$      % classic notation 
+
+
+
+% =======================================================
+%  Example usage
+% =======================================================
+
+on rounded$
+print_precision 5$
+
+normCDF(185,173,7)  ;
+
+Phi( (185-173)/7 );
+
+
+

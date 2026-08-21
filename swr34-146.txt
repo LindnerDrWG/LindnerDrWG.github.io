@@ -1,0 +1,18 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.4-146
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+              
+
+% version with special function beta */
+
+procedure fPDF(x,f1,f2);
+          sqrt(((f1*x)^f1*f2^f2)/(f1*x+f2)^(f1+f2)) / (x * beta(f1/2,f2/2)) $
+
+% -------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+fPDF(1.2, 10, 20);      %  0.56261
+fPDF(1.2, 100, 100);     %  1.095

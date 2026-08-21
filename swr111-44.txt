@@ -1,0 +1,29 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 1.11-44
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+                    
+                      
+procedure moment(X,r);
+begin
+  scalar n, mx, sx;
+  n   := length(X);  
+  mx := (for each el in X sum el)/n; % mean
+  sx :=  for each el in X sum (el - mx)^r;
+  return sx/n
+end;
+
+procedure skew(X);
+    moment(X,3)/ sqrt(moment(X,2)^3);   %--- compatibel with MatLab
+    
+    
+% ------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5 $
+
+X:={5,10,15,20,30,50,80,150,300,500}$
+
+skew(X);  % = 1.5598
+

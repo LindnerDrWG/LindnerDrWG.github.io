@@ -1,0 +1,20 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.7-174
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+
+
+procedure weibullPDF(x,a,b);
+          if (x<0) then 0.0 else
+          b/a*(x/a)^(b-1)*exp(-(x/a)^b) $
+
+% ------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+shape := {0.5,1,1.5,2,2.5,3,3.5,4,4.5,5}$
+
+for each y in shape do write {y, weibullPDF(1,1,y)} ;
+
+% the value 1.8.. is verified as maximum of the green graph.

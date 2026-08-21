@@ -1,0 +1,41 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.4-148
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+
+
+procedure fPDF(x,f1,f2);
+          sqrt(((f1*x)^f1*f2^f2)/(f1*x+f2)^(f1+f2)) / (x * beta(f1/2,f2/2)) $
+
+% -------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+
+matrix X(3,7);
+%X(1,1):= x_$
+for i:=2:7 do X(1,i):= i;
+%X(2,1):= fPDF_x_2_2$
+for i:=2:7 do X(2,i):= fPDF(i,2,2);
+%X(3,1):= MatLab_$
+X(3,2):= 0.2500$
+X(3,3):= 0.1111$
+X(3,4):= 0.0625$
+X(3,5):= 0.0400$
+X(3,6):= 0.0278$
+X(3,7):= 0.0204$
+
+tp(X);
+
+COMMENT Reference values
+
+ ┌                                    ┐
+ │      x:       1  2  3   4   5   6  │
+ │                                    │
+ │               1  1  1   1   1   1  │
+ │ fPDF(x,2,2):  ─  ─  ──  ──  ──  ── │
+ │               4  9  16  25  36  49 │
+ └                                    ┘
+ 
+fPDF(x,2,2): 0.25, 0.11111, 0.0625, 0.04, 0.027778, 0.020408

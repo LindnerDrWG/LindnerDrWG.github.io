@@ -1,0 +1,41 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 1.5-19
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026
+;                     
+                
+load_package assist;  % to use sortnumlist
+
+procedure  median(X);
+begin
+   scalar  Xs,n2,n2p; % local vars
+   Xs   := sortnumlist X; 
+   n2   := floor(length(X)/2);  
+   n2p  := n2+1;
+   if evenp length(X) 
+      then return 0.5*(part(Xs,n2)+part(Xs,n2p))
+      else return  part(Xs,n2p)
+end;
+
+COMMENT  ------------------------------------------------------------
+madMed(X) = median(abs(X - median(X)))  -- med.abs.dev. w.r.t. median
+---------------------------------------------------------------------;
+
+procedure madMed(lst);
+begin
+  scalar n, mu, diff_sum;
+  n        := length(lst);  
+  med      := median(lst);
+  diff_sum := for each el in lst sum abs(el - med);
+  return diff_sum/n
+end;
+
+% ------------------- Example usage ---------------------
+
+on rounded$
+print_precision 5$
+
+X :={2,2,3,4,14};
+madMed(X);
+  

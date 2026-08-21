@@ -1,0 +1,29 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.4-147
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+
+
+procedure fPDF(x,f1,f2);
+          sqrt(((f1*x)^f1*f2^f2)/(f1*x+f2)^(f1+f2)) / (x * beta(f1/2,f2/2)) $
+
+% -------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+for x:=0:8 do if x=0 then write {0,0}
+                  else write {x/2, fPDF(x/2, 10, 20)};
+
+
+COMMENT Reference values
+
+[0  ,       0]
+[0.5, 0.68788]
+[1.0, 0.71436]
+[1.5, 0.35816]
+[2.0, 0.15274]
+[2.5, 0.063724]
+[3.0, 0.027206]
+[3.5, 0.012066]
+[4.0, 0.0055809]

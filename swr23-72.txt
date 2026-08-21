@@ -1,0 +1,65 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 2.3-72
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+
+
+
+procedure nbinPDF(x,r,p); 
+          binomial(x+r-1,x)*p^r*(1-p)^x $
+
+COMMENT-----------------------------------------------------
+  -- where
+  -- n >0        : number of successes until stop
+  -- x = 0,1,2,..: number of failures       
+  -- p in [0,1]  : success probability in each experiment,
+  --               k failures, given n successes.
+
+  -- nbinPDF(x,n,p) returns the negative binomial pdf at the 
+  -- value in x using the corresponding number n of successes
+  -- and probability p of success in a single trial.
+  ---------------------------------------------------------- ;
+
+% variant 1: implementation with factorial function 
+
+procedure nbinPDF1(x,n,p);
+          gamma(n+x)/(factorial(x)*gamma(n)) * p^n*(1-p)^x $
+          
+          
+COMMENT -----------------------------------------------------
+   In REDUCE, the built-in function to calculate factorials is
+              factorial(n). 
+   WARNING: Unlike some other math software, REDUCE does not use  
+   the exclamation mark symbol "!" for factorials. 
+   The following variant avoids the call to factorial().  
+   ----------------------------------------------------------- ;
+
+% variant 2 : implementation with gamma function 
+
+procedure nbinPDF2(x,n,p);
+          gamma(n+x)/(gamma(x)*gamma(n)) * p^n*(1-p)^x $
+
+on rounded $
+print_precision 5$
+
+nbinPDF (5, 3, 0.1);
+nbinPDF1(5, 3, 0.1);
+nbinPDF2(5, 3, 0.1);
+
+
+%%% SURPLUS: an implementaion of factorial, see Steeb, p.9
+%%%          using an goTo-construct ;(
+
+procedure fac n;
+   begin scalar m;
+   m:=1;
+   P: if n=0 then return m;
+      m:=m*n;
+      n:=n-1;
+      go to P;
+   end;
+
+fac(8);
+
+

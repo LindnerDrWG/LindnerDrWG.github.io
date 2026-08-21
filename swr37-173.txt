@@ -1,0 +1,33 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.7-173
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $           
+
+
+procedure weibullPDF(x,a,b);
+          if (x<0) then 0.0 else
+          b/a*(x/a)^(b-1)*exp(-(x/a)^b) $
+
+%   where
+%   a: scale parameter    b: shape parameter
+%   We adpot the MATLAB parameter convention: (x, scale, shape)
+%   R parameter convention:                   (x, shape, scale)
+%   cf. https://de.mathworks.com/help/stats/wblpdf.html
+%.  cf. https://search.r-project.org/CRAN/refmans/ExtDist/html/Weibull.html
+
+
+% ------------------- Example usage ---------------------
+
+
+% EXAMPLE: Compute the density of the observed value 3 in the 
+%          Weibull distribution with unit scale and shape. */
+
+on rounded $
+print_precision 5$
+
+weibullPDF(3,1,1);
+
+%   Reference:
+%   R> dweibull(x = 3, shape = 1, scale = 1, log = FALSE)
+%      [1] 0.04978707 
+

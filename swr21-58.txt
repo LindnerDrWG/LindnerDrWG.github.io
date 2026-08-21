@@ -1,0 +1,35 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 2.1-58
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+
+
+         
+procedure binoPDF(x,n,p);
+          binomial(n,x)*p^x*(1-p)^(n-x) $
+       
+% ------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+       
+binoPDF(4, 6, 0.3);
+
+COMMENT ----------------------------------- Hint by F.J. Wright:
+    You can literally define an alias in REDUCE by using the define 
+    command, e.g.
+                     define choose = binomial
+    which is actually more efficient than defining a new procedure 
+    just to provide a different name for a function. 
+    ------------------------------------------------------------  ;
+    
+define choose = binomial;
+
+procedure binoPDF1(x,n,p);
+          choose(n,x)*p^x*(1-p)^(n-x) $
+
+% ------------------- Example usage ---------------------
+
+binoPDF1(4, 6, 0.3);
+

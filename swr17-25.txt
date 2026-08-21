@@ -1,0 +1,28 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 1.7-25
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026
+;                     
+                      
+load_package assist;
+
+procedure  median(X);
+begin
+  scalar  Xs,n2,n2p; % local vars
+          Xs   := sortnumlist X; 
+          n2   := floor(length(X)/2);  
+          n2p  := n2+1;
+          if evenp length(X) 
+             then return 0.5*(part(Xs,n2)+part(Xs,n2p))
+             else return  part(Xs,n2p) 
+end;
+
+% ------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+X := {1,2,3,4, 5, 6,7,8,9}$
+median(X);
+  

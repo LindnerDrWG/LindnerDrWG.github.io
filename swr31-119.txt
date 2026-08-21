@@ -1,0 +1,96 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.1-119
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026
+;                
+
+% ---------- inverse erf via Newton iteration ------------
+%            contributed by F.J. Wright
+
+% Currently, erf x for |x| >= 5.0 does not evaluate numerically; see
+% "alg/elem.red".  It should evaluate to (approximately) sign x, so...
+
+let erf (~x) => sign x
+   when numberp x and abs(x)>=5 and lisp !*rounded;
+
+procedure numeric_erfinv(x);
+   % Return a numerical approximation to the inverse error function
+   % for real arguments x such that |x| < 1, outside which range it is
+   % undefined.  Do this by solving erf y = x using Newton-Raphson
+   % iteration.
+   if abs x >= 1.0 then rederr "erfinv x defined only for |x| < 1"
+   else if x = 0.0 then 0.0 else
+   begin scalar const := sqrt(pi)/2.0,
+         epsilon := 1.0e-12,
+         dy, y := x;
+      repeat <<
+         dy := const*exp(y^2)*(erf(y) - x);
+         y := y - dy
+      >> until abs dy < epsilon;
+      return y
+   end;
+
+load_package specfn;
+on rounded;
+ 
+procedure normINV(q,m,s);
+   if q=0 then -infinity else if q=1 then infinity else
+   if 0<q and q<1 then 
+          m + sqrt(2) * s * numeric_erfinv(2*q-1);
+
+procedure stdnormINV(q); normINV(q,0,1) $
+
+
+% =======================================================
+%  Example usage
+% =======================================================
+
+on rounded $
+print_precision 8$
+
+% Check R= (1.281552,1.644854,1.959964,2.326348)
+
+X := {0.9,0.95,0.975,0.99};
+for each k in X do write {k, stdnormINV(k)};          
+$ ok;
+
+
+
+%%%----------------------------------------------- check
+%%%               SURPLUS
+%%%----------------------------------------------- check
+%%% with simple implementation
+
+on rounded; precision 10;
+
+procedure erfinv(y);
+% a simple Newton iteration using a for loop ;)
+  begin scalar x, dx;
+    x := y;           
+    for i := 1:50 do 
+	  << dx := (erf(x)-y) / (2/sqrt(pi) * exp(-x^2));
+             x  := x - dx >>;
+    return x;
+  end$
+
+procedure normINV(q,m,s);
+   begin  if q=0 then return "-Inf";
+          if q=1 then return "+Inf";
+          if 0<q and q<1 then 
+             return m + sqrt(2) * s * erfinv(2*q-1);
+    end$
+
+procedure stdnormINV(q); normINV(q,0,1) $
+
+% -------------------- Example usage ---------------------
+
+on rounded $
+print_precision 8$
+
+% Check R= (1.281552,1.644854,1.959964,2.326348)
+
+X := {0.9,0.95,0.975,0.99};
+for each k in X do write {k, stdnormINV(k)};          
+$ ok 
+
+

@@ -1,0 +1,14 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.5-165
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026
+;                
+
+
+procedure chi2CDF(x, k);
+          if x<=0 or k<=0 then 0.0 
+          else iGamma(k*0.5, x*0.5) $
+
+% ----------procedure Wilson & Hilferty -------------
+%
+%           it's your turn

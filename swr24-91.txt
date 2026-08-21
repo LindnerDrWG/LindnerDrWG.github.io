@@ -1,0 +1,39 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 2.4-91
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026$
+              
+
+procedure hgPDF(NN,RR,n,r); 
+          binomial(RR,r)*binomial(NN-RR, n-r)/binomial(NN,n)$
+
+procedure hgCDF(NN,RR,n, x);
+          for k:=0:floor(x) sum hgPDF(NN,RR,n,k) $ 
+
+procedure hgINV(alpha,NN,RR,n);
+   begin scalar x:=0; k:=0;
+         repeat << k := k+1;
+                   x := hgCDF(NN,RR,n, k) >>
+         until x > alpha;
+         return(k)
+   end;
+
+% -------------------- Example usage ---------------------
+
+on rounded$
+print_precision 5$
+
+hgINV(0.995,  3000,50,20);
+
+% Check: hgCDF(3000,50,20,2)  >= 
+hgCDF(3000,50,20,2);
+
+%%%%%%%  check SOLUTION:
+% 
+%  The answer is given by EXCEL as
+%             =HYPGEOM\_INV(.995, 50, 20, 3000) = 2
+%
+%%%%%%%
+
+

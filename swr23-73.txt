@@ -1,0 +1,21 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 2.3-73
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+
+                    
+
+procedure nbinPDF(x,r,p); 
+          binomial(x+r-1,x)*p^r*(1-p)^x $
+
+% -------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+       
+% --- a.
+
+for i:=1:10 do write nbinPDF(i, 10, 1/6);  
+
+

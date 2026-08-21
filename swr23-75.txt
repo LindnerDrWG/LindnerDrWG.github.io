@@ -1,0 +1,59 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 2.3-75
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+
+                     
+
+COMMENT ..............................................................
+   The nbinCDF function calculates the probability of a given number 
+   of failures (x) before the number of successes specified by (n)
+   is reached. The probability_success argument p determines the 
+   constant probability of success.
+.....................................................................$
+
+% 1st version using the mathematical definition 
+
+procedure nbinCDF1(x,n,p); 
+          p^n * (for j:=0:x sum binomial(n+j-1,n-1)*(1-p)^j ) $
+
+% -------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+       
+nbinCDF1(1,2,0.5);   %-- = 0.5 ok
+
+
+
+COMMENT --------------------------------------------------------------
+        We define nbinCDF(x,n,p) alternativ using the special function 
+        beta_incomplete_regularized(n,x,p) alias iBeta(n,x,p).
+----------------------------------------------------------------------$
+
+% Definition of cumulative negative Binomial distribution with iBeta
+
+procedure nbinCDF(k, r, p);
+begin
+  % r: number of successes
+  % k: maximal number of trials
+  % p: probability of success
+  return iBeta(r, k + 1, p)
+end;
+
+% -------------------- Example usage ---------------------
+
+on rounded;
+print_precision 5$
+
+nbinCDF(1,2,0.5);
+
+% Example: maximal k=4 failed attempts with success
+% before r=3. Single success with p=0.30
+nbinCDF(4, 3, 0.30);        % result: 0.3529305
+
+
+off rounded;   % switch to exakt mode
+nbinCDF(2, 2, 1/2);        % 11/16
+

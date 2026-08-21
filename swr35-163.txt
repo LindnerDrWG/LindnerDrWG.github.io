@@ -1,0 +1,63 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.5-163
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $             
+
+
+procedure chi2INV(p,k);
+           << clear x;
+           rhs first num_solve( iGamma(k/2, x/2) = p, x)
+           >>;
+           
+% ------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+p := {0.9,0.95,0.975,0.99};
+
+for each el in p do write {el,  chi2INV(el,10)} ;
+
+
+%%%%%%%%%%%%%%%%%%%
+%% REMARK: actually 
+%% ***** Newton method does not converge  for p=0.975
+
+
+% Check with chiINV_bisection or chi2INV_Newton.
+
+procedure chi2CDF(x, k);
+          if x<=0 or k<=0 then 0.0 
+          else iGamma(k*0.5, x*0.5) $
+
+
+% version by ChatGPT with minor corrections
+% Inverse Chi-Squared distribution using bisection
+% nu  = degrees of freedom
+% p   = cumulative probability
+% tol = desired accuracy
+
+procedure chi2inv_bi(p,nu);
+  begin scalar lo,hi,mid,fmid, tol:= 1.0e-8;
+    lo := 0.0; hi := nu;
+    % Find an upper bracket hi
+    while chi2CDF(hi,nu) < p do hi := 2.0*hi;
+    % Bisection
+    for i := 1:1000 do
+    << mid := (lo+hi)/2.0;
+       fmid := chi2cdf(mid,nu);
+       if abs(fmid-p) < tol then  mid; 
+       if fmid < p then lo := mid else hi := mid;
+    >>;
+    return (lo+hi)/2.0;
+  end;
+
+%--- test
+
+p := {0.9,0.95,0.975,0.99};
+
+On time$
+for each el in p do write {el,  chi2INV_bi(el,10)} ;
+Off time$
+
+

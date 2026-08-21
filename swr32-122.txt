@@ -1,0 +1,25 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.2-122
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+           
+
+procedure expPDF(x, m);  
+          if x<0 then 0 else  m*exp(-m*x) $
+
+
+% ------------------- Example usage ---------------------
+
+on rounded$
+print_precision 5$
+
+% ----- a.
+
+X := for i:=0:10 collect i;
+for each i in X  do write {i, expPDF(i,5) };
+
+% ----- b.
+expPDF(5,1/2) ;
+
+

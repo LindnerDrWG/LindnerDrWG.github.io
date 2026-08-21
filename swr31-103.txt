@@ -1,0 +1,42 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.1-103
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+            
+%                     π = pi = PI
+COMMENT
+  In the Reduce computer algebra system (REDUCE CAS), 
+  the mathematical constant π is represented by the identifier pi (or PI). 
+  Reduce treats it symbolically rather than converting it to a decimal number.
+  π stays as the exact symbol pi in algebraic expressions unless evaluation 
+  to a floating-point number is forced.
+  To get a decimal value for pi, you must turn on the rounded switch. $
+
+
+% ---------- normPDF, phi -------------------------------
+
+procedure normPDF(x,mu,sigma); 
+          1/sqrt(2.*pi)/sigma*exp(-0.5*((x-mu)/sigma)^2) ;
+
+procedure phi(x,mu,sigma);
+          normPDF(x,mu,sigma);     % -- classic notation
+
+procedure normPDF1(x,m,s);         % -- equivalent term
+          exp(-(x-m)^2/(2*s^2))/(sqrt(2*PI)*s) ;
+
+
+% ========================================================
+%  Example usage
+% ========================================================
+
+
+on rounded$
+print_precision 5$
+
+normPDF(82, 78, 12);
+normPDF1(82, 78, 12);
+phi(82, 78, 12);
+
+
+

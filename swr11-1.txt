@@ -1,0 +1,39 @@
+
+COMMENT
+                  STATISTICS WITH REDUCE ch. 1.1 - Exercise 1
+                     Dr. W.G. Lindner
+                     Leichlingen, Germany 2026
+                     
+;
+
+procedure SUM1(X); 
+          for i := 1:length(X) sum part(X, i)$
+
+% the following version is Lisp like, more efficient,
+% shorter formulated and better understandable
+
+procedure SUM2(X); 
+          for each el in X sum el;
+
+COMMENT
+    We show the steps. First we subtract 9 from each number in X, 
+    then we add all these new numbers and shift them to the new center 9. 
+    Then we abstract the procedure to function meanA $
+
+procedure meanA(X,A);
+begin
+ scalar XA;
+ XA := for each el in X collect (el-A); 
+ return sum2(XA)/length(X);
+end;
+
+% ------------------- Example usage ---------------------
+
+on rounded;
+print_precision 5$
+
+
+X := {5,8,11,9,12,6,14,10};
+meanA(X,9);
+
+

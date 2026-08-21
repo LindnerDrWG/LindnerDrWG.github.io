@@ -1,0 +1,69 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 2.5-98
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+               
+
+procedure poissonPDF(k, lam);
+          exp(-lam) * lam^k / factorial(k);
+
+procedure poissonCDF(x, lam);
+          for k:=0:floor(x)  sum poissonPDF(k, lam);
+
+
+% -------------------- Example usage ---------------------
+
+on rounded$
+print_precision 5$
+
+
+1 - poissonCDF(4,2);
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% (?)
+%%% Poisson CDF version using iGammo or iBeta
+%%% NOT YET WORKING - wL
+%%% does NOT evaluate 
+
+procedure poissonCDFg(x, lambda_);
+          Gamma(k + 1, lambda_);
+
+on rounded$
+print_precision 5$
+
+1 - poissonCDFg(4,2);      % 0.0526
+
+
+Comment ........................................
+
+RED: 𝛾⁡(𝑎,𝑧) is provided by the binary function m_gamma, 
+     Γ⁡(𝑎,𝑧) by the two argument version of the function Gamma.
+
+The normalised incomplete gamma function 𝑃⁡(𝑎,𝑧) is provided by 
+the binary function iGamma and is deﬁned as 𝑃⁡(𝑎,𝑧):=  𝛾⁡(𝑎,𝑧)/Γ⁡(𝑎).
+
+gamma(s, x) = int(t^(s-1)e^-t, x, inf)
+
+. GammaRegularized[k + 1, lambda_):
+k:       The maximum number of events occurring k= 0, 1, 2,...
+Γ(s, x): The unregularized upper incomplete Gamma
+
+
+. OTHER SOFTWARE
+Depending on your software package or programming language, the incomplete Gamma function is implemented differently. Here is how to express the Poisson CDF across common libraries:
+
+Environment/LibraryFunction Name Code Implementation Syntax
+
+Python (scipy.special)gammaincc (Upper regularized)
+        scipy.special.gammaincc(k + 1, lambda_)
+Python (scipy.special)gammainc (Lower regularized)1.0 - 
+        scipy.special.gammainc(k + 1, lambda_)
+
+MATLAB gammainc gammainc(lambda_, k + 1, 'upper')
+
+Mathematica / Wolfram GammaRegularized
+       GammaRegularized[k + 1, lambda_]
+
+C++ (boost::math)gamma_qboost::math::  gamma_q(k + 1, lambda_)
+
+$

@@ -1,0 +1,28 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 2.1-64
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+
+
+procedure binoCDF(k,n,p);
+          iBeta(n-k,k+1,1-p);
+
+procedure binoINV2(alpha,n,p);
+% SECOND version of binoINV using a search
+% method until we have success:
+begin scalar x:=0; k:=0;
+      repeat << k := k+1;
+                x := binoCDF(k,n,p);>> 
+      until x>alpha;
+      return(k)
+end;
+
+
+% -------------------- Example usage ---------------------                    
+                    
+on rounded $
+print_precision 5 $
+       
+binoINV2(0.95, 30, 0.5);
+

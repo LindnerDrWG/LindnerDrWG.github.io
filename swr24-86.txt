@@ -1,0 +1,26 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 2.4-86
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026$
+
+               
+
+define choose = binomial $
+
+procedure hgPDF(NN,RR,n,r); 
+          choose(RR,r)*choose(NN-RR, n-r)/choose(NN,n)$
+
+procedure hgCDF(NN,RR,n, x);
+          for k:=0:floor(x) sum hgPDF(NN,RR,n,k) $ % jUp101
+
+% -------------------- Example usage ---------------------
+
+on rounded$
+print_precision 5$
+
+%----- a.
+
+for i:=1:9 do write {i, hgCDF(100,20,10,i)} ;
+
+

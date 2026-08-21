@@ -1,0 +1,23 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.6-167
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $            
+
+
+COMMENT 
+/*  Density of a Pareto distribution with parameters 
+-- m='mu'=location and a='alpha'=shape parameter.
+-- https://search.r-project.org/CRAN/refmans/EnvStats/html/Pareto.html
+-- We adpot this R convention. */
+;
+
+procedure paretoPDF(x, m, a);
+          if x<m then 0.0 else a * m^a / x^(a+1) $
+
+% ------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+paretoPDF(3, 2, 5);    % 0.21948, ok
+

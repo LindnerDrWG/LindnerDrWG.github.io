@@ -1,0 +1,48 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.3-141
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $      
+
+on rounded; precision 10;
+
+procedure normINV(q,m,s);
+     if q=0 then  infinity else
+     if q=1 then -infinity else     
+     if 0<q and q<1 then
+     begin scalar y := 2*q-1, xx;
+        clear x;
+        xx := num_solve(erf x = y, x = y); 
+        xx := rhs first xx;
+        return m + sqrt(2) * s * xx;
+    end$
+
+procedure stdnormINV(q); normINV(q,0,1) $
+
+% ---------- inverse t distribution ------------------------
+
+procedure tINV1(x,f);          
+%-- after Preizer & Pratt  
+%-- t reserved symbol for t(rue); therefore sysmbol tt
+begin scalar q,c, tt;                           %%-- 0<x<1
+      if f=1 then tan(PI*(x-0.5));
+      if f=2 then <<tt:=2.*x-1.; sqrt(2.)*tt/sqrt(1.-tt*tt)>>; 
+      q := stdnormINV(x);
+      c := f -2/3 + 1/(10*f);
+      c := (f-5/6)/(c*c);
+      tt := sqrt(f*exp(c*q*q)-f);
+      if x>0.5 then return tt else return -tt;
+end;
+
+% -------------------  Example usage     -------------------
+
+tINV1(0.99,3);   %% -- 4.54 vs 4.61
+
+%% input NOT allowed:  .95
+tinv1(0.95,50);  %% 1.6759, ok bis x.xxxxx 
+                 %% MatLab>  ans = 1.6759
+                 %% R>       qt(.95,50) [1] 1.675905
+
+for k:=0:4 do write {k/10, tINV1(k/10,5)} ;
+for k:=6:10 do write {k/10, tINV1(k/10,5)} ;
+
+% for k=5 **** Newton method does not converge 

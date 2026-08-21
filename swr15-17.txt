@@ -1,0 +1,24 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 1.5-17
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026
+;                     
+                      
+procedure mad(lst);
+begin
+  scalar n, mu, diff_sum;
+  n  := length(lst);  
+  mu := (for each el in lst sum el)/n;  % mean of list
+  diff_sum := for each el in lst sum abs(el - mu);
+  return diff_sum/n
+end;
+
+% ------------------- Example usage ---------------------
+
+on rounded$
+print_precision 5$
+
+X := {2,2,3,4,14}$
+mad(X);
+  

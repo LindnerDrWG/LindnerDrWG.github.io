@@ -1,0 +1,101 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.5-165
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+                
+
+% ------------------- procedure chisqinv ---------------------
+
+procedure chi2PDF(x, k);
+          1/(2^(k/2)*gamma(k/2))*x^(k/2-1)*exp(-x/2.) $
+
+
+procedure chi2CDF(x, k);
+          if x<=0 or k<=0 then 0.0 
+          else iGamma(k*0.5, x*0.5) $
+
+%% Explored with ChatGPT; minor corrections
+%% Q: 'inverse of Chi-Squared Distribution 
+%%     using Newton iteration in Reduce 3.8'
+
+% Inverse chi-squared CDF using Newton iteration
+procedure chisqinv(p,nu,x0,tol,maxit);
+   begin scalar x,fx,dfx,xnew,k;
+      x := x0;
+      % for k := 1:maxit do
+      repeat
+      <<
+         fx   := chi2cdf(x,nu) - p;
+         dfx  := chi2pdf(x,nu);
+         x    := x - fx/dfx;
+         maxit := maxit - 1
+         >> until abs x < tol or maxit = 0;
+         %if abs(xnew-x) < tol then return xnew;
+         %if xnew <= 0 then  xnew := x/2;
+         %x := xnew;
+      end;
+      return x
+   end;
+
+% ------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+%       (p   , nu, x0, tol    , maxit); 
+chisqinv(0.95, 10,  5, 1.0e-10, 100);  
+
+%.......................................................
+
+procedure chi2PDF(x, k);
+          1/(2^(k/2)*gamma(k/2))*x^(k/2-1)*exp(-x/2.) $
+
+procedure chi2CDF(x, k);
+          if x<=0 or k<=0 then 0.0 
+          else iGamma(k*0.5, x*0.5) $
+
+procedure chisqinv1(p,nu); 
+   begin scalar x, f, fx, dx,
+      tol:= 1.0e-8, maxit:= 100;
+      x := 0;  
+      repeat <<
+         f  := chi2CDF(x,nu) - p;
+         fx := chi2PDF(x,nu);
+      If fx < 1.0e-10 then fx:= 1.0e-10;
+         dx := f/fx;
+         x := x - dx;
+         maxit := maxit - 1
+         >> until abs dx < tol or maxit = 0;
+      return x
+   end$
+
+on rounded $
+print_precision 5$
+
+
+chisqinv1(0.95,10);  %% .. wait a minute ;)
+
+%***** Zero Divisor - chipdf wird zu klein :(
+
+% ------------------- Example usage ---------------------
+
+p     := 0.95;
+nu    := 10;
+x0    := 5;
+tol   := 1.0e-10;
+maxit := 50;
+
+on rounded $
+print_precision 5$
+
+chisqinv(p,nu,x0,tol,maxit);      %% .. wait a minute ;)
+
+chisqinv(0.95,10,5,1.0e-10,100);  %% .. wait a minute ;)
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% RESULT: 18.307
+%% R> qchisq(0.95, df = 10)
+%%    [1] 18.30704
+%%>  qchisq(0.6, df = 10)
+%%   [1] 10.47324

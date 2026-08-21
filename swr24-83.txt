@@ -1,0 +1,39 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 2.4-83
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+
+                
+
+%  we choose the paramerization w.r.t. the urn model:
+%               N  R  n r
+
+procedure hgPDF(NN,RR,n,r); 
+          binomial(RR,r)*binomial(NN-RR, n-r)/binomial(NN,n)$
+
+
+COMMENT  This problem is summarized by:
+--
+--                drawn	     not-drawn      total
+-- red   marbles: r =  4     R-r = 1        R   = 5
+-- green marbles: n-r= 6     N+r-n-R= 39    N-R = 45
+-- total        : n =1 0     N-n = 4        N   = 50
+
+--     (r,     N,    R,     n   )   wikipedia invoking parameters
+--      red    all   reds   draw    $
+
+
+procedure hgPDFwiki(r,NN,RR,n); 
+          hgPDF(NN,RR,n,r)$
+
+% -------------------- Example usage ---------------------
+
+on rounded$
+print_precision 5$
+
+%           r=4   N=50  R=5  n=10) 
+hgPDFwiki(   4,     50,   5,   10);
+
+
+

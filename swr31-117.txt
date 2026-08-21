@@ -1,0 +1,54 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.1-117
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+                
+
+% ---------- inverse erf and normINV -----------------
+% this code is from Gemini AI with minor corrections
+% It implements a Newton-Raphson algorithm
+
+% load_package specfn;   -- erf is autoloaded
+
+procedure erfinv(x);
+begin
+  scalar y, old_y, sqrt_pi, precision_threshold;
+  y := x * 0.8862;          
+  % Initial guess close to x * sqrt(pi)/2
+  precision_threshold := 1.0e-12;
+  sqrt_pi := sqrt(pi);
+  repeat 
+     << old_y := y;
+        y := old_y-(erf(old_y)-x)/((2/sqrt_pi)*exp(-old_y^2));
+     >> 
+    until abs(y - old_y) < precision_threshold;
+  return y
+end;
+
+procedure normINV(q,m,s);
+   begin  if q=0 then return "-Inf";
+          if q=1 then return "+Inf";
+          if 0<q and q<1 then 
+             return m + sqrt(2) * s * erfinv(2*q-1)
+    end$
+
+procedure stdnormINV(q); normINV(q,0,1) $
+
+% ------------------- Example usage ---------------------
+
+%%%%. erf
+%%%%  1   <--> 0.8427
+%%%%           erfinv
+
+on rounded $
+print_precision 5$
+
+stdnormINV(0/10);
+stdnormINV(1/10);
+stdnormINV(2/10);
+normINV(3/10,0,1);
+% ...
+for k:=0:10 do write {k/10, normINV(k/10,2,1)};
+
+

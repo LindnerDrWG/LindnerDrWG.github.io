@@ -1,0 +1,46 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 2.3-74
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+
+                    
+
+procedure nbinPDF(x,r,p); binomial(x+r-1,x)*p^r*(1-p)^x $
+
+procedure nbinPDF1(x,n,p);    % using special function Gamma
+          gamma(n+x)/(factorial(x)*gamma(n)) *p^n*(1-p)^x $
+
+       
+COMMENT ------------------------------------------------------------
+  -- SOLUTION:
+  -- The number of trials (i.e. houses) this takes is therefore k+5=n.
+  -- What we are interested in is the number of houses, 
+  -- so we substitute k = n − 5 into a nbinPDF(5, 0.4) mass function:
+-------------------------------------------------------------------- ;
+
+on rounded $
+print_precision 5$
+       
+% ---------- a. */
+
+nbinPDF(10-5,5,0.4);         %*-- ok, 0.100329, n=10, k=n-5
+nbinPDF1(10-5,5,0.4);         %*-- ok, 0.100329, n=10, k=n-5
+
+% ---------- b. */
+
+procedure f(n); 
+          binomial((n-5)+5-1, n-5)*(1-0.4)^5*0.4^(n-5) $
+f(5);
+f(6);
+f(7);
+f(8);
+
+for i:=5:8 sum f(i);
+
+% ---------- c. */
+
+finisted := 1 - (for i:=5:30 sum f(i)) ;
+finisted;
+
+

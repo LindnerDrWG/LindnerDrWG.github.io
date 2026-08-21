@@ -1,0 +1,24 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.1-104
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+                
+
+procedure normPDF(x,mu,sigma); 
+          1/sqrt(2.*pi)/sigma*exp(-0.5*((x-mu)/sigma)^2) $
+
+procedure phi(x,mu,sigma);
+          normPDF(x,mu,sigma)$     % -- classic notation
+
+
+% =======================================================
+%  Example usage
+% =======================================================
+
+on rounded$
+print_precision 5$
+
+for i:=1:10 do write {0.1*(i-1), normPDF(0.1*(i-1),0,1)};
+
+

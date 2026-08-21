@@ -1,0 +1,26 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 1.10-37
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+
+                      
+procedure moment(X,A,r);
+begin
+  scalar n, mom;
+  n   := length(X);  
+  mom := for each el in X  sum (el - A)^r;
+  return mom/n
+end;
+
+% ------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+X := {  }$
+
+moment(X,A,3);
+print_moment(X,0,3);
+
+

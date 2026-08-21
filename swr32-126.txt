@@ -1,0 +1,21 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.2-126
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+             
+
+procedure expCDF(x, m); if x<0 then 0 else  1-exp(-m*x) $
+
+
+% ------------------- Example usage ---------------------
+
+on rounded$
+print_precision 5$
+
+%% -- SOLUTION:    Pr(X>800) = 1 - Pr(X<=800) = 
+
+1 - expCDF(800, 1/1000);
+
+%% -- RESULT: The light blub will last 800 hrs with prob. of 44.9 %
+

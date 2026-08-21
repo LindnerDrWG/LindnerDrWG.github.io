@@ -1,0 +1,41 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.1-114
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $          
+
+
+% ---------- test  num_solve   ---------------------------
+%
+%%        test for inverting an equation by num_solve
+%%             f(x) = y        ==> x = finv(y),   here
+%%           erf(x) = y = 0.1  ==> x = erfinv(0.1)
+
+on rounded; precision 10;
+print_precision 5$
+
+y := 0.1; num_solve(erf x = y, x = y);
+
+
+% ---------- normINV via num_solve   ---------------------
+% normINV version using num_solve    by F.J. Wright
+
+procedure normINV(q,m,s);
+     if q=0 then  infinity else
+     if q=1 then -infinity else     
+     if 0<q and q<1 then
+     begin scalar y := 2*q-1, xx;
+        if y = 0 then return 0;
+        clear x;
+        xx := num_solve(erf x = y, x = y); % a list of equations
+        xx := rhs first xx;
+        return m + sqrt(2) * s * xx
+    end$
+
+% -------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+normINV(0.8, 0,1);
+
+

@@ -1,0 +1,49 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 1.12-49
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026$                    
+           
+           
+%%%  sd = sqrt(Sum((X-Mean(X))^2) /(length(X)-1)) 
+procedure sd(X);
+begin
+  scalar n, mx, sx;
+  n   := length(X);  
+  mx  := (for each el in X sum el) / n;
+  sx := for each el in X sum (el - mx)^2;
+  return sqrt(sx)/(n-1)
+end;
+                                 
+procedure moment(X,r);
+begin
+  scalar n, mx, sx;
+  n   := length(X);  
+  mx := (for each el in X sum el)/n; % mean
+  sx :=  for each el in X sum (el - mx)^r;
+  return sx/n
+end;
+
+procedure kurtosis(X);
+          moment(X,4)/moment(X,2)^2;   %--- R: with package moments
+    
+procedure kurtosisM(X);
+          moment(X,4)/sd(X)^4;
+
+procedure kurtosisR3(X);
+          moment(X,4)/moment(X,2)^2 *(1 - 1/length(X))^2 - 3 
+
+% ------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5 $
+
+Y := {4,5,5,6,6,6,7,8,10,12,13};
+kurtosis(Y);       
+
+% ...
+
+
+
+
+

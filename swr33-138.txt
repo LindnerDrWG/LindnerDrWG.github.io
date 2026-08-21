@@ -1,0 +1,32 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.3-138
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+               
+
+procedure tCDF(a,df);
+   if a=0 then 0.5 else 
+   if a<0 then 0.5 * ibeta(df/2, 0.5, df/(a^2+df)) else
+           1 - 0.5 * ibeta(df/2, 0.5, df/(a^2+df));
+          
+
+% ------------------- Example usage ---------------------
+          
+on rounded$
+print_precision 5$
+
+1 - tcdf(10,99);
+
+
+% tcdf(10,99) is nearly 1, so the result becomes 0. 
+
+
+% REMARK on iBeta. ...................................
+% The regularized incomplete beta function, written as I_x(a,b), 
+% ranges in value from 0 to 1 for inputs x in [0, 1] 
+% and shape parameters a, b > 0.
+% It represents the cumulative distribution function of 
+% the beta distribution. 
+
+

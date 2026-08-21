@@ -1,0 +1,31 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.3-135
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+               
+
+procedure normPDF(x,m,s);
+          exp(-(x-m)^2/(2*s^2))/(sqrt(2*pi)*s) $
+          
+% a third version of t-PDF
+
+procedure tPDF(x,n); 
+          gamma((n+1)/2)*(1+x*x/n)^(-(n+1)/2)/(sqrt(n*pi)*gamma(n/2)) $
+
+
+% ------------------- Example usage ---------------------
+
+
+on rounded$
+print_precision 5$
+
+for i:=0:5 do  write{-2.5+i, tPDF(-2.5+i,30) - normPDF(-2.5+i,0,1) } ;
+
+
+%%%%%%%%%% Check with octave> -2.5:2.5
+%%            ans = -2.5000  -1.5000  -0.5000  0.5000   1.5000  2.5000
+%%     difference = tpdf(-2.5:2.5,30) - normpdf(-2.5:2.5)
+%%     difference = 0.0035  -0.0006  -0.0042  -0.0042 -0.0006  0.0035
+
+

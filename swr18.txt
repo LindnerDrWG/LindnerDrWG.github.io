@@ -1,0 +1,25 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 1.8
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026
+;                     
+
+% function MODE is explained in exercise 27
+
+procedure MODE(X);
+begin scalar maxx, L;
+      load_package assist;
+      L := frequency(X);
+      maxx:=first(L);
+      for i:=1:length(L) do 
+          if part(part(L,i),2) > part(maxx,2) 
+          then maxx:=part(L,i);
+      return part(maxx,1)
+end;
+
+% ------------------- Example usage ---------------------
+
+X := {1,3,6,6,6,6,7,7,12,12,17};
+mode(X);
+  

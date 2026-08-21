@@ -1,0 +1,22 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 2.2-68
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+
+
+
+procedure geoCDF(n,p);
+          1-(1-p)^(n+1) ;   
+
+
+% -------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+% --- a.
+
+for i:=1:10 do write geoCDF(i, 1/6);  
+
+

@@ -1,0 +1,37 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.1-113
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $          
+
+
+COMMENT ................................................
+  erfc (z) is the Complementary Error Function.
+  we have the identity:  erfc(x) := 1 - erf(x).
+
+  This time we FIRST define   stdnormCDF
+  and then with the help of this normCDF.
+  .....................................................$
+
+
+procedure stdnormCDF(x);  
+          1/2*erfc(-x/sqrt(2)) $
+
+procedure Phi(x);  
+          1/2*erfc(-x/sqrt(2)) $
+
+procedure normCDF(x,mu,sigma); 
+          stdnormCDF((x-mu)/sigma) $
+
+
+% =======================================================
+%  Example usage
+% =======================================================
+
+on rounded$
+print_precision 5$
+
+stdnormCDF( (185-173)/7 );
+Phi( (185-173)/7 );
+
+normCDF(185,173,7);     
+

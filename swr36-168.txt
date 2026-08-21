@@ -1,0 +1,29 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.6-168
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+
+
+procedure paretoPDF(x, m, a);
+          if x<m then 0.0 else a * m^a / x^(a+1) $
+
+
+% ------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+
+%----- a.
+
+shape := {1,2,3,4,5}$
+for each y in shape do write {y, paretoPDF(3,2,y)} ;
+
+
+COMMENT
+[1, 0.22222]
+[2, 0.2963]
+[3, 0.2963]
+[4, 0.26337]
+[5, 0.21948]
+;

@@ -1,0 +1,20 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.6-170
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $            
+
+
+procedure paretoCDF(x,m,a);
+          if  x<m then  0.0 else 1 - (m/x)^a $
+
+% ------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+
+
+paretoCDF(2,1,1) ;     % ok
+paretoCDF(2,1,2) ;
+paretoCDF(2,1,3) ;
+ 

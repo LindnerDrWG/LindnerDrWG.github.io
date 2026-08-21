@@ -1,0 +1,38 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.5-157
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+               
+
+procedure chi2PDF(x, k);
+          1/(2^(k/2)*gamma(k/2))*x^(k/2-1)*exp(-x/2.) $
+
+% ------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+for i:=1:9 do write {i*0.1, chi2PDF(i*0.1,6)};
+
+COMMENT result:
+
+ ┌                ┐
+ │ 0.1  5.9452e-4 │
+ │                │
+ │ 0.2  0.0022621 │
+ │                │
+ │ 0.3  0.0048415 │
+ │                │
+ │ 0.4  0.0081873 │
+ │                │
+ │ 0.5  0.012169  │
+ │                │
+ │ 0.6  0.016668  │
+ │                │
+ │ 0.7  0.021581  │
+ │                │
+ │ 0.8  0.026813  │
+ │                │
+ │ 0.9   0.03228  │
+ └                ┘
+ ;

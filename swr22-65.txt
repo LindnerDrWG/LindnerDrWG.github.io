@@ -1,0 +1,28 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 2.2-65
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+
+
+COMMENT  
+
+   The geometric distribution is the number of failures before 
+   a success, not the number of trials including the success.
+   geoPDF(k,p) : 
+   -- k : number of failures before the first success, k=0,1,2..
+   -- p : probability of success on a given trial, 0<p<1. 
+   This definition uses the convention of Matlab. $
+
+
+procedure geoPDF(k,p);
+          p*(1-p)^k;
+
+
+% -------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+geoPDF(5,0.5);
+

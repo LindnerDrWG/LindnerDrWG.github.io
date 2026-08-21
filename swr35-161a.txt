@@ -1,0 +1,37 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.5-161
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+                
+
+procedure chi2PDF(x, k);
+          1/(2^(k/2)*gamma(k/2))*x^(k/2-1)*exp(-x/2.) $
+
+procedure chi2CDF(x, k);
+          if x<=0 or k<=0 then 0.0 
+          else iGamma(k*0.5, x*0.5) $
+
+% ------------------- step-by-step solution ----------------
+
+on rounded $
+print_precision 5$
+
+
+% Define parameters
+p := 0.95;
+k := 10;
+
+% Define the equation based on the lower incomplete gamma function
+% iGamma(a,z) takes arguments: a = k/2, z = x/2
+
+eqn := iGamma(k/2, x/2) = p;
+
+% Numerically solve for x
+numeric_result := num_solve(eqn, x);
+
+write "The inverse chi-squared value is: ", numeric_result;
+
+
+%% R> qchisq(0.95, df = 10)
+%%    [1] 18.30704
+

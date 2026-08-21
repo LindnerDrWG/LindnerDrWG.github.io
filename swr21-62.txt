@@ -1,0 +1,30 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 2.1-62
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+
+                           
+procedure nCk(n,k);  
+          gamma(n+1) / (gamma(k+1) * gamma(n-k+1)) $
+
+procedure binoCDF2(k,n,p); 
+          for j:=0:k sum nCk(n,j)*p^j*(1-p)^(n-j) $
+
+% -------------------- Example usage ---------------------
+
+on rounded $
+print_precision  5$
+
+Gamma(5);      % = 24 = 5! 
+
+%----- a.
+
+nCk(4,2); % 6
+
+nCk(100,17);  % 6650...800
+
+binoCDF2(4, 10, 0.5);      %-- ok 0.3769 
+binoCDF2(4, 6, 0.3) ;      %-- ok 0.9890 
+
+

@@ -1,0 +1,42 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 2.4-92
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+
+             
+
+procedure hgPDF(NN,RR,n,r); 
+          binomial(RR,r)*binomial(NN-RR, n-r)/binomial(NN,n)$
+
+procedure hgCDF(NN,RR,n, x);
+          for k:=0:floor(x) sum hgPDF(NN,RR,n,k) $ 
+
+procedure hgINV(alpha,NN,RR,n);
+   begin scalar x:=0; k:=0;
+         repeat << k := k+1;
+                   x := hgCDF(NN,RR,n, k) >>
+         until x > alpha;
+         return(k)
+   end;
+
+% -------------------- Example usage ---------------------
+
+on rounded$
+print_precision 5$
+
+
+%   Note that N, the size of the population contains  
+%   m successes and n failures, i.e. N = m+n =16: 
+
+hgINV(0.9, 16,5,4);
+
+
+%%%%%%%  check SOLUTION with Maxima
+%
+%    load(distrib)$
+%    quantile_hypergeometric(0.90, 5, 11, 4);
+%    > 2
+%%%%%%%
+
+

@@ -1,0 +1,35 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 2.5-101
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+           
+
+procedure poissonPDF(k, lam);
+          exp(-lam) * lam^k / factorial(k);
+
+procedure poissonCDF(x, lam);
+          for k:=0:floor(x)  sum poissonPDF(k, lam);
+
+procedure poissonINV(alpha,lam);
+   begin scalar x:=0; k:=0;
+         repeat << k := k+1;
+                   x := poissonCDF(k, lam) >>
+         until x > alpha;
+         return(k)
+   end;
+
+% -------------------- Example usage ---------------------
+
+on rounded$
+print_precision 5$
+
+poissonINV(0.1, 2.5);
+poissonINV(0.2, 2.5);
+poissonINV(0.3, 2.5);
+poissonINV(0.4, 2.5);
+poissonINV(0.5, 2.5);
+
+$$$$$ Now use a loop .. ;) 
+
+
+

@@ -1,0 +1,28 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.7-175
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026$
+                
+
+
+procedure weibullPDF(x,a,b);
+          if (x<0) then 0.0 else
+          b/a*(x/a)^(b-1)*exp(-(x/a)^b) $
+
+% ------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+shape := {1,2,3,4,5}$
+for each i in shape do write {i, weibullPDF(3,2,i)};
+
+
+COMMENT
+
+[1, 0.11157]
+[2, 0.1581]
+[3, 0.11549]
+[4, 0.042726]
+[5, 0.0063735]
+ done

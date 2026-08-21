@@ -1,0 +1,36 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 2.3-77
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+                   
+
+
+procedure nbinCDF1(x,n,p); 
+          p^n * (for j:=0:x sum binomial(n+j-1,n-1)*(1-p)^j ) $
+
+procedure nbinCDF(k, r, p);
+          iBeta(r, k + 1, p);
+
+
+% We do a search for k until success :
+
+procedure nbinINV(alpha,n,p);
+begin scalar x; x:=0; k:=0;
+   repeat << k := k+1;
+             x := nbinCDF(k,n,p); >>
+   until x > alpha;
+   return(k)
+end;
+
+% -------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+nbinINV(0.99, 5, 0.25);  % = 38 
+
+nbinINV(0.95, 10, 0.7) ; % =  9 
+
+
+

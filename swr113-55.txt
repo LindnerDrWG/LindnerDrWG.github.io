@@ -1,0 +1,46 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 1.13-55
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $                   
+                                            
+procedure SUM1(X); 
+          for each el in X sum el$
+          
+procedure mean(X); 
+          Sum1(X)/length(X)$
+
+procedure cov(X,Y) ;
+begin
+  scalar n, mX, mY, co;
+  n   := length(X);  
+  mX  := mean(X);
+  mY  := mean(Y); 
+  co := for i := 1:n sum (part(X, i) - mX)*(part(Y, i) - mY);
+  return co/n
+end;
+
+procedure covR(X,Y) ;   % method 'pearson
+begin
+  scalar n, mX, mY, co;
+  n   := length(X);  
+  mX  := mean(X);
+  mY  := mean(Y); 
+  co := for i := 1:n sum (part(X, i) - mX)*(part(Y, i) - mY);
+  return co/(n-1)
+end;
+
+% ------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5 $
+
+
+X := {2,4,6,8,10};
+Y := {1,11,3,33,5};
+
+cov(X,Y);  
+
+covR(X,Y); 
+
+

@@ -1,0 +1,18 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 2.1-61
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+
+                     
+                 
+procedure binoCDF(k,n,p);
+          iBeta(n-k,k+1,1-p);
+
+% --- a.
+
+on rounded $
+print_precision  5$
+
+for i:=1:10 do write binoCDF(i, 10, 1/6);  
+

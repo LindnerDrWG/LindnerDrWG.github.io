@@ -1,0 +1,18 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.5-156
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+            
+
+% uses special function gamma, with is autoloaded */
+
+procedure chi2PDF(x, k);
+          1/(2^(k/2)*gamma(k/2))*x^(k/2-1)*exp(-x/2.) $
+
+% ------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+chi2PDF(2,3);     % 0.20755
+

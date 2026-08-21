@@ -1,0 +1,22 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 2.4-80
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+
+                
+
+%               N  R  n r
+procedure hgPDF(NN,RR,n,r); 
+          binomial(RR,r)*binomial(NN-RR, n-r)/binomial(NN,n)$
+
+% -------------------- Example usage ---------------------
+
+on rounded$
+print_precision 5$
+
+for i:=0:6 do write hgPDF(49,6,6, i);
+
+
+
+

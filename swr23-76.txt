@@ -1,0 +1,31 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 2.3-76
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+
+                   
+
+procedure nbinCDF1(x,n,p); 
+          p^n * (for j:=0:x sum binomial(n+j-1,n-1)*(1-p)^j ) $
+
+procedure nbinCDF(k, r, p);
+          iBeta(r, k + 1, p);
+
+% -------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+       
+% --- a.
+
+On time$
+for i:=1:10 do write nbinCDF(i, 10, 1/6);  
+Off time$
+
+On time$
+for i:=1:10 do write nbinCDF1(i, 10, 1/6);  
+Off time$
+
+$ nbinCDF1 is 10 times better than nbinCDF (iBeta version)
+

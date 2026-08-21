@@ -1,0 +1,32 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.5-159
+                      Dr. W.G. Lindner
+                      Leichlingen, Germany 2026 $
+             
+
+procedure chi2CDF(x, k);
+          if x<=0 or k<=0 then 0.0 
+          else iGamma(k*0.5, x*0.5) $
+
+% ------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+%----- a.
+
+for x:=0:8 do write {x, chi2CDF(x,4)};
+
+
+%----- c.
+
+define GammaP   = iGamma$
+define gammainc = iGamma$
+
+% iGamma it is the upper incomplete Gamma function Γ(a,𝑥). 
+% It is a binary function, i.e. needs 2 arguments. 
+
+on rounded $
+print_precision 5$
+
+iGamma(2,3);    % inverted argument ordering w.r.t. MatLab.

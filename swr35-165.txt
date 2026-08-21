@@ -1,0 +1,52 @@
+procedure chi2PDF(x, k);
+          1/(2^(k/2)*gamma(k/2))*x^(k/2-1)*exp(-x/2.) $
+
+
+procedure chi2CDF(x, k);
+          if x<=0 or k<=0 then 0.0 
+          else iGamma(k*0.5, x*0.5) $
+
+% ------------------- procedure chisqinv ---------------------
+
+%% Explored with ChatGPT; minor corrections
+%% Q: 'inverse of Chi-Squared Distribution 
+%%     using Newton iteration in Reduce 3.8'
+
+% Inverse chi-squared CDF using Newton iteration
+procedure chisqinv(p,nu,x0,tol,maxit);
+   begin scalar x,fx,dfx,xnew,k;
+      x := x0;
+      for k := 1:maxit do
+      begin
+         fx   := chi2cdf(x,nu) - p;
+         dfx  := chi2pdf(x,nu);
+         xnew := x - fx/dfx;
+         if abs(xnew-x) < tol then return xnew;
+         if xnew <= 0 then  xnew := x/2;
+         x := xnew;
+      end;
+      return x
+   end;
+
+% ------------------- Example usage ---------------------
+
+p     := 0.95;
+nu    := 10;
+x0    := 5;
+tol   := 1.0e-10;
+maxit := 50;
+
+on rounded $
+print_precision 5$
+
+chisqinv(p,nu,x0,tol,maxit);      %% .. wait a minute ;)
+
+chisqinv(0.95,10,5,1.0e-10,100);  %% .. wait a minute ;)
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% RESULT: 18.307
+%% R> qchisq(0.95, df = 10)
+%%    [1] 18.30704
+%%>  qchisq(0.6, df = 10)
+%%   [1] 10.47324
