@@ -1,9 +1,8 @@
 
 COMMENT
            STATISTICS WITH REDUCE ch. 2.4-79
-                      Dr. W.G. Lindner
-                      Leichlingen, Germany 2026 $
-
+                      by W.G. Lindner 2026  $
+                      
 
 
 % Because REDUCE is case-insensitive we use the identifier

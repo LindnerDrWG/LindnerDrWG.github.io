@@ -1,7 +1,7 @@
 COMMENT
            STATISTICS WITH REDUCE ch. 3.5-159
-                      Dr. W.G. Lindner
-                      Leichlingen, Germany 2026 $
+                      by W.G. Lindner 2026  $
+                      
              
 
 procedure chi2CDF(x, k);

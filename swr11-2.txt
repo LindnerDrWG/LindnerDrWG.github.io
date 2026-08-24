@@ -1,16 +1,15 @@
 
 COMMENT
                   STATISTICS WITH REDUCE ch. 1.1 - 2
-                     Dr. W.G. Lindner
-                     Leichlingen, Germany 2026
-                     
-   We use the well-known 'inner product' alias the 'dot'-product 
-   of Linear Algebra to solve the problem using the data structure list
-   ;
-
+                             by W.G. Lindner 2026  $
+ 
+                    
 procedure SUM1(X); 
           for each el in X sum el;
 
+%   We use the well-known 'inner product' alias the 'dot'-product 
+%   of Linear Algebra to solve the problem using the data structure list
+ 
 procedure DOT(A,B); 
           for i := 1:length(A) sum part(A,i)*part(B,i)$
           % part(A,i) means 'i-th element of list A

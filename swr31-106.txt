@@ -1,8 +1,8 @@
 
 COMMENT
            STATISTICS WITH REDUCE ch. 3.1-106
-                      Dr. W.G. Lindner
-                      Leichlingen, Germany 2026 $
+                      by W.G. Lindner 2026  $
+                      
                 
 
 % error function erf is autoloaded

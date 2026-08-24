@@ -1,8 +1,7 @@
 COMMENT
            STATISTICS WITH REDUCE ch. 3.1-119
-                      Dr. W.G. Lindner
-                      Leichlingen, Germany 2026
-;                
+                      by W.G. Lindner 2026  $
+                      
 
 % ---------- inverse erf via Newton iteration ------------
 %            contributed by F.J. Wright

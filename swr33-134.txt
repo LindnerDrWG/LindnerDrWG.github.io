@@ -1,9 +1,8 @@
 
 COMMENT
            STATISTICS WITH REDUCE ch. 3.3-134
-        
-                      Dr. W.G. Lindner
-                      Leichlingen, Germany 2026 $
+                      by W.G. Lindner 2026  $
+                      
 
 procedure tPDF(x,f);  
           1/(sqrt(f)*Beta(1/2,f/2))*(1+ x^2/f)^(-0.5*(f+1)) $

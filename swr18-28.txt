@@ -1,9 +1,8 @@
 
 COMMENT
            STATISTICS WITH REDUCE ch. 1.8-28
-                      Dr. W.G. Lindner
-                      Leichlingen, Germany 2026
-;                     
+                      by W.G. Lindner 2026  $
+                      
 
 COMMNT
      /* ---------------- DEFINITION ---------------- mode

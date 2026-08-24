@@ -1,9 +1,8 @@
 
 COMMENT
            STATISTICS WITH REDUCE ch. 2.3-72
-                      Dr. W.G. Lindner
-                      Leichlingen, Germany 2026 $
-
+                      by W.G. Lindner 2026  $
+                      
 
 
 procedure nbinPDF(x,r,p); 

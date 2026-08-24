@@ -1,8 +1,8 @@
 
 COMMENT
            STATISTICS WITH REDUCE ch. 1.10-37
-                      Dr. W.G. Lindner
-                      Leichlingen, Germany 2026 $
+                      by W.G. Lindner 2026  $
+                      
 
                       
 procedure moment(X,A,r);

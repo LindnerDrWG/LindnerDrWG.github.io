@@ -1,7 +1,7 @@
 COMMENT
            STATISTICS WITH REDUCE ch. 3.3-142
-                      Dr. W.G. Lindner
-                      Leichlingen, Germany 2026 $
+                      by W.G. Lindner 2026  $
+                      
 
 % found by AI:
 % Without relying on heavy special functions, you can write a small procedure 

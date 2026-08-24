@@ -1,9 +1,8 @@
 
 COMMENT
            STATISTICS WITH REDUCE ch. 1.13-54
-                      Dr. W.G. Lindner
-                      Leichlingen, Germany 2026 $
-                     
+                      by W.G. Lindner 2026  $
+                      
                                             
 procedure SUM1(X); 
           for each el in X sum el$

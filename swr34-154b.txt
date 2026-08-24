@@ -1,8 +1,7 @@
 COMMENT
            STATISTICS WITH REDUCE ch. 3.4-154b
-                      Dr. W.G. Lindner
-                      Leichlingen, Germany 2026
-;                
+                      by W.G. Lindner 2026  $
+                      
 
 procedure fPDF(x,f1,f2);
           sqrt(((f1*x)^f1*f2^f2)/(f1*x+f2)^(f1+f2)) / (x * beta(f1/2,f2/2)) $

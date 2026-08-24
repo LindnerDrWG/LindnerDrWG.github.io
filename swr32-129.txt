@@ -1,9 +1,8 @@
 
 COMMENT
            STATISTICS WITH REDUCE ch. 3.2-129
-                      Dr. W.G. Lindner
-                      Leichlingen, Germany 2026 $
-              
+                      by W.G. Lindner 2026  $
+                      
 
 procedure expINV(p,m);        
           - log(1-p)/m $
