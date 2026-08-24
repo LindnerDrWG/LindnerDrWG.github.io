@@ -1,0 +1,23 @@
+COMMENT
+                  STATISTICS WITH REDUCE ch. 1.1 - 2
+                     Dr. W.G. Lindner
+                     Leichlingen, Germany 2026
+                     
+            
+% declare a field (’vector’) of 5 elements         
+array X(5); 
+% fill array
+X(1):=4; X(2):=36$ X(3):=45$ X(4):=50$ X(5):=75$ 
+% sum the members by means of a for loop
+S := (for i:=1:5 sum X(i)); 
+% display the result
+write S;
+
+
+X := {4 ,36, 45, 50, 75};       % (1)
+S := for each el in X sum el;   % (2)
+
+
+procedure xapply(f,lst); lisp(f.cdr(lst))$        % (1)
+procedure mean(lst); xapply(+, lst)/length(lst)$  % (2)
+mean({4 ,36, 45, 50, 75});                        % (3)

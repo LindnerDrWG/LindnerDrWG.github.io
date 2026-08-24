@@ -1,7 +1,7 @@
 COMMENT
-           STATISTICS WITH REDUCE ch. 3.5-160
-                      Dr. W.G. Lindner
-                      Leichlingen, Germany 2026 $
+           STATISTICS WITH REDUCE ch. 3.5-162
+                      by W.G. Lindner 2026  $
+                      
 
 
 
