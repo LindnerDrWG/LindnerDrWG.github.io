@@ -26,9 +26,9 @@ procedure numeric_erfinv(x);
    % iteration.
    if abs x >= 1.0 then rederr "erfinv x defined only for |x| < 1"
    else if x = 0.0 then 0.0 else
-   begin scalar const := sqrt(pi)/2.0,
+   begin scalar const   := sqrt(pi)/2.0,
                 epsilon := 1.0e-12,
-                dy, y := x;
+                dy, y   := x;
       repeat <<
          dy := const * exp(y^2)*(erf(y) - x);
          y  := y - dy

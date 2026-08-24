@@ -4,15 +4,21 @@ COMMENT
                       
 
 
-procedure tINV(p,df); 
-      <<
-       clear x;
-       if x=0.0 then -infinity else
-       if x=1.0 then +infinity else
-       rhs first num_solve(1-0.5*ibeta(df/2,0.5,df/(x^2+df))=p, x=2)
-      >>$
+procedure tINV(p,df);
+     << clear x;
+        rhs first num_solve(1-0.5*ibeta(df/2,0.5,df/(x^2+df))=p, x=2)
+     >> $
 
-% ========== alternative:
+on rounded $
+print_precision 5$
+
+for k:=0:10 do write {k/10, tINV(k/10,5)} ;
+
+% ***** error during function evaluation (e.g. singularity) 
+% currently NOT usable, use tINV_NR instead
+
+
+% ========== alternative numerical solution
 
 % tINV_NR needs tPDF and tCDF as helper
 
@@ -40,26 +46,8 @@ procedure tinv_NR(p,nu);
 
 % -------------------  Example usage     -------------------------
 
-on rounded $
-print_precision 5$
 
 for k:=0:10 do write {k/10, tINV_NR(k/10,5)} ;
-
-% currently NOT usable, use tINV_NR instead
-% ***** Newton method does not converge
-
-write {0.1, tINV(0.1,5)} ;
-write {0.2, tINV(0.2,5)} ;
-write {0.3, tINV(0.3,5)} ;
-% ...
-write {0.8, tINV(0.8,5)} ;
-write {0.9, tINV(0.9,5)} ;
-write {1.0, tINV(1.0,5)} ;
-
-
-for k:=0:10 do write {k/10, tINV(k/10,5)} ;
-* singularity
-
 
 COMMENT reference results.
 
@@ -78,7 +66,7 @@ R:
 [1] Inf
 
 
-R>
+MatLAB>
 [0.1, - 1.4759]
 [0.2, - 0.91954]
 [0.3, - 0.55943]

@@ -5,14 +5,8 @@ COMMENT
                       
                      
                       
-procedure moment(X,r);
-begin
-  scalar n, mx, sx;
-  n   := length(X);  
-  mx := (for each el in X sum el)/n; % mean
-  sx :=  for each el in X sum (el - mx)^r;
-  return sx/n
-end;
+procedure moment(X,A,r);
+         (for each el in X  sum (el - A)^r )/length(X);
 
 procedure skew(X);
     moment(X,3)/ sqrt(moment(X,2)^3); 

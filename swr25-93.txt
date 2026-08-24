@@ -6,6 +6,7 @@ COMMENT
                 
 
 % WARNING: do not use the reserved symbol lambda
+% You may use lambda_ .
 
 procedure poissonPDF(k, lam);
           exp(-lam) * lam^k / factorial(k);

@@ -12,7 +12,7 @@ COMMENT
   Reduce treats it symbolically rather than converting it to a decimal number.
   π stays as the exact symbol pi in algebraic expressions unless evaluation 
   to a floating-point number is forced.
-  To get a decimal value for pi, you must turn on the rounded switch. $
+  To get a decimal value for pi, you must turn ON the rounded switch. $
 
 
 % ---------- normPDF, phi -------------------------------

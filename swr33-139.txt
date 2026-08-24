@@ -15,20 +15,22 @@ COMMENT ------------------ Remark ----------------------------------
   the build-in numerical solver num_solve().
   We remember the 
                    DEFINITION of tCDF 
-   procedure tCDF(a,df);
-         ..  0.5 * ibeta(df/2, 0.5, df/(a^2+df)) 
-  and use their defining term. So we have:
-;
+     procedure tCDF(a,df);
+               ..  0.5 * ibeta(df/2, 0.5, df/(a^2+df)) 
+  and use their defining term for num_solve(). So we have:     $
+
           
 % ------------------------ tINV  ---------------------------------
 
-procedure tINV(p,df); 
-      <<
-       clear x;
-       if x=0.0 then -infinity else
-       if x=1.0 then +infinity else
-       rhs first num_solve(1-0.5*ibeta(df/2,0.5,df/(x^2+df))=p, x=2)
-      >>$
+% The following definition works because the derivative of ibeta 
+% is defined by a let  rule in the REDUCE source code.     - fjW
+
+
+procedure tINV(p,df);
+     << clear x;
+        rhs first num_solve(1-0.5*ibeta(df/2,0.5,df/(x^2+df))=p, x=2)
+     >> $
+
 
 % -------------------  Example usage     -------------------------
 
@@ -39,5 +41,5 @@ tinv(0.95,50);      % ans = 1.6759
 for i:=1:6 do write {i, tinv(0.99,i)};
 
 % gives  31.8205 6.9646 4.5407 3.7469 3.3649 3.1427
-;
+
 

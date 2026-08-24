@@ -13,8 +13,15 @@ define student = tPDF $
 % ------------------- Example usage ---------------------
 
 
+tPDF(x,f);     % we look at tPDF symbolically
+
+tPDF(1,5);     % we look at tPDF(1,5) unevaluated
+
+
 on rounded$
 print_precision 5$
+
+tPDF(1,5);     % we look at tPDF(1,5) evaluated
 
 X := for i:=-4:4 collect i;
 for each i in X  do write {i, student(i, 5) };

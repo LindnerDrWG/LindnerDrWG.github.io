@@ -41,6 +41,14 @@ begin
   return iBeta(r, k + 1, p)
 end;
 
+
+% if we leave out the comments, we could define 
+% nbinCDF as a 1-liner:
+
+procedure nbinCDF(k, r, p);
+          iBeta(r, k + 1, p);
+         
+
 % -------------------- Example usage ---------------------
 
 on rounded;
@@ -50,8 +58,8 @@ nbinCDF(1,2,0.5);
 
 % Example: maximal k=4 failed attempts with success
 % before r=3. Single success with p=0.30
-nbinCDF(4, 3, 0.30);        % result: 0.3529305
 
+nbinCDF(4, 3, 0.30);        % result: 0.3529305
 
 off rounded;   % switch to exakt mode
 nbinCDF(2, 2, 1/2);        % 11/16

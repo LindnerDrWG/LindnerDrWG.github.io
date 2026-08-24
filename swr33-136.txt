@@ -60,7 +60,7 @@ x  := df / (a^2 + df);
 
 % ------------------------- 2nd DEFINITION----------------------------;
 
-% Define the CDF by integrating the PDF from -infinity up to x
+% Define the CDF by integrating the PDF from -infinity up to x;
 % needs tPDF as helper
 
 procedure tPDF(x,f);  
@@ -81,9 +81,7 @@ $ ok
 % [1] 0.9177463
 
 
-
 % ------------------------- 3rd DEFINITION----------------------------;
-
 % under construction
 
 load_package specfn2;   %  HYPERGEOMETRIC lives there

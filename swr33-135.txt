@@ -16,6 +16,7 @@ procedure tPDF(x,n);
 
 % ------------------- Example usage ---------------------
 
+tPDF(x,n); 
 
 on rounded$
 print_precision 5$

@@ -15,6 +15,17 @@ procedure binoCDF(k,n,p);
 
 % -------------------- Example usage ---------------------
 
+% if switch rounded is off or not activated
+% binoCDF is 'only' evaluated symbolically,
+% i.e. iBeta does not return a number:
+
+binoCDF(4, 10, 0.5);       % no number back
+
+
+% if switch rounded is on i.e. numerically
+% evaluation is activated, then we get
+% a numeric result as a floating point number:
+
 on rounded $
 print_precision  5$
 

@@ -6,21 +6,16 @@ COMMENT
 
                       
 procedure moment(X,A,r);
-begin
-  scalar n, mom;
-  n   := length(X);  
-  mom := for each el in X  sum (el - A)^r;
-  return mom/n
-end;
+         (for each el in X  sum (el - A)^r )/length(X);
 
 % ------------------- Example usage ---------------------
 
 on rounded $
 print_precision 5$
 
-X := {  }$
+X := { 1 }$
 
 moment(X,A,3);
-print_moment(X,0,3);
+moment(X,0,3);
 
 

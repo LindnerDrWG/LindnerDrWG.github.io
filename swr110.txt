@@ -13,6 +13,12 @@ begin
   return mom/n
 end;
 
+% or in short:
+
+procedure moment(X,A,r);
+         (for each el in X  sum (el - A)^r )/length(X);
+
+
 % ------------------- Example usage ---------------------
 
 on rounded $
