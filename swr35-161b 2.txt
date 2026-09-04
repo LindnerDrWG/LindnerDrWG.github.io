@@ -1,0 +1,29 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.5-161.b
+                      by W.G. Lindner 2026  $
+                      
+
+%  REMARK
+%  a clean, lightning-fast and very short version 
+%  using iGamma without use of chi1PDF or chi2CDF
+%  but remembering that chi2CDF has defining term
+%      iGamma(k*0.5, x*0.5)
+
+
+procedure chi2INV(p,k);
+   << clear x;
+      rhs first num_solve( iGamma(k/2, x/2) = p, x)
+   >>;
+           
+           
+% ------------------- Example usage -----------------
+           
+on rounded $
+print_precision 5$
+
+chi2INV(0.95,10);        % 18.30704
+
+%% R> qchisq(0.95, df = 10)
+%%    [1] 18.30704
+
+

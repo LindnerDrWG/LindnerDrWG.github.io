@@ -1,0 +1,23 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.2-131
+                      by W.G. Lindner 2026  $
+                      
+          
+
+procedure expINV(p,m);        
+          - log(1-p)/m $
+          
+procedure quantile_exp(q,m);  
+          1/m * (-log(1-q)) $
+
+% ------------------- Example usage ---------------------
+
+on rounded$
+print_precision 5$
+
+
+expINV(0.50,1/700);
+
+
+

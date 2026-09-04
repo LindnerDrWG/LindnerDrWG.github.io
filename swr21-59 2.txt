@@ -1,0 +1,20 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 2.1-59
+                      by W.G. Lindner 2026  $
+                      
+                   
+         
+procedure binoPDF(x,n,p);
+          binomial(n,x)*p^x*(1-p)^(n-x) $
+       
+% -------------------- Example usage ---------------------
+       
+on rounded $
+print_precision 5$
+       
+% --- a.
+
+for i:=1:10 do write binoPDF(i, 10, 1/6);  
+
+

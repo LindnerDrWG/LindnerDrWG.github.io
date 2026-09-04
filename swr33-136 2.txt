@@ -1,0 +1,102 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.3-136
+                      by W.G. Lindner 2026  $
+                      
+               
+
+%                         Remark 
+COMMENT ..................................................
+
+   We define the cumulative t distribution tCDF(x,n) using 
+   the special function iBeta(a,b,x). 
+   The regularized incomplete beta function I_x(a,b) is
+            I_{x}(a,b):= iBeta(a,b,x).
+   The 'regularized' (name in Math) incomplete beta function 
+   is named 'nromalised' incomplete Beta in REDUCE and 
+   written iBeta(a,b,x). In short:
+   I_x(a,b) is represented by the ternary function ibeta(a,b,x) $
+
+
+% ------------------------- 1st DEFINITION----------------
+          
+procedure tCDF(a,df);
+   if a=0 then 0.5 else 
+   if a<0 then 0.5 * ibeta(df/2, 0.5, df/(a^2 + df)) else
+           1 - 0.5 * ibeta(df/2, 0.5, df/(a^2 + df));
+          
+
+% -------------------- Example usage ---------------------
+
+on rounded$
+print_precision 5$
+
+for i:=-4:4 do write {i, tCDF(i, 5) };
+$ ok
+
+%%% R
+%%% > pt(-4:4, df = 5) 
+%%%      -4      -3      -2.     -1.     0       1       2       3       4
+%%%  [1] 0.00516 0.01504 0.05096 0.18160 0.50000 0.81839 0.94903 0.98495 0.99483
+
+
+% ---------------- procedural step-by-step example -------
+
+% Task: calculate fcdf(1.5,10) via incomplete Beta function
+%       with comments by Google META AI
+
+on rounded;
+print_precision 8;
+a  := 1.5;
+% Handle the perfectly symmetric center case
+if a = 0 then 0.5;
+df := 10;
+% Transform argument for the incomplete Beta function
+x  := df / (a^2 + df);
+% ibeta(a, b, x) returns the regularized incomplete beta ratio
+0.5 * ibeta(df/2, 0.5, x);    % if a would be < 0
+1-0.5 * ibeta(df/2, 0.5, x);  % ✅ for a>0
+
+
+% ------------------------- 2nd DEFINITION----------------------------;
+
+% Define the CDF by integrating the PDF from -infinity up to x;
+% needs tPDF as helper
+
+procedure tPDF(x,f);  
+          1/(sqrt(f)*Beta(1/2,f/2))*(1+ x^2/f)^(-0.5*(f+1)) $
+
+procedure tcdf1(x, nu);
+   0.5 + num_int(tpdf(z, nu), z=(0 .. x)); 
+
+% ----- example usage
+
+on rounded;
+print_precision 5;
+
+tcdf1(1.5, 10); 
+$ ok
+
+% R> pt(1.5, df = 10)  reference value
+% [1] 0.9177463
+
+
+% ------------------------- 3rd DEFINITION----------------------------;
+% under construction
+
+load_package specfn2;   %  HYPERGEOMETRIC lives there
+
+procedure tcdf2(x, nu);
+   1/2 + x*gamma((nu+1)/2)/(sqrt(pi*nu)*gamma(nu/2))
+      * hypergeometric({1/2, (nu+1)/2}, {3/2}, -x^2/nu);
+
+% ----- example usage
+
+on rounded;
+print_precision 5;
+
+write tcdf2(1.5, 10);    
+
+
+% R> pt(1.5, df = 10)
+% [1] 0.9177463

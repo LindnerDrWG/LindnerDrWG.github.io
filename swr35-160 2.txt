@@ -1,0 +1,50 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.5-160
+                      by W.G. Lindner 2026  $
+                      
+                
+
+
+procedure chi2CDF(x, k);
+          if x<=0 or k<=0 then 0.0 
+          else iGamma(k*0.5, x*0.5) $
+
+% ------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+X := {1,2,4,8,16,32};
+write("x   chi2CDF(x)   P-value")$
+for each el in X do write {el,  chi2CDF(el,3), 1-chi2CDF(el,3)} ;
+
+
+COMMENT
+	
+[1, 0.19875, 0.80125]
+[2, 0.42759, 0.57241]
+[4, 0.73854, 0.26146]
+[8, 0.95399, 0.046012]
+[16, 0.99887, 0.001134]
+[32, 1.0,     5.2335e-7]
+
+
+% ------------------- Remark: R usage ---------------------
+COMMENT
+
+# Density at x = 3 with 4 degrees of freedom
+dchisq(3, df = 4)
+
+# Cumulative probability for X <= 5 with 4 degrees of freedom
+pchisq(5, df = 4)
+
+> pchisq(1, df = 3)
+[1] 0.198748
+
+# Critical value for alpha = 0.05 (95th percentile) with 4 degrees of freedom
+qchisq(0.95, df = 4)
+
+# Generate 10 random numbers from a chi-square distribution with 4 df
+rchisq(10, df = 4)
+
+;

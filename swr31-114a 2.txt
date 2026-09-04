@@ -1,0 +1,48 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.1-114
+                      by W.G. Lindner 2026  $
+                      
+
+
+COMMENT (a) ..............................................
+        this is a simple but stable version of normINV
+        using a user-defined inverse error function erfINV
+        found by CLAUDE AI, later optimized by F J Wright
+        ...............................................  $
+
+
+% ---------- inverse erf via Newton; normINV -------------
+
+on rounded; precision 10;
+
+procedure erfinv(y);
+  begin scalar x, dx;
+    x := y;       % initial guess
+    for i := 1:50 do 
+	  << dx := (erf(x)-y) / (2/sqrt(pi) * exp(-x^2));
+             x  := x - dx >>;
+    return x
+  end;
+
+procedure normINV(q,m,s);
+   begin  if q=0 then return "-Inf";
+          if q=1 then return "+Inf";
+          if 0<q and q<1 then 
+             return m + sqrt(2) * s * erfinv(2*q-1)
+    end$
+
+procedure stdnormINV(q); normINV(q,0,1) $
+
+
+% -------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+stdnormINV(0.8);
+stdnormINV(0.9);
+
+normINV(0.8, 0,1);
+normINV(0.6, 0,1);
+
+normINV(0.80, 170, 5);

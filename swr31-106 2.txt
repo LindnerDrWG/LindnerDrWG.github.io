@@ -1,0 +1,22 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.1-106
+                      by W.G. Lindner 2026  $
+                      
+                
+
+% error function erf is autoloaded
+
+procedure normCDF(x,m,s); 
+          1/2+erf((x-m)/(s*sqrt(2)))/2 $
+
+% =======================================================
+%  Example usage
+% =======================================================
+
+on rounded$
+print_precision 5$
+
+for i:=-3:3 do write {i, normCDF(i,0,1)};
+
+

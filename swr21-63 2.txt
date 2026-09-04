@@ -1,0 +1,37 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 2.1-63
+                      by W.G. Lindner 2026  $
+                      
+
+                 
+procedure binoCDF(k,n,p);
+          iBeta(n-k,k+1,1-p);
+
+%--- a.
+
+on rounded $
+print_precision 5 $
+
+For k:=30:35 do write binoCDF(k,100,0.3) ;
+
+
+%--- b.
+
+% FIRST version of binoINV using a bisection method:
+
+procedure binoINV(q,n,p);
+begin scalar a, b, m;
+      a:=0; b:=n;
+      while (b-a>1) do 
+         begin
+            m := 0.5*(a+b);
+            if binoCDF(m,n,p) < q then a:=m else b:=m;
+         end;
+      return  floor(b)
+end;
+ 
+
+binoINV(0.7, 100, 0.3);
+
+

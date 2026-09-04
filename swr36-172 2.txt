@@ -1,0 +1,19 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.6-172
+                      by W.G. Lindner 2026  $
+                      
+
+
+procedure paretoINV(p,m,a);
+          m * (1-p)^(-1/a) $
+
+% ------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+mu    := 2.5;
+alpha := 2;
+for p:=1:10 do write {p/10, paretoINV(p/10, mu, alpha)}
+
+paretoINV(0.25, 1,1);   % = 1.3333,  ok

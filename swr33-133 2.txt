@@ -1,0 +1,29 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.3-133
+                      by W.G. Lindner 2026  $
+                      
+
+procedure tPDF(x,f);  
+          1/(sqrt(f)*Beta(1/2,f/2))*(1+ x^2/f)^(-0.5*(f+1)) $
+
+define student = tPDF $
+
+
+% ------------------- Example usage ---------------------
+
+
+tPDF(x,f);     % we look at tPDF symbolically
+
+tPDF(1,5);     % we look at tPDF(1,5) unevaluated
+
+
+on rounded$
+print_precision 5$
+
+tPDF(1,5);     % we look at tPDF(1,5) evaluated
+
+X := for i:=-4:4 collect i;
+for each i in X  do write {i, student(i, 5) };
+
+

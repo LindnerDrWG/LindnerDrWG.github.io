@@ -1,0 +1,32 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 1.9-33
+                      by W.G. Lindner 2026  $
+                      
+
+%-- We use the 'nearest-rank method' for calculating the quantile.
+
+procedure quantile(X,p);
+begin scalar Xs, i, dim;
+      if  p = 100 then max(X);
+      if  p = 0 then min(X);
+      load_package assist;
+      dim(X) := length(X);
+      Xs     := sortnumlist(X); 
+      i      := ceiling(dim(X)*p/100);     %-- always round
+      return part(Xs, i)
+      % or  (part(Xs, i)+part(Xs, i))/2    %-- alternative
+end;
+
+% ------------------- Example usage ---------------------
+
+
+X:={1                  };
+% test
+
+on rounded $
+print_precision 5$
+
+quantile(X, 42);
+
+  

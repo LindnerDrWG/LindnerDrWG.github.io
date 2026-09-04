@@ -1,0 +1,23 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.7-179
+                      by W.G. Lindner 2026  $
+                      
+
+
+procedure weibullINV(p,lam,k);
+         abs( lam * ( -log(1-p) )^(1/k) ) $
+
+
+% ------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+p := {0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0}$
+for each y in p do write {y, weibullINV(y,1,5)} ;
+
+
+%%%%%%%%%%%
+% Interpret the answer of REDUCE. It seems 
+% p=1.0 is critical. Why? So we should cancel it.
+% TASK: formulate the loop using: for p:=0:10 ..

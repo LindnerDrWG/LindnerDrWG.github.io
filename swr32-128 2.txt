@@ -1,0 +1,22 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.2-128
+                      by W.G. Lindner 2026  $
+                      
+           
+
+procedure expCDF(x, m); if x<0 then 0 else  1-exp(-m*x) $
+
+% -------------------- Example usage ---------------------
+
+on rounded$
+print_precision 5$
+
+%%-- SOLUTION:            Pr(X>10|X>5) = Pr(X>10)/Pr(X>5) = 
+
+lambd := 1/10 $
+
+(1-expCDF(10, lambd)) / (1-expCDF(5, lambd));
+
+%%-- .. with 60.7% the refrigerator will work ok for another 5 years. 
+

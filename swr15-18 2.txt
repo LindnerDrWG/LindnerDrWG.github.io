@@ -1,0 +1,23 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 1.5-18
+                      by W.G. Lindner 2026  $
+                      
+                      
+procedure dsquare(lst);
+begin
+  scalar n, mu, Xbar;
+  n        := length(lst);  
+  mu       := for each el in lst sum el/n;  % mean
+  Xbar     := for each el in lst sum (el - mu)^2;
+  return Xbar/n
+end;
+
+% ------------------- Example usage ---------------------
+
+on rounded$
+print_precision 5$
+
+X :={4,36,45,50,75};
+dsquare(X);
+  

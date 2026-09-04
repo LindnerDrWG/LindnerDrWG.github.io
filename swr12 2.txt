@@ -1,0 +1,26 @@
+
+COMMENT
+                  STATISTICS WITH REDUCE ch. 1.2
+                             by W.G. Lindner 2026  $
+
+
+procedure VAR(lst);
+begin
+  scalar n, mu, ds;
+  n := length(lst);  
+  mu := (for each el in X sum el) / n;
+  ds := for each el in X sum (el - mu)^2;
+  return ds/n;
+end;
+
+% ------------------- Example usage ---------------------
+
+
+on rounded$
+print_precision 5$
+
+X := {4, 36, 45, 50, 75}$
+
+var(X);
+
+

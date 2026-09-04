@@ -1,0 +1,26 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 1.8-29
+                      by W.G. Lindner 2026  $
+                      
+
+procedure MODE(X);
+begin scalar maxx, L;
+      load_package assist;
+      L := frequency(X);
+      maxx:=first(L);
+      for i:=1:length(L) do 
+          if part(part(L,i),2) > part(maxx,2) 
+          then maxx:=part(L,i);
+      return part(maxx,1)
+end;
+
+% ------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+
+X := {1        };
+mode(X);
+  

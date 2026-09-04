@@ -1,0 +1,19 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 2.2-66
+                      by W.G. Lindner 2026  $
+                      
+
+procedure geoPDF(k,p);
+          p*(1-p)^k;
+
+% -------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+       
+% --- a.
+
+for k:=1:10 do write geoPDF(k, 1/6);  
+
+

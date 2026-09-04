@@ -1,0 +1,24 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 1.10-38
+                      by W.G. Lindner 2026  $
+                      
+
+                      
+procedure moment(X,A,r);
+begin
+  scalar n, mom;
+  n   := length(X);  
+  mom := for i := 1:n sum (part(X, i) - A)^r;
+  return mom/n;
+end;
+
+% ------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+%%% Your turn ...
+
+
+

@@ -1,0 +1,22 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.4-155
+                      by W.G. Lindner 2026  $
+                      
+
+
+procedure fCDF(x,df1,df2);
+          iBeta( 0.5*df1, 0.5*df2, x/(x+df2/df1))$
+
+procedure fINV_PAULSON(p,df1,df2);
+   begin
+     1;   % your task 
+   end;
+
+
+% ------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+X := {0.25, 0.5, 0.75, 0.999};
+for each i in X do write {i, finv_paulson(i,10,20)};

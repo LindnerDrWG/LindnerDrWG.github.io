@@ -1,0 +1,23 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.5-164
+                      by W.G. Lindner 2026  $
+                      
+              
+
+procedure chi2INV(p,k);
+           << clear x;
+           rhs first num_solve( iGamma(k/2, x/2) = p, x=2)
+           >>;
+           
+% ------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+for i:=1:10 do write {i/10,  chi2INV(i/10,10)} ;
+
+
+%% REMARK: actaully
+%% ***** Newton method converge only until p=0.5
+%% Check with chiINV_bisection or chi2INV_Newton.
+

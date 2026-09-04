@@ -1,0 +1,54 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.4-154b
+                      by W.G. Lindner 2026  $
+                      
+
+procedure fPDF(x,f1,f2);
+          sqrt(((f1*x)^f1*f2^f2)/(f1*x+f2)^(f1+f2)) / (x * beta(f1/2,f2/2)) $
+
+procedure fCDF(x,df1,df2);
+          iBeta( 0.5*df1, 0.5*df2, x/(x+df2/df1))$
+
+% ---------- Inverse F via Newton iteration ---------------------
+precision 10$
+
+procedure finv_NR(p,d1,d2);
+begin
+  scalar x0,x1,fx,dfx,iter,tol,maxiter,stop;
+  if (p<=0.0) or (p>=1.0) then <<
+     write "finv: p must lie strictly between 0 and 1";
+     return 0.0 >>;
+  tol := 1.0e-10;
+  maxiter := 100;
+  % starting guess: distribution mean when it exists, else 1
+  x0 := if d2 > 2.0 then d2/(d2-2.0) else 1.0;
+  iter := 0;
+  stop := 0;
+  while (iter < maxiter) and (stop = 0) do <<
+    fx  := fcdf(x0,d1,d2) - p;
+    dfx := fpdf(x0,d1,d2);
+    if abs(dfx) < 1.0e-300 then dfx := 1.0e-300;
+    x1 := x0 - fx/dfx;
+    if x1 <= 0.0 then x1 := x0/2.0;   % keep iterate in domain
+    if abs(x1-x0) < tol*(1.0+abs(x1)) then stop := 1;
+    x0 := x1;
+    iter := iter+1
+  >>;
+  return x0
+end;
+
+% ---------------- example calls --------------------------------
+
+on rounded $
+print_precision 5$
+
+X := {0.25, 0.5, 0.75, 0.999};
+for each i in X do write {i, finv_NR(i,10,20)};
+
+% checks:
+%on rounded;
+% finv_NR(0.95, 5, 10);
+% finv_NR(0.99, 2, 30);
+% finv_NR(0.50, 4, 4);
+
+

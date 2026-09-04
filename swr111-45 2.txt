@@ -1,0 +1,34 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 1.11-45
+                      by W.G. Lindner 2026  $
+                      
+                     
+                      
+procedure moment(X,A,r);
+         (for each el in X  sum (el - A)^r )/length(X);
+
+procedure skew(X);
+    moment(X,3)/ sqrt(moment(X,2)^3); 
+    
+% ------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5 $
+    
+on rounded $
+precision 5 $
+
+X:=
+{2,2,2,2,2,2,2,2,
+3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
+4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,6,
+6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+7,7,
+8,8,8,
+9,
+10}$
+
+skew(X);  % = 0.8080
+

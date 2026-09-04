@@ -1,0 +1,22 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.2-127
+                      by W.G. Lindner 2026  $
+                      
+           
+
+procedure expCDF(x, m); if x<0 then 0 else  1-exp(-m*x) $
+
+
+% ------------------- Example usage ---------------------
+
+
+on rounded$
+print_precision 5$
+
+%% -- SOLUTION:               Pr(X<=500) = 
+
+expCDF(10, 1/2000);
+
+%% -- .. with 22.2% the printer will work ok.
+

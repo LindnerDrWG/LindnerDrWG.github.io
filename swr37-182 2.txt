@@ -1,0 +1,29 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.7-182
+                      by W.G. Lindner 2026  $
+                      
+             
+
+procedure weibullPDF(x,a,b);
+          if (x<0) then 0.0 else
+          b/a*(x/a)^(b-1)*exp(-(x/a)^b) $
+
+% ------------------- Example usage ---------------------
+
+
+
+%  x=(0:1:10);               % values for x:  0 until 10 step 1
+%  b = 0.444;  T=0.767;      % parameter of Weibull-distribution
+%  a = 1/(T^b);              % adaption of parameters to MATLAB 
+%                            % calculate the Weibull-density
+%   pdfwb = wblpdf(x, a, b)
+
+
+on rounded $
+print_precision 5$
+
+b := 0.444;  
+T := 0.767;
+a := 1/(T^b);
+
+for x:=1:10 do write weibullPDF(x,a,b); 

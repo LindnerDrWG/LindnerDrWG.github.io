@@ -1,0 +1,27 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 1.4
+                             by W.G. Lindner 2026  $
+
+              
+procedure SD(lst);
+begin
+  scalar n, mu, diff_sum;
+  n := length(lst);  
+  if n = 0 then 0;  
+  mu := (for each el in lst sum el)/n;  % mean of list
+  diff_sum := for each el in lst sum (el - mu)^2;
+  return sqrt(diff_sum/n)
+end;
+        
+procedure SEM(X);
+          sd(X) / sqrt(length(X));
+
+% ------------------- Example usage ---------------------
+
+on rounded$
+print_precision 5$
+
+X := {4,36,45,50,75}$
+sem(X);
+  

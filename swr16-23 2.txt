@@ -1,0 +1,22 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 1.6-23
+                      by W.G. Lindner 2026  $
+                      
+                      
+procedure rms(lst);
+begin
+  scalar n, me;
+  n        := length(lst);  
+  me       := for each el in lst sum el^2;  % mean
+  return sqrt(me/n)
+end;
+
+% ------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5$
+
+X := {1       }$
+rms(X);
+  

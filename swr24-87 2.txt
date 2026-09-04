@@ -1,0 +1,26 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 2.4-87
+                      by W.G. Lindner 2026  $
+                      
+               
+
+procedure hgPDF(NN,RR,n,r); 
+          binomial(RR,r)*binomial(NN-RR, n-r)/binomial(NN,n)$
+
+procedure hgCDF(NN,RR,n, x);
+          for k:=0:floor(x) sum hgPDF(NN,RR,n,k) $ % 
+
+% -------------------- Example usage ---------------------
+
+on rounded$
+print_precision 5$
+
+hgCDF(100,20,10,2);
+
+
+%%%%%%%%%%%  Check with MatLab
+%  SOLUTION: MATLAB> p = hygecdf(2, 100,20,10) = 0.6812
+%  --                            x  M   K  N
+%  --                            x  N   R  n
+

@@ -1,0 +1,22 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 2.5-94
+                      by W.G. Lindner 2026  $
+                      
+              
+
+% WARNING: do not use the reserved symbol lambda
+
+procedure poissonPDF(k, lam);
+          exp(-lam) * lam^k / factorial(k);
+
+
+% -------------------- Example usage ---------------------
+
+on rounded$
+print_precision 5$
+
+for k:=0 step 1 until 10 do write{k, poissonPDF(k,2.5)} ;
+
+
+

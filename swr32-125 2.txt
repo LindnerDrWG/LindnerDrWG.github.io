@@ -1,0 +1,21 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 3.2-125
+                      by W.G. Lindner 2026  $
+                      
+                
+
+procedure expCDF(x, m); if x<0 then 0 else  1-exp(-m*x) $
+
+
+% ------------------- Example usage ---------------------
+
+on rounded$
+print_precision 5$
+
+% ----- a.
+
+X := for i:=0:10 collect i;
+for each i in X  do write {i, expCDF(i,5) };
+
+

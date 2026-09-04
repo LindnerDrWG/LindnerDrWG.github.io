@@ -1,0 +1,83 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 1.11-42
+                      by W.G. Lindner 2026  $
+                      
+                      
+procedure SUM1(X); 
+          for each el in X sum el $
+          
+procedure mean(X); 
+          Sum1(X)/length(X)$
+
+%%%  sd = sqrt(Sum((X-Mean(X))^2) /(length(X)-1)) 
+
+procedure sd(X);
+begin
+  scalar n, mx, sx;
+  n   := length(X);  
+  mx  := mean(X);
+  sx := for each el in X sum (el - mx)^2;
+  return sqrt(sx)/(n-1)
+end;
+
+
+procedure moment(X,r);
+begin
+  scalar n, mx, sx;
+  n   := length(X);  
+  mx  := mean(X);
+  sx := for each el in X sum (el - mx)^r;
+  return sx/n
+end;
+
+procedure skew(X);
+    moment(X,3)/ sqrt(moment(X,2)^3);   %--- compatibel with MatLab
+    
+    
+%%% skewR =Sum((X-Mean(X))^3)/ ((length(X)-1)*sd(X)^3)   
+procedure skewR(X);                     %--- R, default 
+begin
+  scalar n, mx, sx;
+  n   := length(X);  
+  mx  := mean(X);
+  sx := for each el in X sum (el - mx)^3;
+  return sx/((n-1)*sd(X)^3)
+end;
+  
+  
+%%% skew1 = 1/length(X) * Sum(( (X - Mean(X)) / sd(X))^3  )  
+procedure skew1(X);                     %---R, type=3
+begin
+  scalar n, mx, sx;
+  n   := length(X);  
+  mx  := mean(X);
+  sx  := for each el in X  sum ((el - mx) / sd(X))^3;
+  return sx/n
+end;
+
+
+%%% skew2 = block([n: length(X)], sqrt(n*(n-1))/(n-2)*skew(X) )) 
+procedure skew2(X);                     %---- R, type=2 
+begin
+  scalar n, mx, sx;
+  n   := length(X);  
+  return sqrt(n*(n-1))/(n-2)*skew(X) 
+end;
+
+% ------------------- Example usage ---------------------
+
+
+on rounded $
+print_precision 5 $
+
+X := {1     }$ 
+
+skew(X);    %  = 0.1060  [MatLAB, R type 1] 
+
+skewR(X);   %  = 0.1006  [R]
+
+skew1(X);   %  = 0.0905  [R, type=3] 
+
+skew2(X);   %  = 0.1258  [R, type=2] */ ;
+

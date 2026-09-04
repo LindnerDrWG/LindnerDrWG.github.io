@@ -1,0 +1,30 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 1.12-46a
+                      by W.G. Lindner 2026  $
+                      
+                      
+procedure moment(X,r);
+begin
+  scalar n, mx, sx;
+  n   := length(X);  
+  mx := (for each el in X sum el)/n; % mean
+  sx :=  for each el in X sum (el - mx)^r;
+  return sx/n;
+end;
+
+procedure kurtosis(X);
+          moment(X,4)/moment(X,2)^2;   %--- compatibel with MatLab
+    
+% ------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5 $
+
+X := {4,36,45,50,75};
+kurtosis(X);         % = 2.347 or 1.9129
+
+Y := {4,4,4,5,5,5,5,5,5,6,6,6,6,6,6,6,6,6,7,7,7,8,8,8,10,10,10,12,12,12,13,13,13};
+kurtosis(Y);         % = 2.2958
+
+

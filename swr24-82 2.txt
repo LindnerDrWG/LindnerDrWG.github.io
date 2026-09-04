@@ -1,0 +1,21 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 2.4-82
+                      by W.G. Lindner 2026  $
+                      
+                
+
+%  we choose the paramerization w.r.t. the urn model:
+%               N  R  n r
+
+procedure hgPDF(NN,RR,n,r); 
+          binomial(RR,r)*binomial(NN-RR, n-r)/binomial(NN,n)$
+
+% -------------------- Example usage ---------------------
+
+on rounded$
+print_precision 5$
+
+for i:=0:5 do write hgPDF(100,20,10, i);
+
+

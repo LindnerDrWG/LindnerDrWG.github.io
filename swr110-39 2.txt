@@ -1,0 +1,36 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 1.10-39
+                      by W.G. Lindner 2026  $
+                      
+
+                      
+procedure SUM1(X); 
+          for each el in X  sum el $
+
+procedure DOT(A,B); 
+          for i := 1:length(A) sum part(A,i)*part(B,i)$
+          
+procedure meanF(X,f); 
+          dot(X,f)/Sum1(f)$
+
+procedure momentF(X,f,r);
+begin
+  scalar n, mf, diff;
+  n    := length(X);  
+  mf   := meanF(X,f);
+  diff := for each el in X   collect (el - mf)^r;
+  return dot(f, diff) / sum1(f)
+end;
+
+% ------------------- Example usage ---------------------
+
+
+on rounded $
+print_precision 5 $
+
+X := {61, 64, 67, 70, 73};   % class mark
+f := {5, 18, 42, 27, 8};     % frequency
+
+momentF(X,f,2);
+

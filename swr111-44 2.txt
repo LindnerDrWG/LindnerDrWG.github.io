@@ -1,0 +1,23 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 1.11-44
+                       by W.G. Lindner 2026  $
+                      
+                    
+                      
+procedure moment(X,A,r);
+         (for each el in X  sum (el - A)^r )/length(X);
+
+procedure skew(X);
+    moment(X,3)/ sqrt(moment(X,2)^3);   %--- compatibel with MatLab
+    
+    
+% ------------------- Example usage ---------------------
+
+on rounded $
+print_precision 5 $
+
+X:={5,10,15,20,30,50,80,150,300,500}$
+
+skew(X);  % = 1.5598
+
