@@ -1,0 +1,108 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 4.10 b
+                      by W.G. Lindner 2026  $
+                      
+             
+%|         WILCOXON two sample signed rank test
+
+% ----------------------- helper functions ----------------
+procedure SUM_(X);  for each el in X sum el$ 
+procedure mean(X);  Sum1(X)/length(X)$
+procedure sp(X,Y);  % scalar product alias inner product
+   for i := 1:length(X) sum part(X,i) * part(Y, i)$
+procedure quicksort(l);  % - by Gemini AI
+   if l = {} then {}
+   else begin
+      scalar pivot, rest_l, left, right, x;
+      pivot := first(l);  rest_l := rest(l);
+      left  := {};         right := {};
+      for each x in rest_l do
+         if x <= pivot then left  := x . left
+                       else right := x . right;
+      return append(quicksort(left), pivot . quicksort(right));
+   end;
+procedure putNTH(l,k,v);
+ begin scalar a,b; integer i;
+    a:=l; b:={};
+    for i:=1 step 1 until k-1 do
+         <<b:=append(b,{first a}); a:=rest a>>;
+    b:=append(b,{v}); a:=rest a;
+    return append(b,a)
+ end;
+procedure crank_aux(v, sL, nL);           
+% v : element of list L, sL: sorted L; nL: length L    
+% crank.red - Numeric Recipes CRANK, p.510 for REDUCE
+% Lisp'ish VERSION: W must be sorted increasingly
+% returns S, and W is modified in place with averaged ranks  
+   begin scalar positions:={};
+      for k:=1:nl do
+          if part(sl,k) = v 
+             then positions := append(positions, {k});
+      return sum_(positions) / length(positions)
+    end;
+procedure  crank(w);     % w should be sorted
+begin scalar s, n;
+    s := quicksort(w);   % or sortnumlist(w) of package assist
+    n := length(w);
+    return for i:=1:n collect crank_aux( part(w,i), s, n) 
+END ;
+procedure correspond(X,soX);  
+begin scalar n:=length(X);
+   M  := for i:=1:n collect 0;
+   rX := cRank(soX);
+   for j:=1:n do for i:=1:n do 
+       if    part(soX,i)=part(X,j) 
+       then  M := putnth(M, j, part(rX,i));
+   return M;
+END;
+define    DIM  = length $
+define    DOT  = sp $
+define    SORT = quicksort $
+
+
+             
+%-- We abstract the procedure of 4.11a to function 
+%--'signrank2' alias 'WILCOXON two sample signed rank test'
+
+%#########################################################
+procedure   signrank2(X,Y); 
+%#########################################################
+BEGIN scalar n,D,aD,sD,cD, Tp,Tm,T0,Wp,Wm,T_;
+    n  := length(X);
+    D  := for i:=1:n collect part(X,i) - part(Y,i) ;  
+    aD := map(abs, D); 
+    sD := sort(aD);
+    cD := correspond(aD,sD);
+    Tp := for i:=1:n collect if part(D,i)>0 then 1 else 0;   
+    Tm := for i:=1:n collect if part(D,i)<0 then 1 else 0;  
+    T0 := for i:=1:n collect if part(D,i)=0 then 1 else 0; 
+    Wp := dot(Tp, cd);     
+    Wm := dot(Tm, cd);
+    T_ := min(Wp,Wm);
+    write("___ signrank2 ___");
+    write "Wp_= ", Wp;
+    write "Wm_= ", Wm;
+    write " T = ", T_
+    %(matrix( ["Wp","Wm", "T"], [Wp,Wm,T] )) 
+END;
+%----------------------------------------------------------
+
+
+% TEST with 1st  example:
+
+on rounded $
+print_precision 5$
+
+X := {6.1, 6.0, 8.2, 7.6, 6.5, 5.4, 6.9, 6.7, 7.4, 5.8};
+Y := {5.2, 7.9, 3.9, 4.7, 5.3, 7.4, 4.2, 6.1, 3.8, 7.3};
+
+signrank2(X,Y);
+
+
+% 2nd example fig.40, ok.
+
+X := {7.8, 6.6, 6.5, 7.4, 7.3, 7.0, 6.4, 7.1, 6.7, 7.6, 6.8};
+Y := {7.0, 7.6, 6.5, 9.0, 7.3, 6.0, 4.4, 8.1, 4.2, 7.8, 5.8};
+signrank2(X,Y);
+
+

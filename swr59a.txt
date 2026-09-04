@@ -1,0 +1,131 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 5.9 a
+                      by W.G. Lindner 2026  $
+                      
+
+% ---------------------- helper functions ------------------
+random_new_seed(1)$ % Seeding recommended before generating
+procedure rnd();       random(10000000)/10000000.0 $
+procedure randlist(n); for i:=1:n collect rnd() $
+procedure sum_(lst);   for each el in lst sum el $ 
+procedure mean(lst);   sum_(lst)/length(lst) $ 
+procedure listmake(m); for i:=1:m collect 0$
+procedure putNTH(L,k,v); begin scalar a:=L, b:={};
+    for i:=1:(k-1) do
+         << b:=append(b,{first a}); a:=rest a>>;
+    b := append(b,{v}); a := rest a;
+    return append(b,a) end;  
+    %  check: putnth({1,2,3},2,9);   --> {1,9,3};
+    % sometime read 2-times in Input Editor ------------ ??
+define    dim = length $
+
+% --------------------------------------------------------
+%            BOOTSTRAPci for confidence interval
+% ---------- step-by-step --------------------------------
+
+COMMENT EXAMPLE from AskPython
+-- To understand the need for bootstrap sampling let’s consider an 
+-- example, suppose we want to calculate the average age of 1000 
+-- employees working for a particular company. 
+-- The first approach could be to ask all the 1000 employees their  
+-- age and then calculate the mean age.
+-- This can be a tedious task and a time-consuming approach, 
+-- another method is to consider a sample of 5 employees and collect 
+-- their ages. This process can be repeated 20 times, and
+-- then average the collected age data of 100 employees. 
+-- This average age would be the estimate of all 1000 employees. $
+
+
+%-- FIRST We follow the example step by step.
+%-- a. - calculate the estimated population mean age
+
+on rounded $
+print_precision $
+
+X := {25, 30, 35, 40, 45, 50, 55, 60, 65, 70}$
+
+n  := dim(X);
+numSamples := 3;   %-- choose number of bootstrap samples
+
+%-- get random index r to resample with replacement from the 
+%-- original sample to generate a bootstrap sample.
+
+r := 1 + random(10);
+
+%-- create a list to save the bootstrap results of 10 drawings
+M := listmake(n);
+
+%-- create a list as container to save the means of the drawings
+bootstrapMeans := listmake(numSamples);
+
+%-- now resample with replacement from the original sample X to
+%-- generate a bootstrap sample in M:
+
+for j:=1:numSamples do  %-- perform bootstrap sampling
+     begin           
+     for  i:=1:n do 
+            begin r := 1 + random(10);
+              M := putNTH( M, i, part(X,r));
+              write M;
+              % Now calculate the mean age of the 
+              % bootstrap sample M; this calculated mean is 
+              % stored in list bootstrapMeans:
+              bootstrapMeans := putNTH( bootstrapMeans, j, Mean(M));
+              write bootstrapMeans
+            end;
+end;
+
+%-- Now we calculate the estimated population mean age
+estimatedMean := Mean(bootstrapMeans);
+
+
+%-- b. - define a percentile function to calc CI.
+%-- To calculate the confidence interval with method 'percentile',
+%-- we need the helper function percentile():
+
+% Example:  90 % percentile of sorted X
+
+X := {25, 30, 35, 40, 45, 50, 55, 60, 65, 70}$
+load_package assist$
+part(sortnumlist(X), ceiling(10 * 90 / 100));
+%    {25,30,..,65,70}      9       --> 65, ok                
+
+COMMENT
+  # Percentiles divide a ranked data set into 100 equal parts. 
+  # Each (ranked) data set has 99 percentiles that divide it into 100
+  # equal parts. The 𝑘th percentile is denoted by 𝑃𝑘, where 𝑘 is an 
+  # integer in the range 1 to 99. 
+  # For instance, the 25th percentile is denoted by 𝑃25.   $
+
+load_package assist$
+procedure percentile(X, perc);      
+     part( sortnumlist(X), ceiling( length(X) * perc/ 100));
+
+%% SOMETIMES DOES NOT WORK ?? 
+
+
+%- c. -  Bootstrap Sampling for Confidence Interval (CI).
+%  -- calc confidence intervals via percentiles for the
+%  -- bootstrapMeans
+
+bootstrapMeans := {47, 50, 51.5};   %-- fix bsMeans from above
+
+ci1 := percentile(bootstrapMeans, 98.5);   
+ci2 := percentile(bootstrapMeans, 2.5);
+
+% ... calculate the 90% confidence interval
+
+ci1 := percentile(bootstrapMeans, (100-90)/2);   % = 5 %
+ci2 := percentile(bootstrapMeans, (100+90)/2);   % = 95 %
+
+confidenceIntervall := {ci1,ci2};
+
+
+COMMENT #################
+
+bootstrapMeans : [47, 50, 51.5];
+%o18	
+ci1 : 51.5
+ci2 :  47
+confidenceIntervall : [ci1,ci2]= [47, 51.5]

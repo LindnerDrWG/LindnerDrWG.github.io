@@ -6,8 +6,8 @@ COMMENT
                 
 
 % ---------- inverse erf and normINV -----------------
-% this code is from Gemini AI with minor corrections
-% It implements a Newton-Raphson algorithm
+% this code is from Gemini AI with minor corrections.
+% It implements a Newton-Raphson algorithm.
 
 % load_package specfn;   -- erf is autoloaded
 

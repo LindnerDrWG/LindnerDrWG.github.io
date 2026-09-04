@@ -1,6 +1,6 @@
 
 COMMENT
-           STATISTICS WITH REDUCE ch. 2.2-69
+           STATISTICS WITH REDUCE ch. 2.2-70
                       by W.G. Lindner 2026  $
                       
 

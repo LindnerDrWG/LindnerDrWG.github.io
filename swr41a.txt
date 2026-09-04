@@ -1,0 +1,103 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 4.1 a
+                      by W.G. Lindner 2026  $
+                      
+
+%|          Z-Test alias Gauss test
+
+% ------------------- helper functions ---------------------
+%   To calculate the Z-TEST we need the functions
+%   stdnormCDF() and stdnormINV() as helper.    
+precision 10;
+procedure normCDF(x,m,s); 1/2+erf((x-m)/(s*sqrt(2)))/2 $
+procedure stdnormCDF(x);  normCDF(x, 0,1);   
+procedure normINV(q,m,s);
+     if q=0 then  infinity else if q=1 then -infinity else     
+     if 0<q and q<1 then
+     begin scalar y := 2*q-1, xx;
+        if y = 0 then return 0;
+        clear x;
+        xx := num_solve(erf x = y, x = y); % a list of equations
+        xx := rhs first xx;
+        return m + sqrt(2) * s * xx
+     end$
+procedure stdnormINV(q); normINV(q,0,1)$
+procedure MEAN(X);  (for each el in X sum el)/length(X);
+
+% ------------------- step-by-step solution -------------
+
+on rounded $
+print_precision 5 $
+
+Write "--- EXAMPLE : female blood pressure ---";
+
+clear X;
+
+X  := {141.5, 152.3, 121.2, 123.0, 151.6, 124.8, 
+       138.9, 137.4, 145.6, 135.6, 135.4, 121.5}; % given sample
+
+mu0   := 124.6;                          
+sigma := 14.5$
+alpha := 0.05$
+n     := length(X);   % data length
+
+write("- a. - computing the test statistic Z")$
+
+Z    := sqrt(n)*(mean(X) - mu0)/sigma; %-- test statistics : critical value 
+u975 := stdnormINV(1-alpha/2);         %-- two-sided, quantile; alpha/2 = 0.025
+p    := 1 - stdnormCDF(Z);             %-- p-value
+
+% For a significance level 𝛼=0.05, the 95% two sided confidence 
+% interval (CI) for the population mean is calculated via
+
+X  := {141.5, 152.3, 121.2, 123.0, 151.6, 124.8, 
+       138.9, 137.4, 145.6, 135.6, 135.4, 121.5}; % given sample
+
+CIleft  := mean(X) - u975*sigma/sqrt(n);
+CIright := mean(X) + u975*sigma/sqrt(n);
+CI      := {CIleft, CIright};
+
+%%%%%%%%
+
+on rounded$
+precision 8$
+print_precision 5$
+
+X := {0.9,0.95,0.975,0.99}$
+
+matrix M(5,20)$
+        
+Write "Please, wait some time ... START:";
+<<
+   for f:=1:20 do M(1,f) := f$
+   for f:=1:20 do M(2,f) := tINV1(part(X,1),f)$
+   for f:=1:20 do M(3,f) := tINV1(part(X,2),f)$
+   for f:=1:20 do M(4,f) := tINV1(part(X,3),f)$
+   for f:=1:20 do M(5,f) := tINV1(part(X,4),f)$
+>>;
+
+%%%%%%%%%%%% In case normINV does not work for you
+%%%%%%%%%%%% you may use this version by fjW
+
+let erf (~x) => sign x
+    when numberp x and abs(x)>=5 and lisp !*rounded;
+
+procedure numeric_erfinv(x);
+   if abs x >= 1.0 then rederr "erfinv x defined only for |x| < 1"
+   else if x = 0.0 then 0.0 else
+   begin scalar const   := sqrt(pi)/2.0,
+                epsilon := 1.0e-12,
+                dy, y   := x;
+      repeat <<
+         dy := const * exp(y^2)*(erf(y) - x);
+         y  := y - dy
+      >> until abs dy < epsilon;
+      return y
+   end;
+ 
+procedure normINV(q,m,s);
+   if q=0 then -infinity else if q=1 then infinity else
+   if 0<q and q<1 then 
+          m + sqrt(2) * s * numeric_erfinv(2*q-1);
+
+procedure stdnormINV(q); normINV(q,0,1)$

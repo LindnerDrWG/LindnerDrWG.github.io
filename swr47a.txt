@@ -1,0 +1,109 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 4.7 a
+                      by W.G. Lindner 2026  $
+                  
+    
+%|         varTest II
+             
+% ------------------- helper functions ---------------------
+procedure fCDF(x,df1,df2);                         % see 149
+          iBeta( 0.5*df1, 0.5*df2, x/(x+df2/df1))$
+procedure fINV(p,df1,df2);  << clear x;
+   rhs first num_solve(iBeta(0.5*df1,0.5*df2,x/(x+df2/df1))=p, x=2) >>$
+   % maybe x instead x=2 
+%%%%%%(( us finv_NR in case fIMV does not work
+procedure fPDF(x,f1,f2);
+          sqrt(((f1*x)^f1*f2^f2)/(f1*x+f2)^(f1+f2)) / (x * beta(f1/2,f2/2)) $
+procedure fCDF(x,df1,df2);
+          iBeta( 0.5*df1, 0.5*df2, x/(x+df2/df1))$
+procedure finv_NR(p,d1,d2);   %-- choose 0<p<1 (!)
+%% use if 
+begin
+  scalar x0,x1,fx,dfx,iter,tol,maxiter,stop;
+  tol := 1.0e-10; maxiter := 100;
+  x0 := if d2 > 2.0 then d2/(d2-2.0) else 1.0;
+  iter := 0; stop := 0;
+  while (iter < maxiter) and (stop = 0) do <<
+    fx  := fcdf(x0,d1,d2) - p;
+    dfx := fpdf(x0,d1,d2);
+    if abs(dfx) < 1.0e-300 then dfx := 1.0e-300;
+    x1 := x0 - fx/dfx;
+    if x1 <= 0.0 then x1 := x0/2.0;   % keep iterate in domain
+    if abs(x1-x0) < tol*(1.0+abs(x1)) then stop := 1;
+    x0 := x1;  iter := iter+1  >>;
+  return x0
+end;
+%%%%%%%%%  ))
+procedure SD(lst);
+   begin scalar n, mu, ds;
+     n := length(lst);  
+     mu := (for each el in lst sum el) / n;
+     ds := for each el in lst sum (el - mu)^2;
+     return sqrt(ds/(n-1))       % with n-1, sample
+   end;
+procedure MEAN(X);  (for each el in X sum el)/length(X);
+procedure SUM_(X);  (for each el in X sum el);
+define    DIM = length$
+
+
+%#################################################
+%     EXAMPLE:  Groundwater sulfate concentrations
+%#################################################
+% -- WARNING: do not change the order of X and Y! 
+% --          See remark 3 in the text! 
+
+on rounded $
+print_precision 5$
+
+X := {560, 530, 570, 490, 510, 550, 550, 530}$
+Y := {600, 590, 590, 630, 610, 630}$
+
+m := dim(X) $       %-- length of samples */
+n := dim(Y) $
+
+df1 := m-1  $       %-- degrees of freedom */ $
+df2 := n-1  $
+
+s1 := sd(X) ;       %-- standard deviations */ $
+s2 := sd(Y) ;
+
+T_ := s1*s1/(s2*s2);   %-- test statistic; denoted F in CAS R
+
+pValue := min{2*fCDF(T_,df1,df2), 2*(1-fCDF(T_,df1,df2)) };
+
+%-- calculate the confidence interval */
+
+alpha := 0.05 ;             %-- significance level 
+
+critValue := fCDF(alpha/2, df1,df2);    %-- critical Value 
+
+Falpha1 := fINV(alpha/2, df1,df2);       % -- F quantile 
+
+Falpha2 := fINV(1-alpha/2, df1,df2) ;
+
+lcl := T_ * 1/fINV(1-alpha/2, df1,df2);   %-- lower confidence interval 
+ucl := T_ * 1/fINV(alpha/2, df1,df2);     %-- upper confidence interval
+
+CI := {lcl, ucl};                        %-- confidence intervall */;
+
+if (pValue < 1-alpha) then write( "accept H0") else write("reject H0");
+
+COMMENT  DECISION:
+-- Gimond: "So for a two-tailed test, p = 0.42. With such a high 
+-- value, we cannot reject the null and therefore can state that for
+-- all intents and purposes, the variances between both populations 
+-- are the same, i.e. the observed variability between both s
+-- can be explain by chance alone.      $
+
+
+COMMENT ---------------------------------------- Results
+
+T         : 2.1163
+pValue    : 0.42634
+critValue : 5.3026e-5
+Falpha1   : 0.18921
+Falpha2   : 6.8531
+lcl       : 0.30882
+ucl       : 11.185
+accept H0
+$

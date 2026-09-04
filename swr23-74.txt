@@ -16,7 +16,7 @@ COMMENT ------------------------------------------------------------
   -- The number of trials (i.e. houses) this takes is therefore k+5=n.
   -- What we are interested in is the number of houses, 
   -- so we substitute k = n − 5 into a nbinPDF(5, 0.4) mass function:
--------------------------------------------------------------------- ;
+-------------------------------------------------------------------- $
 
 on rounded $
 print_precision 5$

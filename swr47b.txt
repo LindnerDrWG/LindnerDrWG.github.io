@@ -1,0 +1,68 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 4.6 b
+                      by W.G. Lindner 2026  $
+                      
+%|         varTest II
+
+             
+% ------------------- helper functions ---------------------
+procedure fCDF(x,df1,df2);                         % see 149
+          iBeta( 0.5*df1, 0.5*df2, x/(x+df2/df1))$
+procedure fINV(p,df1,df2);  << clear x;
+   rhs first num_solve(iBeta(0.5*df1,0.5*df2,x/(x+df2/df1))=p, x=2) >>$
+procedure SD(lst);
+   begin scalar n, mu, ds;
+     n := length(lst);  
+     mu := (for each el in lst sum el) / n;
+     ds := for each el in lst sum (el - mu)^2;
+     return sqrt(ds/(n-1))       % with n-1, sample
+   end;
+procedure MEAN(X);  (for each el in X sum el)/length(X);
+procedure SUM_(X);  (for each el in X sum el);
+define    DIM = length$
+
+% ----------------------------------------------------------
+procedure varTest(X, Y, alpha);  
+% ----------------------------------------------------------
+begin scalar n,m, s1,s2, df1,df2, T_, p, lCI,uCI;
+      m := dim(X);                
+      n := dim(Y);
+      df1 := m-1;                 
+      df2 := n-1;                
+      s1 := sd(X);               
+      s2 := sd(Y);
+      T_ := s1*s1/(s2*s2);
+      p := min{2*fCDF(T_,df1,df2), 2*(1-fCDF(T_,df1,df2))};
+%%% the following both lines do not work ------------------- ???
+      lCI := T_ * 1/fINV(1-alpha/2, df1,df2);     
+      uCI := T_ * 1/fINV(  alpha/2, df1,df2);
+      CI := {lCI, uCI}; 
+      if (p < 1-alpha) then write("... accept H0") 
+                        else write("... reject H0");
+END;
+
+
+%#################################################
+%     EXAMPLE:  Groundwater sulfate concentrations
+%#################################################
+% -- WARNING: do not change the order of X and Y! 
+% --          See remark 3 in the text! 
+
+on rounded $
+print_precision 5$
+
+X := {560, 530, 570, 490, 510, 550, 550, 530}$
+Y := {600, 590, 590, 630, 610, 630}$
+
+vartest(X, Y, 0.05);
+
+
+COMMENT ----------------------------------- result:
+
+... accept H0
+┌                                  ┐
+│   T     p-value   CI.l     CI.h  │
+│                                  │
+│ 2.1163  0.42634  0.30882  11.185 │
+└                                  ┘
+$

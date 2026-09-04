@@ -1,0 +1,203 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 5.7 a
+                      by W.G. Lindner 2026  $
+                      
+%|          BOOTSTRAP for dependend samples
+
+COMMENT  .......... random() ..........................
+We quote the REDUCE documentation:
+
+7.1.12 RANDOM
+random(n) returns a random number 𝑟 in the range 0≤ 𝑟 <𝑛. 
+A type error occurs if the value of the argument is not 
+a positive integer in algebraic mode, or positive number 
+in symbolic mode. For example:    random(1000);  ->  191
+
+7.1.13 RANDOM_NEW_SEED
+random_new_seed(n) reseeds the random number generator to 
+a sequence determined by the integer argument 𝑛. 
+It can be used to ensure that a repeatable pseudo-random 
+sequence will be delivered regardless of any previous use 
+of random [..].         
+REMARK:                          
+RANDOM(n) returns an integer in [0, n-1], so dividing by n  
+approximates a uniform distribution on [O,1].  ........  $
+
+
+% ---------------------- helper functions ------------------
+random_new_seed(1)$ % Seeding recommended before generating
+procedure rnd();       random(10000000)/10000000.0 $
+procedure randlist(n); for i:=1:n collect rnd() $
+procedure sum_(lst);   for each el in lst sum el $ 
+procedure mean(lst);   sum_(lst)/length(lst) $ 
+procedure SD(lst);
+begin scalar n, mu, ds, n:=length(lst);
+  mu := (for each el in lst sum el)/n;  % mean
+  ds := for each el in lst sum (el - mu)^2;
+  return sqrt(ds/n)
+end$
+define    dim = length $
+
+% --------------------------------------------------------
+%            EXAMPLE: from the script
+%            BOOTSTRAP for dependend samples
+% --------------------------------------------------------
+%  Consider the sample X= {4,5,4,7,2}.
+%  eEtimate the standard deviation of the bootstrap distribution.
+
+on rounded $
+
+COMMENT FIRST we do some experiments with random
+%       to get aquinted with it.
+% >  PLEASE do/interpret the following commands line-by-line
+% >  in order to get a solide intuition of this theme
+
+% 1. we generate 5 random's 0 .. 1
+randlist(5);
+
+% 2. we now generate 5 random numbers which are in {1,2,3}.
+for i:=1:5 collect random(3);
+
+% 3. Now we pick randomly elements of a list X.
+%    Please, run this example several times to watch the effect: 
+ 
+X := {2,1,3,4,7};
+n := dim(X)$
+for i:=1:10 collect ( 1 + random(dim(X)));
+for i:=1:10 collect part(X,1 + random(dim(X)));
+
+% 4.  here we construct an array T as Container 
+T_ := for i:=1:5 collect 0;
+
+% --------------------------------------------------------------
+%   -- ok, Now we are prepared to understand the following procedure
+%   -- to determine an estimated mean resp. sd of a sample X.
+%  -------------------------------------------------------------
+
+procedure listmake(m); for i:=1:m collect 0$
+
+
+procedure putNTH(L,k,v);
+ %    putNTH sets k-th element of list L to value v
+ %    because part(L,k) gives only _reading_ access
+ begin scalar a:=L, b:={};;
+    for i:=1:(k-1) do
+         << b:=append(b,{first a}); a:=rest a>>;
+    b := append(b,{v}); a := rest a;
+    return append(b,a)
+ end;         %  putnth({1,2,3},2,9) --> {1,9,3};
+ 
+
+% ................................................................
+% do the following commands line by line ------------------------- (???)
+% WHY are S, Mboot, Sboot nt evaluaued ??
+% WHY must do the := lines by line ??
+% ................................................................
+
+on rounded $
+print_precision $
+
+X := {2,1,3,4,7}$
+n := dim(X);                     %-- number of samples 
+IT := 10;                        %-- number of iterations 
+
+M := listmake(IT);               %-- container for all samples
+S := listmake(IT);               %-- container for all samples
+Mboot := listmake(n);            %-- container for all means
+Sboot := listmake(n);            %-- container for all sd's
+
+for j:=1:IT do  
+    begin                         %-- start bootstrap samples 
+      for i:=1:n do               %-- create one resample of X
+          begin r := 1 + random(n);  
+            putNTH( Mboot,i, part(X,r));
+            putNTH( Sboot,i, part(X,r))
+           end;                    %-- bootstrap new sample 
+       putNTH( M,j,  Mean(Mboot)); %-- j.th bootstrap mean 
+       putNTH( S,j,  sd(Sboot));   %-- j.th bootstrap sd 
+       write M(j)," ; ",S(j)       %-- show intermediate results
+     end;                     
+estM := Mean(M);                   %-- bootstrap sample mean/sd
+estS := sd(S);                     %-- i.e. estimated values */ ;
+
+mat( (estMean_, estSD_),(estM, estS));
+
+
+% ############ results
+
+/* here we construct an array T as Container */
+T : listarray (make_array (fixnum, 5));
+%o12
+ [0, 0, 0, 0, 0]
+%i13
+for i:1 thru 5 do T[i] : i;
+%o13
+ done
+%i14
+print(T);
+[1, 2, 3, 4, 5]
+%o14
+ false
+%i15
+/* ----------------------------------------------------------------
+   -- ok, Now we are prepared to understand the following procedure
+   -- to determine an estimated mean resp. sd of a sample X.
+  ----------------------------------------------------------------*/
+
+X : [2,1,3,4,7]$
+IT : 10  /*-- number of iterations */$
+n : dim(X)                             /*-- number of samples */ ;
+ 5
+M : listmake( IT)          /*-- container for all samples */ ;
+ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Mboot : listmake(n)       /*-- to save a mean sample */ ;
+ [0, 0, 0, 0, 0]
+Sboot : listmake( n)        /*-- to save a sd sample */ ;
+ [0, 0, 0, 0, 0]
+
+for j:1 thru IT do  
+          block(                     /*-- start bootstrap samples */
+              for i:1 thru n do      /*-- create one resample of X */
+                block( r : 1 + random(n),  
+                       Mboot[i] : X[r],
+                       Sboot[i] : X[r]
+                    ),              /*-- bootstrap new sample */
+              M[j] : Mean(Mboot),       /*-- j.th bootstrap mean */
+              S[j] : sd(Sboot),        /* -- j.th bootstrap sd */
+              print(M[j]," ; ",S[j])  /*-- show intermediate results */
+             )                     /* block end */ ;
+             
+11
+──,  ; , 1.3038
+5
+13
+──,  ; , 1.5166
+5
+23
+──,  ; , 2.3022
+5
+4,  ; , 1.8708
+2,  ; , 0.70711
+18
+──,  ; , 2.3022
+5
+17
+──,  ; , 2.3022
+5
+14
+──,  ; , 2.3875
+5
+3,  ; , 1.0
+14
+──,  ; , 1.6432
+5
+estM : float(Mean(M))        /* -- bootstrap sample mean/sd */ ;
+ 3.1
+estS : float(sd(S))               /*-- i.e. estimated values */ ;
+ 0.60074
+┌                   ┐
+│ est.mean  est.sd  │
+│                   │
+│   3.1     0.60074 │
+└                   ┘

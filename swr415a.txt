@@ -1,0 +1,70 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 4.10 a
+                      by W.G. Lindner 2026  $
+                      
+             
+%|                    McNEMAR TEST
+%|  McNEMAR test needs cumulative Chi.square distribution 
+
+procedure chi2CDF(x, k);
+          if x<=0 or k<=0 then 0.0 
+          else iGamma(k*0.5, x*0.5) $
+
+%### -----------------------------------------------------------
+%%%%                EXAMPLE: tea vs coffee
+%### -----------------------------------------------------------
+
+COMMENT  We check he null hypothesis of the equal popularity of 
+--       tea and coffee w.r.t the splitted contingency table 
+--
+--          A\B  +    -
+--           +: [37   17] a+b = 54
+--           -: [9    25] c+d = 34
+--               46   42
+--               a+c  b+d        $
+
+%-- SOLUTION step-by-step :
+
+on rounded $
+print_precision 5$
+
+X :=  mat((37, 17),(9, 25))$
+
+a := X(1,1);  b := X(1,2);  c := X(2,1);  d := X(2,2) ;
+b;
+b+c;
+n  := a+b+c+d;
+
+Yates := if( b+c<=30 or n<=40) then 1 else 0$
+
+% Yates(b,c,n) := if( b+c<=30 or n<=40) then 1 else 0$ 
+
+z := abs(b-c) - Yates;
+
+chi  := z*z/(b+c);r         %-- test statistics chi cf. wiki/R
+
+critVal := chi2CDF(chi,1);    %-- critical value at chi 
+p   := 1 - chi2CDF(chi,1);   %-- p value
+
+h := if(p < 0.05) then  0 else 1;   % 0: reject Ho  1: accept Ho
+
+result := mat( (chi_,  Ho_, p_),(chi, h, p )); 
+
+%-- Result: The null hypothesis h of the equal difficulty of the 
+%-- problems can be rejected only with 11.2 % of error.
+
+
+
+COMMENT
+chi     : 1.8846
+critVal : 0.83019
+p       : 0.16981
+h       : 1
+% 0: reject Ho  1: accept Ho
+┌                     ┐
+│  chi    Ho     p    │
+│                     │
+│ 1.8846  1   0.16981 │
+└                     ┘
+$

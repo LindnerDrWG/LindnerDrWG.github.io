@@ -1,0 +1,48 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 5.1 a
+                      by W.G. Lindner 2026  $
+                     
+%|         PEARSON corrCoeff
+             
+procedure MEAN(lst); 
+          (for each el in lst sum el )/length(lst)$
+
+procedure sp(X,Y);  % scalar product alias inner product
+          for i := 1:length(X) sum part(X,i) * part(Y, i)$
+                             % zip the sum of products 
+define    DOT = sp$
+
+
+%##################################################
+%      EXAMPLE of Pearson's product-moment formula 
+%##################################################
+% -- step-by-step calculation of CORRELATIONcoeff r
+% -- we program product-moment formula of Spiegel p.370
+
+X := {60,65,72,70,74,63,66,68,67,69,70,64}$
+Y := {120,140,180,184,190,160,155,158,170,190,210,150}$
+
+xbar := Mean(X);
+ybar := Mean(Y);
+
+Xm := for each el in X collect (el - xbar);  %Xm := (X - xbar);
+Ym := for each el in Y collect (el - ybar); 
+
+num := dot( Xm, Ym);   % numerator
+
+procedure sumsq(lst);  for each el in lst sum el^2 $
+
+den := sqrt( sumsq(Xm) * sumsq(Ym) ) ;  % denumerator
+
+r := num/den;
+
+on rounded $
+print_precision 5$
+
+r;
+
+COMMENT
+
+r : 0.8359
+$

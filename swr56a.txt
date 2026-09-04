@@ -1,0 +1,94 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 5.6 a
+                      by W.G. Lindner 2026  $
+                      
+%|         ANOVA1
+
+
+% ---------------------- helper functions ------------------
+
+procedure sum_(lst); for each el in lst sum el$ 
+procedure mean(lst); sum_(lst)/length(lst)$ 
+define    dim = length$
+
+
+%                  ONE-WAY ANOVA
+% --------------------------------------------------------
+%            EXAMPLE: Yields in bushels 
+% --------------------------------------------------------
+COMMENT ADVICE: submit each of the following command lines 
+        (separated by blank lines) one after the other to 
+		the Web.Reduce Input_Editor and then press [enter]. $
+COMMENT
+-- The table X below shows the yields in bushels per acre of a 
+-- certain varity of wheat grown in a particular type of soil  
+-- treated with chemicals A,B,C. Do an analysis for the data.  
+-- FIRST solution step-by-step following Spiegel  $
+
+X := {{3,4,5,4},{2,4,3,3},{4,6,5,5}};   
+     %-- the table as list of lists
+
+on rounded $
+print_precision 5$
+
+X1 := part(X,1);     %-- look at 1st row (treatment)
+
+Sum_(X1);            %- sum of 1st row */
+
+T_ := for i:=1:dim(X) sum sum_ part(X,i);
+      % or:  sum_( {sum_ part(X,1), sum_ part(X,2),sum_ part(X,3)});
+      %-- sum of all values in table X */;
+
+a := dim(X);           %-- no. of rows alias repetitions 
+
+b := dim( part(X,1));  %-- no. of columns alias groups
+
+procedure sq(x); x^2;
+
+Xsq := {map(sq, part(X,1)), map(sq, part(X,2)),map(sq, part(X,3))};
+        % i.e. X^2  i.e. look at the squares of the elements in X
+
+%-- calculate (V)ariations total V, between VB and within VW 
+%  -- using the 'shortcut methods'.
+
+V :=  (for i:=1:dim(X) sum sum_ part(Xsq,i)) - T_^2/(a*b);  % = 14
+      % = sum( Sum((X^2)[i]), i,1, dim(X)) - T^2/(a*b)     
+      %-- formula (10) in SPIEGEL                 
+
+VB := 1/b*(for i:=1:dim(X) sum (sum_ part(X,i))^2) - T_^2/(a*b); % =8
+      % 1/b*sum( Sum(X[j])^2, j,1,a) - T^2/(a*b)  %-- formula (11)
+
+VW := V-VB;                 %-- formula (12) ibid. 
+
+%-- calculate degres of freedom: (b)etween, (w)ithin and (t)otal
+
+dfb := a-1;
+
+dfw := a*(b-1);              
+
+dft := a*b-1 ;     
+
+%-- calculate the mean squares MS.
+
+MSb := VB/dfb;
+
+MSw := VW/dfw ;
+
+%-- F test 'statistics' for the Ho hypothesis.
+
+F := MSb/MSw;
+
+
+COMMENT  result
+anova1(X):
+┌                                 ┐
+│ Source   df  SS    MS       F   │
+│                                 │
+│ Between  2   8     4.0     6.0  │
+│                                 │
+│ Within   9   6   0.66667    -   │
+│                                 │
+│  Total   11  14     -     ANOVA │
+└                                 ┘
+$

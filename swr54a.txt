@@ -1,0 +1,78 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 5.4 a
+                      by W.G. Lindner 2026  $
+                      
+%|         ICC
+
+% ---------------------- helper functions ------------------
+
+procedure xapply(f,lst); lisp(f.cdr(lst))$       
+procedure sum_(lst);     xapply(+, lst)$ 
+define    dim  =  length$
+
+% --------------------------------------------------------------
+%              EXAMPLE: women asked about their weight
+% --------------------------------------------------------------
+% -- Fourteen women were asked about their weight; the given 
+% -- answers X were then compared to the actual measured weight Y.
+% -- Calculate the ICC(X,Y). 
+
+% -- SOLUTION:  step-by-step along the procedure in script                  
+
+X := {48,48,50,50,52,58,63,56,48,63,58,58,52,60}$
+Y := {51,50,50,52,53,63,70,70,49,63,59,58,56,62}$
+
+on rounded $
+print_precision 5$
+
+Z := append(X,Y);
+
+k := 2$
+n := length(X)$
+
+S := Sum_(Z);
+
+T_ := for i:=1:n collect part(X,i)+part(Y,i);
+
+id := for i:=1:n collect i;  % do eventually 2 times :(
+
+z_sq := for i:=1:2*n collect part(Z,i)^2;  % = Z^2
+                   % watch: dim(Z) = 2*n (!)
+
+SAQtotal := Sum_(z_sq) - (S^2)/(k*n);
+
+SAQrow := 1/k * (for j:=1:n sum (part(T_,j)^2)) - S^2/(k*n);
+
+dfrow := n-1;       %-- degree of freedom, row 
+
+MQrow := SAQrow / dfrow;
+
+SAQrest := SAQtotal - SAQrow;
+
+dfrest := n*(k-1);
+
+MQrest := SAQrest / dfrest;
+
+ICC := (MQrow-MQrest)/(MQrow+(k-1)*MQrest);
+
+
+COMMENT  result
+
+T : [99, 98, 100, 102, 105, 121, 133, 126, 97, 126, 117, 116, 108, 122]
+I : [1,2,3,4,5,6,7,8,9,10,11,12,13,14]
+matrix(I,T):
+┌                                                                   ┐
+│ 1   2    3    4    5    6    7    8   9   10   11   12   13   14  │
+│                                                                   │
+│ 99  98  100  102  105  121  133  126  97  126  117  116  108  122 │
+└                                                                   ┘
+SAQtotal : 1131.9    = Sum(Z^2) - S^2/(k*n)
+SAQrow   :  976.86   = 1/k * sum(T[j]^2,  j,1,n) - S^2/(k*n)
+dfrow    : 13        = n-1      /* degree of freedom, row */
+MQrow    :  75.143   = SAQrow / dfrow
+SAQrest  :  155.0    = SAQtotal - SAQrow
+dfrest   :  14       = n*(k-1)
+MQrest   :  11.071   = SAQrest / dfrest
+ICC      : 0.74316   = (MQrow-MQrest)/(MQrow+(k-1)*MQrest)
+$

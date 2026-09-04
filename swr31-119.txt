@@ -58,7 +58,7 @@ $ ok;
 %%%----------------------------------------------- check
 %%%               SURPLUS
 %%%----------------------------------------------- check
-%%% with simple implementation
+%%% with very simple implementation
 
 on rounded; precision 10;
 

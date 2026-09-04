@@ -1,0 +1,81 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 4.6 b
+                      by W.G. Lindner 2026  $
+                      
+
+%|         varTest
+
+% ------------------- helper functions ---------------------
+procedure chi2CDF(x, k);
+          if x<=0 or k<=0 then 0.0 
+          else iGamma(k*0.5, x*0.5) $
+procedure chi2inv(p,nu);  % use only chi2CDF
+  begin scalar lo,hi,mid,fmid, tol:= 1.0e-10;
+    lo := 0.0; hi := nu;
+    while chi2CDF(hi,nu) < p do hi := 2.0*hi;
+    for i := 1:1000 do
+    << mid := (lo+hi)/2.0;   % bisection
+       fmid := chi2cdf(mid,nu);
+       if abs(fmid-p) < tol then  mid; 
+       if fmid < p then lo := mid else hi := mid;
+    >>;   return (lo+hi)/2.0;
+  end;
+procedure SD(lst);
+   begin scalar n, mu, ds;
+     n := length(lst);  
+     mu := (for each el in lst sum el) / n;
+     ds := for each el in lst sum (el - mu)^2;
+     return sqrt(ds/(n-1))       % with n-1, sample
+   end;
+procedure MEAN(X);  (for each el in X sum el)/length(X);
+procedure SUM_(X);  (for each el in X sum el);
+define    DIM = length$
+
+
+% ----------------------------------------------------------
+procedure vartest(X, alpha, sigma0);  
+% ----------------------------------------------------------
+begin scalar n, T_, p, df, s, ci;
+      n  := dim(X);  
+      df := n-1;
+      s  := sd(X);
+      T_ := (n-1)*s*s/(sigma0 * sigma0);
+      p  := min( 2*chi2CDF(T_,df), 2*(1-chi2CDF(T_,df)));
+      CI := { (n-1)*s^2/ chi2INV(1-alpha/2,df),     
+              (n-1)*s^2/ chi2INV(  alpha/2,df) };
+      if (p < alpha) then write("... reject H0")
+                     else write("... accept H0");
+      write "T=chi2 = ", T_;
+      write "pValue = ", p;
+      write "CI = ",  {first CI, second CI};  
+%      write( matrix(["T=chi2", "p", "alpha", "lCL", "uCL"],
+%                    [T,p,alpha,CI[1],CI[2]]) ;
+END;
+% -------------------------------------------------- vartest
+
+
+
+%#################################################
+%      EXAMPLE: The size of PREY
+%#################################################*/
+
+on rounded $
+print_precision 5$
+
+X := {12.43, 11.71, 14.41, 11.05, 9.53, 11.66, 9.33, 11.71, 14.35, 13.81}$
+
+%          alpha  sigma0
+vartest(X, 0.05, 1);
+
+
+COMMENT ----------------------------------- result:
+
+vartest(X, 0.05, 1);
+..... reject H0
+┌                                          ┐
+│ T=chi2      p      alpha   lCL     uCL   │
+│                                          │
+│ 29.208  0.0011956  0.05   1.5354  10.816 │
+└                                          ┘
+$
+$

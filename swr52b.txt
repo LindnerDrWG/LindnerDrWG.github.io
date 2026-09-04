@@ -1,0 +1,131 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 5.3.b
+                      by W.G. Lindner 2026  $
+                      
+                      
+% ----------------------- helper functions ----------------
+
+procedure SUM_(X);  for each el in X sum el$ 
+procedure mean(X);  Sum1(X)/length(X)$
+procedure quicksort(l);  % - by Gemini AI
+   if l = {} then {}
+   else begin
+      scalar pivot, rest_l, left, right, x;
+      pivot := first(l);  rest_l := rest(l);
+      left  := {};         right := {};
+      for each x in rest_l do
+         if x <= pivot then left  := x . left
+                       else right := x . right;
+      return append(quicksort(left), pivot . quicksort(right));
+   end;
+procedure putNTH(l,k,v);
+ begin scalar a,b; integer i;
+    a:=l; b:={};
+    for i:=1 step 1 until k-1 do
+         <<b:=append(b,{first a}); a:=rest a>>;
+    b:=append(b,{v}); a:=rest a;
+    return append(b,a)
+ end;
+procedure crank_aux(v, sL, nL);           
+% v : element of list L, sL: sorted L; nL: length L    
+% crank.red - Numeric Recipes CRANK, p.510 for REDUCE
+% Lisp'ish VERSION: W must be sorted increasingly
+% returns S, and W is modified in place with averaged ranks  
+   begin scalar positions:={};
+      for k:=1:nl do
+          if part(sl,k) = v 
+             then positions := append(positions, {k});
+      return sum_(positions) / length(positions)
+    end;
+procedure  crank(w);     % w should be sorted
+begin scalar s, n;
+    s := quicksort(w);   % or sortnumlist(w) of package assist
+    n := length(w);
+    return for i:=1:n collect crank_aux( part(w,i), s, n) 
+END ;
+procedure correspond(X,soX);  
+begin scalar n:=length(X);
+   M  := for i:=1:n collect 0;
+   rX := cRank(soX);
+   for j:=1:n do for i:=1:n do 
+       if    part(soX,i)=part(X,j) 
+       then  M := putnth(M, j, part(rX,i));
+   return M;
+END;
+define    DIM  = length $
+define    SORT = quicksort $
+
+
+% --------------------------------------------------------------
+% FUNCTION spearman1 : general function SPEARMAN's rho_S
+% --------------------------------------------------------------
+procedure  spearman1(X,Y);
+   BEGIN   scalar n:=length(X), sX_,sY,cX,cY,D,rho; 
+      sX_:= sort(X);
+      sY := sort(Y);
+      cX := correspond(X, sX_);
+      cY := correspond(Y, sY);
+      D  := for i:= 1:n collect part(cX,i) - part(cY,i);
+      D2 := for i:= 1:n collect part(D,i)^2;
+      rho := 1 - 6*sum_(D2)/n/(n^2-1);
+      return rho
+   END;
+
+%----------------------------------------------------------
+%          EXAMPLE: heigths of fathers vs sons
+%----------------------------------------------------------
+
+on rounded $
+print_precision 5$
+
+Far := {65, 63, 67, 64, 68, 62, 70, 66, 68, 67, 69, 71};
+Son := {68, 66, 68, 65, 69, 66, 68, 65, 71, 67, 68, 70};
+
+spearman1(Far,Son);
+
+% Result: 0.7465
+
+COMMENT
+     ok - Spiegel p.473: r = 0.7465  $
+
+
+COMMENT   CHECK with R
+-- > Far = c(65,63,67,64,68,62,70,66,68,67,69,71)
+-- > Son = c(68,66,68,65,69,66,68,65,71,67,68,70)
+-- > cor.test(Far, Son, method = "spearman")
+--
+--   	Spearman's rank correlation rho
+--    data:  Far and Son
+--    S = 74.285, p-value = 0.005903
+--    alternative hypothesis: true rho is not equal to 0
+--    sample estimates:
+--    rho = 0.7402623 
+$
+
+
+COMMENT    CHECK with Octave/MatLAB
+--  octave:1> pkg load statistics
+--  octave:2> X = [70,78,90,87,84,86,91,74,83,85];
+--  octave:3> Y = [90,94,79,86,84,83,88,92,76,75];
+--  octave:4> spearman(X, Y)
+--            ans = -0.4182
+$
+
+%----------------------------------------------------------
+%          EXERCISE: significance
+%----------------------------------------------------------
+COMMENT
+##  USE the FACT
+##  The test for significance of SPEARMAn rho  use the statistics
+##
+##      T = |rho| * sqrt(n-2) / sqrt( 1-roh^2 ) 
+##
+##  which is t-distributed with df=n-2.
+##  Do an t-test for the significance of rho. 
+$
+%--  SOLUTION: ...
+
+
+
+%--  Result:   T = 2.905 

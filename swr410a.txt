@@ -1,0 +1,189 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 4.10 a
+                      by W.G. Lindner 2026  $
+
+%|         WILCOXON one sample signed rank test 
+
+                      
+% ----------------------- helper functions ----------------
+procedure SUM_(X);  for each el in X sum el$ 
+procedure mean(X);  Sum1(X)/length(X)$
+procedure sp(X,Y);  % scalar product alias inner product
+   for i := 1:length(X) sum part(X,i) * part(Y, i)$
+procedure quicksort(l);  % - by Gemini AI
+   if l = {} then {}
+   else begin
+      scalar pivot, rest_l, left, right, x;
+      pivot := first(l);  rest_l := rest(l);
+      left  := {};         right := {};
+      for each x in rest_l do
+         if x <= pivot then left  := x . left
+                       else right := x . right;
+      return append(quicksort(left), pivot . quicksort(right));
+   end;
+procedure putNTH(l,k,v);
+ begin scalar a,b; integer i;
+    a:=l; b:={};
+    for i:=1 step 1 until k-1 do
+         <<b:=append(b,{first a}); a:=rest a>>;
+    b:=append(b,{v}); a:=rest a;
+    return append(b,a)
+ end;
+procedure crank_aux(v, sL, nL);           
+% v : element of list L, sL: sorted L; nL: length L    
+% crank.red - Numeric Recipes CRANK, p.510 for REDUCE
+% Lisp'ish VERSION: W must be sorted increasingly
+% returns S, and W is modified in place with averaged ranks  
+   begin scalar positions:={};
+      for k:=1:nl do
+          if part(sl,k) = v 
+             then positions := append(positions, {k});
+      return sum_(positions) / length(positions)
+    end;
+procedure  crank(w);     % w should be sorted
+begin scalar s, n;
+    s := quicksort(w);   % or sortnumlist(w) of package assist
+    n := length(w);
+    return for i:=1:n collect crank_aux( part(w,i), s, n) 
+END ;
+procedure correspond(X,soX);  
+begin scalar n:=length(X);
+   M  := for i:=1:n collect 0;
+   rX := cRank(soX);
+   for j:=1:n do for i:=1:n do 
+       if    part(soX,i)=part(X,j) 
+       then  M := putnth(M, j, part(rX,i));
+   return M;
+END;
+define    DIM  = length $
+define    DOT  = sp $
+define    SORT = quicksort $
+
+COMMENT REMARK
+   The helper functions are described and explained 
+   in the following lines.  ............................ $
+             
+
+
+%##########################################################
+%    EXAMPLE 2.2 EXAMPLE 2.2 from PennState Eberly College 
+%##########################################################
+COMMENT  https://online.stat.psu.edu/stat415/lesson/20/20.2
+
+   Let X_i denote the length, in centimeters, of a randomly 
+   selected pygmy sunfish, i=1..10. 
+   If we obtain the following data set
+         5.0 3.9 5.2 5.5 2.8 6.1 6.4 2.6 1.7 4.3 
+   can we conclude that the median length of pygmy sunfish 
+   differs significantly from 3.7 centimeters ?
+SOLUTION:      $
+
+Comment      Here are the steps for the solution.
+-- Formulate the null hypthesis H0 and then do ..
+-- H0 : m = m0, i.e. the median length is equal to m0 = 3.7
+-- METHOD of Wilcoxon signed-rank test statistics is
+-- 1. we subtract the median from each measurement,
+-- 2. we find absolute values of the differences, |Xi− m0|
+-- 3. we rank the absolute values of the differences Xi− m0
+-- 4. we find the value of W, the Wilcoxon signed-rank test 
+-- statistics by definition     W = ∑ Zi*Ri            $
+
+on rounded $
+print_precision 5$
+
+X:= {5.0, 3.9, 5.2, 5.5, 2.8, 6.1, 6.4, 2.6, 1.7, 4.3};
+
+%-- length of sample
+n  := length(X) ;             
+
+%-- make list sgn filled with 0
+sgn := for i:=1:n collect 0;   
+
+%-- null hypothesis: median m0=3.7
+med :=3.7;                     
+
+%-- differences D to the median: D = X - m
+D := for i:=1:n collect part(X,i) - med;  
+%--  = {1.3, 0.2, 1.5, 1.8, -0.9, 2.4, 2.7, -1.1, 2.0, 0.6} 
+
+%-- make differences positive
+mD := map(abs, D);             
+
+%-- we may sort both data sets by eye, because they are small :)
+%   sD := {0.2, 0.6, 0.9, 1.1, 1.3 , 1.5, 1.8, 2.0, 2.4, 2.7};
+%                              sd(5)
+% but now we sort using quicksort
+
+sD := sort(md);      
+
+COMMENT   ......... now rank _sorted_ D i.e. sD ..........
+-- Determine the rank of the absolute values 
+-- (in ascending order) according to their magnitude:
+-- Because sD[5]=1.3, 1.3 has rank=5, we set 5 in place mD[1]=1.3,..:
+-- mD =  {1.3, 0.2, 1.5, 1.8, 0.9, 2.4, 2.7, 1.1, 2.0, 0.6} 
+--         |   |    |    ...                      |    |
+-- rD =  ( 5,  1,   6,   7,   3,   9,   10,  4,   8,   2)
+-- we rank equal data using mean values if 'ties' are seen:
+--    rD = {1,2,3,4,5,6,7,8,9,10}, because there are no ties 
+-- (duplicates)   
+-- We now use cRank() for rank'ing of list sD:           $
+
+mD := {1.3, 0.2, 1.5, 1.8, 0.9, 2.4, 2.7, 1.1, 2.0, 0.6} ; 
+sd := {0.2, 0.6, 0.9, 1.1, 1.3 , 1.5, 1.8, 2.0, 2.4, 2.7} ;
+
+%-- rD is only intern used in correspond,
+%-- it is displayed here for didactical reasons:
+
+rD := crank(sd);
+
+cD := correspond(mD,sD);      
+%   = {5,1,6,7,3,9,10,4,8,2};
+
+%-- find indices with positive difference D>0 in D
+%-- i.e. if part(d,i)>0 then part(Z,i):=1;
+Z := for i:=1:n collect if part(D,i)>0 then 1 else 0;
+
+% -- calculate statistics W, which is the
+% -- vector of products Z[i]*cd[i] 
+
+ZR := for i:=1:n collect part(Z,i)*part(cD,i);
+%   = {5,1,6,7,0,9,10,0,0,2}  ok
+
+W := Sum_(ZR);
+
+id := for i:=1:10 collect i; 
+
+Write ("------------------- result ---------------------");
+
+write "No: ", id;
+write "Xi: ", X;
+write "Xi-3.7: ", D;
+write "|Xi-3.7|: ", mD;
+write "Rank Ri: ", cD;
+write "signed Ri: ", ZR;
+
+%--  test statistics 
+W :=  DOT( Z,cd );
+
+COMMENT      cite ibid.:
+-- Determine if the observed value of W is extreme in light of the 
+-- assumed value of the median under the null hypothesis. 
+-- That is, calculate the P-value associated with W, and make a 
+-- decision about whether to reject or not to reject.
+-- When the null hypothesis is true, for large n,
+-- then T follows an approximate standard normal distribution N(0, 1).
+$
+
+T_ := (W - n*(n+1)/4)/ sqrt(n*(n+1)*(2*n+1)/24);    
+%   = 1.2741
+
+COMMENT
+-- Well, in this case, with n = 10, our sample size is fairly small 
+-- so we can use the exact distribution of W. The upper and lower 
+-- percentiles of the Wilcoxon signed rank statistic when n = 10 are:
+--             n=10: Pr(T>=W=40) = 0.116
+-- Therefore, our P-value is 2 × 0.116 = 0.232. 
+-- Because our P-value is large, we cannot reject the null hypothesis.
+$
+

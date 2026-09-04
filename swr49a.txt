@@ -1,0 +1,70 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 4.9 a
+                      by W.G. Lindner 2026  $
+                      
+             
+%|         signTest2
+
+% ------------------- helper functions ---------------------
+% -- These problems are dominated by the binomial distribution.
+% -- To calculate the sign-TEST score we need the function
+%   -- binoPDF() as helper:
+
+precision 10 $
+procedure binoPDF(x,n,p);
+          binomial(n,x)*p^x*(1-p)^(n-x) $ % x=0,1,2,...n
+          procedure count_gr(X,a); 
+   begin scalar s;
+     for each el in X do if (el>a) then s:=s+1;
+     return s
+   end;
+procedure count_neq(X,a); 
+   begin scalar s;
+     for each el in X do if not(el=a) then s:=s+1;
+     return s
+   end;
+procedure count_eq(X,a); 
+   begin scalar s;
+      for each el in X do if (el=a) then s:=s+1;
+      return s
+   end;
+define    DIM = length$
+
+%#################################################
+%    EXAMPLE: IQ of twin pairs 
+%#################################################
+
+on rounded $
+print_precision 5$
+
+IGh:= {97,79,100,100,100,124,95,80,91,108,91,90,104,119}$
+IGl:= {97,70,101,106,85,123,84,70,84,106,97,90,92,104}$
+
+n  := dim(IGh) ;       %-- length of samples */
+D := for i:=1:n collect (part(IGh,i)- part(IGl,i)); % D = IGh-IGl
+
+%-- Calculate total number of trials with equal scores
+nt := count_neq(D, 0);
+
+%-- Calculate number of scores greater than zero */
+s  := count_gr(D, 0);
+
+% -- We have:  N+ = 9 = s, N- = 3, N°0 = 2, NTotal = 12 = nt
+% -- Now we can calculate the p-value in the case "both-sided":
+
+ p1 := for i:=0:s sum binoPDF(i,nt,0.5);
+ p2 := 1 - for i:=0:(s-1) sum binoPDF(i,nt,0.5);
+ p  := min(2 * p1, 2 * p2) ;
+ write "s_ = ", s;
+ write "p_ = ", p;
+% write(matrix(["s", "p"],[s,p]));
+END;
+
+COMMENT -- RESULT:
+-- We count 9 differeneces with a positive sign.
+-- The test statistics is therefore T = sign = 9.
+-- The probality p for T = 9 is 0.1459 > 0.05.
+-- INTERPRETATION:
+-- The null hypothesis, Ho: "IQ independent of weight",  
+-- can not be rejected with a 5 % probability of error. 
+$

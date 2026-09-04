@@ -6,10 +6,13 @@ COMMENT
             
 % declare a field (’vector’) of 5 elements         
 array X(5); 
+
 % fill array
 X(1):=4; X(2):=36$ X(3):=45$ X(4):=50$ X(5):=75$ 
+
 % sum the members by means of a for loop
 S := (for i:=1:5 sum X(i)); 
+
 % display the result
 write S;
 

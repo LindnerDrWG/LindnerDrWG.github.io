@@ -15,7 +15,7 @@ begin
 end;
 
    % The square root function can be input using the name sqrt, 
-   % or the power operation ^(1/2)
+   % or the power operation ..^(1/2)
 
 procedure SD1(lst);
 begin

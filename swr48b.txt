@@ -1,0 +1,97 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 4.8 b
+                      by W.G. Lindner 2026  $
+                      
+             
+%|         signTest
+
+% ------------------- helper functions ---------------------
+% -- These problems are dominated by the binomial distribution.
+% -- To calculate the sign-TEST score we need the function
+%   -- binoPDF() as helper:
+
+precision 10 $
+procedure binoPDF(x,n,p);
+          binomial(n,x)*p^x*(1-p)^(n-x) $ % x=0,1,2,...n
+procedure count_gr(X,a); 
+   begin scalar s;
+     for each el in X do if (el>a) then s:=s+1;
+     return s
+   end;
+procedure count_neq(X,a); 
+   begin scalar s;
+     for each el in X do if not(el=a) then s:=s+1;
+     return s
+   end;
+procedure count_eq(X,a); 
+   begin scalar s;
+      for each el in X do if (el=a) then s:=s+1;
+      return s
+   end;
+define    DIM = length$
+
+% ---------------------------------------------------
+
+  procedure  signtest(X, med,  method);     
+
+%------------ method: left=-1, right=1,both=0 -------
+begin scalar n,p,p1,p2,s,nt;
+  %if method  else rederr("signtest: method must be left,right,both ");
+  n  := dim(X);
+  nt := count_neq(X, med);
+  s  := count_gr(X, med);
+  if (method = 0) then 
+      << p1 := for i:=0:s sum binoPDF(i,nt,0.5);
+         p2 := 1 - (for i:=1:(s-1) sum binoPDF(i,nt,0.5) );
+         p  := min(2 * p1, 2 * p2) >>;
+  if (method = 1) then 
+        p := 1 - (for i:=1:(s-1) sum binoPDF(i, nt, 0.5) );
+  if (method = -1) then
+         p := for i:=0:s sum binoPDF(i, nt, 0.5);
+
+   write "s= ",s;
+   write "p_= ",p;
+  % mat((s_, pp),(s,p));
+END;
+
+%#################################################
+%     EXAMPLE:  FIRST MARRIAGE 
+%#################################################
+
+on rounded $
+print_precision 5$
+
+X := {26.0, 25.6, 25.5, 25.6, 25.3, 25.6, 25.7, 
+      25.9, 26.0, 26.1, 26.3, 26.6, 26.9, 27.0}$
+
+median0 := 26.0         %-- hypo. median 
+signtest(X, 26.0, 0) ;  % p =0.7744
+
+
+count_gr(X,26.0);
+count_neq(X,26.0);
+
+COMMENT
+   -- in R: 
+> dbinom(0, size=12, prob=0.5) + 
+  dbinom(1, size=12, prob=0.5) + 
+  dbinom(2, size=12, prob=0.5) + 
+  dbinom(3, size=12, prob=0.5) + 
+  dbinom(4, size=12, prob=0.5) +
+  dbinom(5, size=12, prob=0.5) 
+  [1] 0.387207
+
+> dbinom(0, size=12, prob=0.5) 
+[1] 0.0002441406
+> dbinom(1, size=12, prob=0.5)
+[1] 0.002929688
+> dbinom(2, size=12, prob=0.5) 
+[1] 0.01611328
+> dbinom(3, size=12, prob=0.5)
+[1] 0.05371094
+>  dbinom(4, size=12, prob=0.5)
+[1] 0.1208496
+> dbinom(5, size=12, prob=0.5) 
+[1] 0.1933594
+$
+

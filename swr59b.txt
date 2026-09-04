@@ -1,0 +1,74 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 5.9 b
+                      by W.G. Lindner 2026  $
+                   
+%|         bootstrapping for Confidence Inteval CI
+
+% ---------------------- helper functions ------------------
+procedure sum_(lst);   for each el in lst sum el $ 
+procedure mean(lst);   sum_(lst)/length(lst) $ 
+procedure listmake(m); for i:=1:m collect 0$
+procedure putNTH(L,k,v); begin scalar a:=L, b:={};
+    for i:=1:(k-1) do
+         << b:=append(b,{first a}); a:=rest a>>;
+    b := append(b,{v}); a := rest a;
+    return append(b,a) end;  
+    %  check: putnth({1,2,3},2,9);   --> {1,9,3};
+    % sometime read 2-times in Input Editor ------------ ??
+load_package assist$
+procedure percentile(X, perc);      
+     part( sortnumlist(X), ceiling(length(X) * perc/ 100));
+define    dim = length $
+
+
+%### ----------------------------------------------------------
+%###    bootstrapping for Confidence Inteval CI
+%### ----------------------------------------------------------
+
+procedure bootci(X,IT);
+begin scalar n, r, M, Mboot, estimatedMean;
+      n := dim(X);           %-- number of samples
+      M := listmake(IT);     %- container for all samples 
+      Mboot := listmake(n);  %-- save a sample 
+      for j:=1:IT do         %-- perform bootstrap sampling
+        begin           
+          for  i:=1:n do 
+            begin r := 1 + random(n);
+              Mboot := putNTH( Mboot, i, part(X,r));
+              write "Mboot: ", Mboot;
+              write "mean(Mboot) = ", Mean(Mboot);
+              M     := putNTH( M, j, Mean(Mboot));
+                              %-- bootstrap sample mean 
+              write "M: ", M  
+            end;
+       end;                       %-------- mean(M) not reached --- ???
+       estimatedMean := Mean(M);
+       ci2 := percentile(M, 68.5);
+       ci1 := percentile(M,  2.5);
+       write "est.Mean: ", estimatedMean;
+       write "CI: ", {ci1,ci2}
+END;
+
+% ----- Test
+
+on rounded $
+print_precision $
+
+%-- check with the data from above
+%--    1.  2. 3   4.  5   6   7   8   9.  10 
+X := {25, 30, 35, 40, 45, 50, 55, 60, 65, 70}$
+
+part(sortnumlist(X), ceiling(10 * 90 / 100));
+%    {25,30,..,65,70}      9       --> 65, ok
+percentile(X, 90);         %       --> 65, ok
+
+bootci(X,10);              % M not filled ??
+
+COMMENT  result should be 
+┌                      ┐
+│ est.Mean  CI.l  CI.h │
+│                      │
+│  48.135   39.5  50.5 │
+└                      ┘
+$

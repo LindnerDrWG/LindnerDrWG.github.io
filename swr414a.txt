@@ -1,0 +1,50 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 4.14 a
+                      by W.G. Lindner 2026  $
+                      
+             
+%|                FISHER EXACT TEST
+
+%  the FISHER test needs the Hypergeometric distribution.
+% ---------------- helper functions ----------------------
+procedure hgPDF(NN,RR,n,r); 
+          binomial(RR,r)*binomial(NN-RR, n-r)/binomial(NN,n)$
+procedure hgCDF(NN,RR,n, x);
+          for k:=0:floor(x) sum hgPDF(NN,RR,n,k) $ % 
+
+%### --------------------------------------------------------------
+%           EXAMPLE: contingency table for the US presidents
+%### --------------------------------------------------------------
+Comment 
+--             >=70  <70
+--          X: [1     4] a+b = 5
+--          Y: [14   12] c+d = 26
+--             15    16
+--            a+c    b+d
+--
+-- Ho: the natural death year is independent of age and height  $
+
+on rounded $
+print_precision 5$
+
+X := {1 , 4}$
+Y := {14,12}$
+
+
+alpha := 0.1 $
+a := part(X,1);  b := part(X,2); 
+c := part(Y,1);  d := part(Y,2) ;
+
+n := a+b+c+d;
+
+p := hgCDF( n, a+b, a+c, a );
+                           
+%-- 0: reject Ho  1: accept Ho at level alpha = 10 %
+
+h := if (p < alpha) then write (0) else write (1); 
+
+COMMENT result
+			
+p :  0.18638
+1 :  accept Ho

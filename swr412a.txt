@@ -1,0 +1,184 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 4.12 a
+                      by W.G. Lindner 2026  $
+
+
+%|         MANN-WHITNEY-U-test     
+         
+% --------------------- helper functions ----------------
+procedure SUM_(X);  for each el in X sum el$ 
+procedure  MEAN(X);  Sum1(X)/length(X)$
+procedure listmake(m); for i:=1:m collect 0$
+procedure sp(X,Y);  % scalar product alias inner product
+   for i := 1:length(X) sum part(X,i) * part(Y, i)$
+procedure quicksort(l);  % - by Gemini AI
+   if l = {} then {}
+   else begin
+      scalar pivot, rest_l, left, right, x;
+      pivot := first(l);  rest_l := rest(l);
+      left  := {};         right := {};
+      for each x in rest_l do
+         if x <= pivot then left  := x . left
+                       else right := x . right;
+      return append(quicksort(left), pivot . quicksort(right));
+   end;
+procedure  MEDIAN(X);
+begin scalar  Xs,n2,n2p; % local vars
+   Xs   := quicksort (X); 
+   n2   := floor(length(X)/2);  
+   n2p  := n2+1;
+   if evenp length(X) 
+      then return 0.5*(part(Xs,n2)+part(Xs,n2p))
+      else return  part(Xs,n2p)
+end$
+procedure putNTH(l,k,v);
+ begin scalar a,b; integer i;
+    a:=l; b:={};
+    for i:=1 step 1 until k-1 do
+         <<b:=append(b,{first a}); a:=rest a>>;
+    b:=append(b,{v}); a:=rest a;
+    return append(b,a)
+ end;
+procedure crank_aux(v, sL, nL);           
+% v : element of list L, sL: sorted L; nL: length L    
+% crank.red - Numeric Recipes CRANK, p.510 for REDUCE
+% Lisp'ish VERSION: W must be sorted increasingly
+% returns S, and W is modified in place with averaged ranks  
+   begin scalar positions:={};
+      for k:=1:nl do
+          if part(sl,k) = v 
+             then positions := append(positions, {k});
+      return sum_(positions) / length(positions)
+    end$
+procedure  crank(w);     % w should be sorted
+begin scalar s, n;
+    s := quicksort(w);   % or sortnumlist(w) of package assist
+    n := length(w);
+    return for i:=1:n collect crank_aux( part(w,i), s, n) 
+END ;
+procedure correspond(X,soX);  
+begin scalar n:=length(X);
+   M  := for i:=1:n collect 0;
+   rX := cRank(soX);
+   for j:=1:n do for i:=1:n do 
+       if    part(soX,i)=part(X,j) 
+       then  M := putnth(M, j, part(rX,i));
+   return M;
+END;
+define    DIM  = length $
+define    DOT  = sp $
+define    SORT = quicksort $
+
+
+%#######################################################
+%        EXAMPLE: butterflies
+%#######################################################
+COMMENT
+-- PROBLEM: (cited from Zoefel [19, p.103])
+-- As part of a biological study, butterflies were observed  
+-- at various times within a fixed timeframe. 
+-- The weather conditions were recorded, with a general 
+-- classification into sunny and cloudy periods. 
+-- The results are shown in the table:
+--     sunny : 6 15 35 35 62 73 98 112
+--     cloudy: 1  4  8 17 23 34 43
+
+-- An U test should explain whether the difference between the two 
+-- median values of the samples is significant.      $
+
+%--     SOLUTION: step-by-step.
+COMMENT ADVICE: submit each of the following command lines 
+        (separated by blank lines) one after the other to 
+		the Web.Reduce Input_Editor and then press [enter].
+		IF an output does not appear, 
+		   repeat the relevant line alone for new ones!! $
+
+on rounded $
+print_precision 5$
+
+X := {6, 15, 35, 35, 62, 73, 98, 112};
+Y := {1, 4, 8, 17, 23, 34, 43};
+
+median(X);        %-- 48.5 
+median(Y);        %-- 17 
+
+%-- rank.ing the data by eye 
+load_package matrix;
+
+sumX := sum_(X);
+
+sumY := sum_(Y);
+
+matXY :=mat( (sun_, 6, 15, 35, 35, 62, 73, 98, 112, _, sum_),
+     (rank_,3,5,9.5,9.5,12,13,14,15,_,sumX),
+     (cloud_, 1, 4, 8, 17, 23, 34, 43,_, _, _),
+     (rank_, 1,2,4,6,7,8,11,_,_, sumY ));
+     
+%-- transpose of matrix matXY
+tp(matXY);      
+     
+%-- We now create the process from column to column.
+%-- First collect data X and Y in one sample Z  :
+
+Z := append(X,Y);
+
+sZ := sort(Z);
+
+%-- establish a correspondence between Z and the sorted sZ 
+%-- which gives the rank numbers for each entry of Z
+
+cZ := correspond(Z, sZ);
+
+%-- now add the ranks of entrys in X and Y by splitting Z -> X,Y
+
+R1 := for i:=1:dim(X) sum part(cZ,i);  %-- rank sum of X
+
+R2 := for i:=1:dim(Y) sum part(cZ,i+dim(X));  %-- rank sum of Y
+
+%-- now calculate the U statistic
+
+n1 := dim(X);
+n2 := dim(Y);
+n  := n1+n2;
+
+U1 := R1 - n1*(n1+1)/2;
+U2 := R2 - n2*(n2+1)/2;
+
+%-- critical value U to test is the minimum of U1 and U2
+
+U := min(U1,U2);
+
+COMMENT
+.. To check the hypothesis we need the Wilcoxon-Mann-Whitney table
+.. see e.g.: https://chem.pg.edu.pl/documents/175361/28234418/U.pdf
+.. We get: U_alpha_0.05(7,8) = 10 = critValue
+.. DECISION:                    $
+
+critValue := 10;
+
+if((U > critValue) or (U = critValue)) then 
+   write  "reject H0" else write " accept H0";
+
+
+COMMENT  .....RESULT and DECISION:  U > critV(0.05;7,8)=10
+-- We have U = 11 > 10 = U05[7,8] of U table.
+-- The calculated U value has to be smaller/equal than the tabulated U0.
+-- Here the significance is narrowly missed w.r.t. alpha=0.05. $
+
+
+COMMENT ....................................................
+  Calculate the approximative p-value with test statistic T:
+  -- calc the approximative p-value using stdnormCDF.
+  -- Define the T statistic:
+  ......................................................... $
+
+procedure stdnormCDF(x);   1/2*erfc(-x/sqrt(2)) ;
+
+T_ := (R2-0.5*n2*(n+1))/sqrt(n1*n2*(n+1)/12);
+
+pValue := stdnormCDF(abs(T_));
+
+if(pValue < 0.975) then write("accept H0") 
+                else write("reject H0");
+

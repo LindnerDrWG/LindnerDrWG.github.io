@@ -1,0 +1,48 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 5.4.b
+                      by W.G. Lindner 2026  $
+                      
+%|         ICC
+
+% ---------------------- helper functions ------------------
+
+procedure xapply(f,lst); lisp(f.cdr(lst))$       
+procedure sum_(lst);     xapply(+, lst)$ 
+define    dim  =  length$
+
+%### ----------------------   ICC   -------------------------
+%###     icc(X,Y)
+%###     method = Single Score Oneway Intraclass Correlation
+%###              with k = 2 cases (fix)
+%### ........................................................$
+
+procedure icc(X,Y);
+   begin scalar k,Z,T_,S,n,
+          z_sq,SAQt,SAQr,dfr,MQr,SAQb,dfb,MQb,ICC;
+          k := 2;
+          n := dim(X);
+          T_:= for i:=1:n collect part(X,i)+part(Y,i);
+          Z := append(X,Y);
+          S := Sum_(Z);
+          z_sq := for i:=1:2*n collect part(Z,i)^2;
+          SAQt := Sum_(z_sq) - (S^2)/(k*n);
+          SAQr := 1/k * (for j:=1:n sum (part(T_,j)^2)) - S^2/(k*n);
+          dfr  := n-1;
+          MQr  := SAQr/dfr;
+          SAQb := SAQt - SAQr;    %-- b : between
+          dfb  := n*(k-1);
+          MQb  := SAQb / dfb;
+          ICC  := (MQr -MQb)/(MQr + (k-1)*MQb);
+          return icc
+    end;
+%*-------------------------------------------------------- END
+
+
+X := {48,48,50,50,52,58,63,56,48,63,58,58,52,60}$
+Y := {51,50,50,52,53,63,70,70,49,63,59,58,56,62}$
+
+on rounded $
+print_precision 5$
+
+icc(X,Y);   %% =  0.74316

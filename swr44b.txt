@@ -1,0 +1,199 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 4.4 b
+                      by W.G. Lindner 2026  $
+                      
+%|         ttest2
+
+             
+% ------------------- helper functions ---------------------
+COMMENT
+   To calculate the t-TEST score 'T' we need the functions
+   tCDF() and tINV() from t-distribution as helper, see Ch.3.3 
+$
+
+procedure tPDF(x,f);  
+          1/(sqrt(f)*Beta(1/2,f/2))*(1+ x^2/f)^(-0.5*(f+1)) $
+procedure tCDF(a,df);
+   if a=0 then 0.5 else 
+   if a<0 then 0.5 * ibeta(df/2, 0.5, df/(a^2 + df)) else
+           1 - 0.5 * ibeta(df/2, 0.5, df/(a^2 + df));
+procedure tINV(p,nu); 
+% needs tcdf and tpdf
+   begin scalar x, f, fx, dx,
+      tol:= 1.0e-8, maxit:= 100;
+      x := 0;  
+      repeat <<
+         f  := tcdf(x,nu) - p;
+         fx := tpdf(x,nu);
+         dx := f/fx;
+         x := x - dx;
+         maxit := maxit - 1
+      >> until abs dx < tol or maxit = 0;
+      return x
+   end$
+procedure MEAN(X);  (for each el in X sum el)/length(X);
+procedure SD(lst);
+   begin
+     scalar n, mu, ds;
+     n := length(lst);  
+     mu := (for each el in lst sum el) / n;
+     ds := for each el in lst sum (el - mu)^2;
+     return sqrt(ds/(n-1))
+   end;
+define DIM = length$
+
+
+%---------------------------------------------------
+procedure  ttest2(A,B, alpha, method) ;
+       %   method = "left","right","both" or -1,1,0
+%---------------------------------------------------
+begin scalar n1,n2,m1,m2,s1,s2,df,T_,
+             t95, F, N, ci, pvalue;
+     n1 := dim(A);
+     n2 := dim(B);
+     m1 := mean(A);
+     m2 := mean(B);
+     s1 := sd(A);
+     s2 := sd(B);
+     s1 := 1/n1*s1*s1;
+     s2 := 1/n2*s2*s2;
+     df := (s1+s2)^2/(s1^2/(n1-1) + s2^2/(n2-1));
+     T_  := (m1-m2)/sqrt(s1+s2);  % T reserved identifier
+
+     t95 := tINV(1-alpha/2, df);
+     F   := sqrt(n1*n2/(n1+n2));
+     N   := sqrt(((n1-1)*s1^2+(n2-1)*s2^2)/(n1+n2-2));
+     CI  := {mean(A)-mean(B)-t95*N/F,
+                  mean(A)-mean(B)+t95*N/F};
+     pValue := min( 2*tCDF(T_,df), 2*(1-tCDF(T_,df))) ;
+   
+   % calculate test statistic T */
+        tstat := T_ ;
+   
+   if not (method = 1 or method = -1 or method = 0) 
+      then rederr("ttest: method must be 0,1 or -1.");
+      
+   if method = 0 then                %-- one sided smaller
+         <<
+            critval := tINV(alpha/2, df);
+            if (abs(tstat) >  abs(critval) or  -abs(tstat) < -abs(critval)) 
+                then write("both: reject H0")
+                else write("both: accept H0")
+          >>;
+   if method = 1 then                %-- one-sided test greater 
+         <<
+            critval := tINV(alpha, df);
+            if (tstat > critval) then write("right: reject H0") 
+                                 else write("right: accept H0")
+            >>;
+   if method = -1 then               %-- for left-tailed test
+         <<
+            critval := tINV(alpha, df);
+            if (tstat < critval) then write("left: reject H0")
+                                 else write("left: accept H0")
+          >>;
+
+   write "Significance level:          = ", alpha;
+   write "Degrees of freedom:     = ", df;
+   write "Test statistic:  = ", tstat;
+   write "Critical value: ", critval; 
+   
+    write "CI left:", first CI;
+    write "CI right:", second CI;
+    write "mean A:", mean(A);
+    write "mean B:", mean(B);
+    write "p-value:", pValue;
+
+
+COMMENT -- to do: matrix output
+ 
+ M : zeromatrix(9,2),
+     M[1,1] : "Significance level:",
+     M[2,1] : "Degrees of freedom:",
+     M[3,1] : "Test statistic:",
+     M[4,1] : "Critical value:",
+     M[5,1] : "CI left:",
+     M[6,1] : "CI right:",
+     M[7,1] : "mean A:",
+     M[8,1] : "mean B:",
+     M[9,1] : "p-value:",
+
+     M[1,2] : alpha,
+     M[2,2] : df,
+     M[3,2] : tstat, 
+     M[4,2] : critval,
+     M[5,2] : CI[1],
+     M[6,2] : CI[2],
+     M[7,2] : mean(A),
+     M[8,2] : mean(B),
+     M[9,2] : pValue,
+   M
+$
+
+END;
+
+%
+%--  The null hypothesis $H_0$ states that the mean test score of the 
+%--  two student groups $A$ and $B$ are equal
+%
+
+
+
+%#################################################
+%      EXAMPLE: STUDENTS score
+%#################################################
+
+on rounded $
+print_precision 5 $
+
+
+A := {88, 92, 94, 78, 88, 95.}$
+B := {75, 80, 79, 88, 85, 92.}$   
+alpha := 0.05 $
+
+ttest2(A, B, alpha,  0)     ;
+ttest2(A, B, alpha,  1)     ;
+ttest2(A, B, alpha, -1)     ;
+
+
+COMMENT
+
+--  The null hypothesis $H_0$ states that the mean test score of the 
+--  two student groups $A$ and $B$ are equal:
+
+ttest2(A, B, alpha,  0) :
+both: reject H0
+ ┌                               ┐
+ │ Significance level:    0.05   │
+ │                               │
+ │ Degrees of freedom:     8     │
+ │                               │
+ │   Test statistic:    - 3.3458 │
+ │                               │
+ │   Critical value:    - 2.306  │
+ └                               ┘
+
+ttest2(A, B, alpha,  1)     :
+right: accept H0
+ ┌                               ┐
+ │ Significance level:    0.05   │
+ │                               │
+ │ Degrees of freedom:     8     │
+ │                               │
+ │   Test statistic:    - 3.3458 │
+ │                               │
+ │   Critical value:    - 1.8595 │
+ └                               ┘
+
+ttest2(A, B, alpha, -1)     :
+left: reject H0
+ ┌                               ┐
+ │ Significance level:    0.05   │
+ │                               │
+ │ Degrees of freedom:     8     │
+ │                               │
+ │   Test statistic:    - 3.3458 │
+ │                               │
+ │   Critical value:    - 1.8595 │
+ └                               ┘
+$

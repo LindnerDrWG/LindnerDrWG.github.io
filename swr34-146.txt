@@ -13,5 +13,5 @@ procedure fPDF(x,f1,f2);
 on rounded $
 print_precision 5$
 
-fPDF(1.2, 10, 20);      %  0.56261
+fPDF(1.2, 10, 20);       %  0.56261
 fPDF(1.2, 100, 100);     %  1.095

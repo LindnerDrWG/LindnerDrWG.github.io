@@ -1,0 +1,99 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 5.7 b
+                      by W.G. Lindner 2026  $
+                      
+
+%|     BOOTSTRAP for dependend samples with REDUCE
+
+% ---------------------- helper functions ------------------
+random_new_seed(1)$ % Seeding recommended before generating
+procedure rnd();       random(10000000)/10000000.0 $
+procedure randlist(n); for i:=1:n collect rnd() $
+procedure sum_(lst);   for each el in lst sum el $ 
+procedure mean(lst);   sum_(lst)/length(lst) $ 
+procedure SD(lst);
+begin scalar n, mu, ds, n:=length(lst);
+  mu := (for each el in lst sum el)/n;  % mean
+  ds := for each el in lst sum (el - mu)^2;
+  return sqrt(ds/n)
+end$
+procedure listmake(m); for i:=1:m collect 0$
+procedure putNTH(L,k,v);
+ begin scalar a:=L, b:={};
+    for i:=1:(k-1) do
+      << b:=append(b,{first a}); a:=rest a>>;
+    b := append(b,{v}); a := rest a;
+    return append(b,a)
+ end;      %  putnth({1,2,3},2,9) --> {1,9,3};
+ define    dim = length $
+
+
+%-- boot1 determines an estimated mean resp. sd of a sample X.
+
+%----------------------- boot1 --------------------------------
+procedure boot1(X,IT);
+%--------------------------------------------------------------
+begin
+  scalar n:=length(X), r, M, Mboot, Sboot, estM, estS;
+  M     := listmake(IT);   S     := listmake(IT);          
+  Mboot := listmake(n);    Sboot := listmake(n);        
+  for j:=1:IT do  
+    begin                        
+      for i:=1:n do              
+          begin r := 1 + random(n);  
+            putNTH( Mboot,i, part(X,r));
+            putNTH( Sboot,i, part(X,r))
+           end;                   
+       putNTH( M,j,  Mean(Mboot)); 
+       putNTH( S,j,  sd(Sboot)); 
+       write M(j)," ; ",S(j)   
+     end;                     
+  estM := Mean(M);      
+  estS := sd(S);                    
+  write "estMean =, estM, " ; estSD = ", estS;
+   %mat( (estMean_, estSD_),(estM, estS));
+END;
+% ----------------------- boot1 ---------------------------- END
+
+COMMENT  Consider the sample X= {4,5,4,7,2}.
+Estimate the standard deviation of the bootstrap distribution. $
+
+X := {4,5,4,7,2}$
+
+boot1(X, 10)$
+boot1(X, 100)$      %-- using 100 repetitions ("resamples")
+boot1(X, 1000)$
+boot1(X, 10000)$
+
+
+COMMENT  possible results
+
+boot1(X, 10)$
+┌                   ┐
+│ est.mean  est.sd  │
+│                   │
+│   4.3     0.44138 │
+└                   ┘
+
+boot1(X, 100)$
+┌                  ┐
+│ est.mean  est.sd │
+│                  │
+│  4.452    0.4977 │
+└                  ┘
+
+boot1(X, 1000)$
+┌                   ┐
+│ est.mean  est.sd  │
+│                   │
+│  4.3814   0.52429 │
+└                   ┘
+
+boot1(X, 10000)$
+┌                   ┐
+│ est.mean  est.sd  │
+│                   │
+│  4.4048   0.52705 │
+└                   ┘
+$

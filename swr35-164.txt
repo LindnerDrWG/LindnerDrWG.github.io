@@ -21,3 +21,36 @@ for i:=1:10 do write {i/10,  chi2INV(i/10,10)} ;
 %% ***** Newton method converge only until p=0.5
 %% Check with chiINV_bisection or chi2INV_Newton.
 
+
+% ------------------- Example with chiINV_bisection ------
+% Check with chiINV_bisection or chi2INV_Newton.
+
+procedure chi2CDF(x, k);
+          if x<=0 or k<=0 then 0.0 
+          else iGamma(k*0.5, x*0.5) $
+
+procedure chi2inv_bi(p,nu);
+  begin scalar lo,hi,mid,fmid, tol:= 1.0e-8;
+    lo := 0.0; hi := nu;
+    % Find an upper bracket hi
+    while chi2CDF(hi,nu) < p do hi := 2.0*hi;
+    % Bisection
+    for i := 1:1000 do
+    << mid := (lo+hi)/2.0;
+       fmid := chi2cdf(mid,nu);
+       if abs(fmid-p) < tol then  mid; 
+       if fmid < p then lo := mid else hi := mid;
+    >>;
+    return (lo+hi)/2.0;
+  end;
+
+%--- test
+
+on rounded $
+print_precision 5$
+
+On time$
+for i:=1:10 do write {i/10,  chi2INV_bi(i/10,10)} ;
+Off time$
+
+

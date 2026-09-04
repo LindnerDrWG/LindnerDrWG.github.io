@@ -5,7 +5,6 @@ COMMENT
                       
                 
 
-
 procedure normCDF(x,m,s); 
           1/2+erf((x-m)/(s*sqrt(2)))/2 $
 

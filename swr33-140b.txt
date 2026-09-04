@@ -61,15 +61,24 @@ tINV2(0.99,3);      % = 4.5407  ok
 tinv2(0.975, 10);   % should be close to 2.228
 tinv2(0.95,1);      % should be ≈6.3138
 
+
+
 % -------------- 2a. version: NEWTON iteration by fjW -----------
 
-COMMENT by F.J. Wright in private communication
+COMMENT by F.J. Wright in private communication:
   The main problem with the Newton-Raphson code in 2. is that it 
   always executes maxit iterations because the return in the inner 
   begin...end only stops the begin...end containing it, not the loop. 
   Also, it is ignoring the return value (and it really only makes
   sense to return a local value).   $
 
+procedure tPDF(x,f);  
+          1/(sqrt(f)*Beta(1/2,f/2))*(1+ x^2/f)^(-0.5*(f+1)) $
+
+procedure tCDF(a,df);
+   if a=0 then 0.5 else 
+   if a<0 then 0.5 * ibeta(df/2, 0.5, df/(a^2+df)) else
+           1 - 0.5 * ibeta(df/2, 0.5, df/(a^2+df));
 
 procedure tinv2a(p,nu); 
    begin scalar x, f, fx, dx,

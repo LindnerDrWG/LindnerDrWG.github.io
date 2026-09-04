@@ -1,0 +1,88 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 4.2 b
+                      by W.G. Lindner 2026  $
+                      
+          
+%|         2-sample-Z-TEST
+   
+% ------------------- helper functions ---------------------
+%-- To calculate the 2-sample-Z-TEST we need the functions
+%-- stdnormCDF() and stdnormINV() as helper: 
+
+procedure normCDF(x,m,s); 1/2+erf((x-m)/(s*sqrt(2)))/2 $
+procedure stdnormCDF(x);  normCDF(x, 0,1);   
+procedure normINV(q,m,s);
+     if q=0 then  infinity else if q=1 then -infinity else     
+     if 0<q and q<1 then
+     begin scalar y := 2*q-1, xx;
+        if y = 0 then return 0;
+        clear x;
+        xx := num_solve(erf x = y, x = y); % a list of equations
+        xx := rhs first xx;
+        return m + sqrt(2) * s * xx
+    end$
+procedure stdnormINV(q); normINV(q,0,1)$
+procedure MEAN(lst);  (for each el in lst sum el)/length(lst);
+define dim = length$
+procedure VAR(lst);
+begin
+  scalar n, mu, ds;
+  n := length(lst);  
+  mu := (for each el in lst sum el) / n;
+  ds := for each el in lst sum (el - mu)^2;
+  return ds/n
+end;
+procedure SD(lst); sqrt(var(lst));
+% ------------------- helper functions ----------------- END
+
+on rounded $
+print_precision 5 $
+
+%############################################################
+%   EXAMPLE: THE TWO URNS from ch.4.2 of the script
+%############################################################
+
+%-- the data */
+X:={47,37,46,38,35,38,40,37.0};
+Y:={59,56,61,59,65,56,57,59.0};
+
+% Calculating statistics */
+
+m := dim(X)$
+n := dim(Y)$
+mu1 := mean(X);
+mu2 := mean(Y); 
+
+sigma1 := sd(X);
+sigma2 := sd(Y);
+
+alpha := 0.05;
+
+% Calculate Z statistic aka T aka z-score */
+
+zstat := (mu1 - mu2) / sqrt(sigma1^2 / m + sigma2^2 / n);
+
+Zcrit := stdnormINV(1-alpha/2);    %-- quantile aka critical value 
+
+% Calculate p-value for hypothesis 'two.sided' */
+
+pvalue := 2 * stdnormCDF(abs(zstat)); % abs statt -abs
+
+% Confidence interval CI */
+
+SEdiff := sqrt(sigma1^2/m + sigma2^2/n);
+
+CI := {(mu1-mu2) - Zcrit*SEdiff, (mu1-mu2) + Zcrit*SEdiff};
+
+ok$
+
+COMMENT ...................................
+sigma1 : 4.1155
+sigma2 : 2.7839
+alpha : 0.05;
+zstat : - 10.958
+Zcrit : 1.96
+pvalue : 0.0
+SEdiff : 1.7567
+CI : [- 22.693, - 15.807]
+$

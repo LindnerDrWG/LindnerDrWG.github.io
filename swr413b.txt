@@ -1,0 +1,67 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 4.13 b
+                      by W.G. Lindner 2026  $
+                  
+                      
+%|                 PEARSON's Chisq test
+
+% ------------------- helper functions ---------------------
+procedure chi2CDF(x, k);
+          if x<=0 or k<=0 then 0.0 
+          else iGamma(k*0.5, x*0.5) $
+procedure chi2inv(p,nu);  % use only chi2CDF
+  begin scalar lo,hi,mid,fmid, tol:= 1.0e-10;
+    lo := 0.0; hi := nu;
+    while chi2CDF(hi,nu) < p do hi := 2.0*hi;
+    for i := 1:1000 do
+    << mid := (lo+hi)/2.0;   % bisection
+       fmid := chi2cdf(mid,nu);
+       if abs(fmid-p) < tol then  mid; 
+       if fmid < p then lo := mid else hi := mid;
+    >>;   return (lo+hi)/2.0;
+  end;
+
+%######################################## cf. C code in [6, p.160]
+%##   chisqTest(a,b,c,d)
+%##
+%##   input:  a,b, c,d integer valued
+%##           A,B, C,D features watched
+%##   table               C  D 
+%##                    A:[a  b]
+%##                    B:[c  d]
+%##
+%##   is good approximation, if n=a+b+c+d > 40 and a,b,c,d > 5
+%################################################# four.fields test
+procedure chisqTest(a,b,c,d);
+begin scalar n,z,chi,p,phi;
+    if (a<=0 or b<=0 or c<=0 or d<=0) then
+         rederr("chisqTest: a,b,c,d musst be >0");
+    n   := a+b+c+d;
+    z   := abs(a*d-b*c) - 0.5*n;
+    chi := z*z*n/((a+b)*(c+d)*(a+c)*(b+d));
+    p   := 1 - chi2CDF(chi,1);
+    phi := sqrt(chi/n);     %-- contingency coefficient
+    write(" _____ ChiSquared test ____");
+    %  mat((chi_,p_,phi_),(chi,p,phi));
+    write "chi = ", chi;
+    write "p = ", p;
+    write "phi = ", phi
+END;
+
+
+on rounded $
+print_precision 5$
+
+chisqTest( 17, 122, 31 , 109);  
+
+COMMENT 
+
+chisqTest( a:17, b:122, c:31 , d:109)
+ _____ ChiSquared test ____
+┌                           ┐
+│  Chi       p        phi   │
+│                           │
+│ 4.1407  0.041864  0.12182 │
+└                           ┘
+$

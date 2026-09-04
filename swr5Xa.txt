@@ -1,0 +1,182 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 5.X a
+                      by W.G. Lindner 2026  $
+
+%|         Jackknife method '1-deleted'
+
+% ---------------------- helper functions ------------------
+procedure sum_(lst);   for each el in lst sum el $ 
+procedure mean(lst);   sum_(lst)/length(lst) $ 
+procedure listmake(m); for i:=1:m collect 0$
+procedure putNTH(L,k,v); begin scalar a:=L, b:={};;
+    for i:=1:(k-1) do
+         << b:=append(b,{first a}); a:=rest a>>;
+    b := append(b,{v}); a := rest a;
+    return append(b,a)  end;         
+	% example call:  putnth({1,2,3},2,9) --> {1,9,3};
+define    dim    = length $
+define    setNTH = putnth $
+
+
+%-- We first follow the jackknife process with the small data sample
+%-- used in the script. 
+
+% --------------------------------------------------------------
+%                 EXAMPLE: jackknife step-by-step
+% --------------------------------------------------------------
+COMMENT ADVICE: submit each of the following command lines 
+        (separated by blank lines) one after the other to 
+	the Web.Reduce Input_Editor and then press [enter]. $
+
+%--  We calculate the CI using SE (std.error.of.mean) 
+
+%-- the small data sample of the script
+X := {1,2,3,4};      
+
+n := dim(X);
+
+%-- container for the means
+M   := listmake(n);      
+
+%-- mean of X, 10/4 =2.5  ok ;)
+mX := Mean(X);       
+
+%-- Using a 'video' (i.e. a for loop) to watch how the sample X
+%-- is repeatedly '1-deleted' and the correspondent means recorded in M
+
+for  i:=1:n do 
+           begin 
+		   write("---------- new X one-deleted ----------"), write(i);
+           h := part(X,i);         %-- save X[i] in helper
+           X := setNTH(X,i,0); 
+           M := setNTH(M,i,n/(n-1)*Mean(X));  
+                Comment -- i=1:  X=(0,2,3,4).  mean(X)= 4/3*2.25
+                        -- i=2:  X=(1,0,3,4). mean(X)
+                        -- i=3:  X=(1,2,0,4). mean(X)
+                        -- i=4:  X=(1,2,3,0). mean(X)
+                        -- i.th element of X becomes 0, i.e. 'deleted'
+                        -- and afterwards reconstructed
+                        -- container M collects new Means  $
+           write {X,M};  
+                       %-- 1st row: X with one entry 'deleted'
+                       %-- 2nd row: mean of the 1st row 
+           X := setnth(X,i, h);  %-- restore X[i] from helper h
+           END;
+
+% ... the Jackknife means collected in M:
+M;
+
+load_package matrix;
+
+%-- X and M as a 2 x 4 matrix, X 1st row, M 2nd row
+mat( (1,2,3,4), (3,8/3,7/3,2)) ;          
+
+%-- the mean of the Jackknife means of M,
+%-- theta is mean of means in M
+theta := Mean(M) ;             
+        
+%-- mean of the means
+jac := n*mX  - (n-1)*theta ;   
+
+% ... calculate the pseudovariables Ji 
+
+%-- container list for the pseudovariables Ji 
+JCK := for i:=1:n collect  n*mX - (n-1)*part(M,i);    
+
+%-- collect the differences  jac - JCK(i)    
+D  :=  for i:=1:n collect  jac - part(JCK,i);
+
+su :=  for i:=1:n Sum part(D,i)^2;   % = D^2
+
+sigma := sqrt(su/(dim(X)-1));  
+
+on rounded $
+print_precision 5 $
+
+sigma;
+
+% ... calculate standard error of mean SE
+%     or use the fact  se = sqrt(var(JCK)/n)
+SE := sigma/sqrt(n);        
+
+% ... calculate Confidence Interval CI using std.error (SE) of mean 
+
+CIm := Mean(JCK) - SE;
+
+CIp := Mean(JCK) + SE;
+
+CI := {CIm, CIp};
+
+% RESULT: mean 2.5 is between 1.85 and 3.14, ok :)
+
+% -------------------------------------------------------------------
+
+
+
+COMMENT here is the Output_Display: 
+           
+---------- new X '1-deleted' ----------
+1
+[[0, 2, 3, 4], [3, 0, 0, 0]]
+
+---------- new X '1-deleted' ----------
+2
+                   8
+[[1, 0, 3, 4], [3, ─, 0, 0]]
+                   3
+				   
+---------- new X '1-deleted' ----------
+3
+                   8  7
+[[1, 2, 0, 4], [3, ─, ─, 0]]
+                   3  3
+				   
+---------- new X '1-deleted' ----------
+4
+                   8  7
+[[1, 2, 3, 0], [3, ─, ─, 2]]
+                   3  3
+				   
+/*-- X and M as a 2 x 4 matrix, X 1st row, M 2nd row */
+┌            ┐
+│ 1  2  3  4 │
+│            │
+│    8  7    │
+│ 3  ─  ─  2 │
+│    3  3    │
+└            ┘
+
+jac : n*mX  - (n-1)*theta ;
+ 5
+ ─
+ 2
+
+/*-- container for the pseudovariables Ji */
+print(JCK);
+[1, 2, 3, 4]
+
+D  : jac - JCK;
+  3  1    1    3
+ [─, ─, - ─, - ─]
+  2  2    2    2
+
+su : 
+ 5
+
+sigma : 
+ 1.291
+
+/*... calculate standard error of mean */
+SE : sigma/sqrt(n);
+ 0.6455
+
+/*... calculate Confidence Interval CI using std.error (SE) of mean */
+
+CIm : Mean(JCK) - SE;
+ 1.8545
+
+CIp : Mean(JCK) + SE;
+ 3.1455
+
+CI : [CIm, CIp];
+ [1.8545, 3.1455]

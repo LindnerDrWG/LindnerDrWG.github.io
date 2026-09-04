@@ -1,0 +1,61 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 5.5 a
+                      by W.G. Lindner 2026  $
+                      
+%|         PEARSON's LINEAR REGRESSION LINE
+
+% ---------------------- helper functions ------------------
+
+procedure xapply(f,lst); lisp(f.cdr(lst))$       
+procedure sum_(lst);     xapply(+, lst)$ 
+procedure mean(lst);     xapply(+, lst)/length(lst)$ 
+define    dim = length$
+
+
+%%%%         LINEAR REGRESSION 
+%### --------------------------------------------------------
+%            EXAMPLE: electrical resistance of a conductor
+%### --------------------------------------------------------
+COMMENT ADVICE: submit each of the following command lines 
+        (separated by blank lines) one after the other to 
+		the Web.Reduce Input_Editor and then press [enter]. $
+
+X := {19,25,30,36,40,45,50}$
+Y := {76.3, 77.8, 79.8, 80.8, 82.4, 83.9, 85.1}$
+
+%-- Determine the linear regression line through the points (X,Y).
+%-- FIRST Solution step-by-step 
+
+on rounded $
+print_precision 5$
+
+n := dim(X)$
+
+mX := Mean(X);
+
+mY := Mean(Y);
+
+sXY := for i:=1:n sum (part(X,i)-mX)*(part(Y,i)-mY);
+       % = Sum((X-mX)*(Y-mY)) i.e. covariance of X and Y
+
+sX := for i:=1:n sum (part(X,i)-mX)^2;
+       % = Sum((X-mX)^2) i.e. sum the squared differences to the mean
+
+a := sXY/sX;          %-- constant a of regression line y=ax+b
+
+b := 1/n*(Sum_(Y)-a*Sum_(X));  %--  slope b or regression coefficient
+
+write("     y = a*x+b    :");
+
+mat((a_, b_), (a,b));    % a=0.287  b= 70.8
+
+
+
+COMMENT  result
+┌                 ┐
+│    a       b    │
+│                 │
+│ 0.28757  70.807 │
+└                 ┘
+$

@@ -1,0 +1,69 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 4.5 b
+                      by W.G. Lindner 2026  $
+                      
+%|         tdiff test
+             
+% ------------------- helper functions ---------------------
+COMMENT
+   To calculate the tDIFF score 'T' we need only function
+   tCDF()  $
+
+procedure tPDF(x,f);  
+          1/(sqrt(f)*Beta(1/2,f/2))*(1+ x^2/f)^(-0.5*(f+1)) $
+procedure tCDF(a,df);
+   if a=0 then 0.5 else 
+   if a<0 then 0.5 * ibeta(df/2, 0.5, df/(a^2 + df)) else
+           1 - 0.5 * ibeta(df/2, 0.5, df/(a^2 + df));
+procedure MEAN(X);  (for each el in X sum el)/length(X);
+procedure SUM_(X);  (for each el in X sum el);
+define    DIM = length$
+
+
+%---------------------------------------------------
+procedure  tdiff(X,Y,alpha);
+%---------------------------------------------------
+begin scalar T_,df,D,d_,n, sum1, sum2, pvalue;
+   n  := dim(X);
+   df := n-1;
+   D  := for k:=1:n collect part(X,k)-part(Y,k); 
+   sum1 := Sum_(D);
+   sum2 := for k:=1:n sum part(D,k)*part(D,k);  % = D.D
+   d_  := sqrt((sum2-sum1^2/n)/(n*(n-1.)));
+   T_   := sum1/(n*d_);
+   pValue := min( 2*tCDF(T_,df), 2*(1-tCDF(T_,df)) );
+   if (pValue < 0.975) then write("..... accept H0")
+                        else write("..... reject H0");
+   write "T = ",T_;
+   write "pValue = ",pvalue;
+   mat((T__,p_alue),(T_, pvalue))    %-- no output                                  
+END;
+
+
+
+%#################################################
+%      EXAMPLE: monthly rainfall
+%#################################################
+
+on rounded $
+print_precision 5$
+
+X := {52.4,37.4,41.2,71.5,51.3,21.6,17.7,21.2,41.3,32.0,53.0,61.4}$
+Y := {47.8,42.0,33.2,41.0,29.5,28.1,17.4,21.5,41.4,51.3,49.5,53.7}$          
+
+tdiff(X,Y,0.05);
+
+% TASK:
+% Calculate t45 and confidence interval CI.
+% Look at exercise 44a and the helper functions.
+
+
+COMMENT result:
+
+ accept H0
+┌                   ┐
+│    T:      1.022  │
+│                   │
+│ p-value:  0.32874 │
+└                   ┘
+$

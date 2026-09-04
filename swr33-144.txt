@@ -6,13 +6,28 @@ COMMENT
 
 % -------------- tiNV via num_solve ------- -----------------
 
-procedure tINV(p,df); 
+procedure tINV(p,df);
+     << clear x;
+        rhs first num_solve(1-0.5*ibeta(df/2,0.5,df/(x^2+df))=p, x=2)
+     >> $
+
+
+procedure tINV1(p,df); 
       <<
-       clear x;
-       if x=0.0 then -infinity else
-       if x=1.0 then +infinity else
+       clean x;
+       if p=0.0 then -infinity else
+       if p=1.0 then +infinity else
        rhs first num_solve(1-0.5*ibeta(df/2,0.5,df/(x^2+df))=p, x=2)
       >>$
+
+on rounded $
+print_precision 5$
+
+
+for df:=1:6 do write {df, tINV(0.99,df)} ;
+
+for df:=1:6 do write {df, tINV1(0.99,df)} ;
+
 
 % -------------- tiNV via NEWTON iteration  -----------------
 
@@ -46,9 +61,9 @@ print_precision 5$
 %% ... wait ...
 
 for df:=1:6 do write {df, tINV_NR(0.99,df)} ;
-for df:=1:6 do write {df, tINV(0.99,df)} ;
 
 $ ok
+
 
 COMMENT reference results.
 

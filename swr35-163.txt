@@ -24,6 +24,9 @@ for each el in p do write {el,  chi2INV(el,10)} ;
 %% ***** Newton method does not converge  for p=0.975
 
 
+% ------------------- Example with chiINV_bisection ------
+
+
 % Check with chiINV_bisection or chi2INV_Newton.
 
 procedure chi2CDF(x, k);
@@ -36,6 +39,7 @@ procedure chi2CDF(x, k);
 % nu  = degrees of freedom
 % p   = cumulative probability
 % tol = desired accuracy
+% needs chi2CDF(x, k)
 
 procedure chi2inv_bi(p,nu);
   begin scalar lo,hi,mid,fmid, tol:= 1.0e-8;
@@ -53,6 +57,9 @@ procedure chi2inv_bi(p,nu);
   end;
 
 %--- test
+
+on rounded $
+print_precision 5$
 
 p := {0.9,0.95,0.975,0.99};
 

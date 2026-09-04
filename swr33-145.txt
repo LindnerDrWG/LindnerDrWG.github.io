@@ -64,13 +64,10 @@ procedure tinv2a(p,nu);     % enhanced by F.J. Wright
 
 % -------------- d. tiNV via num_solve  -----------------
 
-procedure tINV(p,df); 
-      <<
-       clear x;
-       if x=0.0 then -infinity else
-       if x=1.0 then +infinity else
-       rhs first num_solve(1-0.5*ibeta(df/2,0.5,df/(x^2+df))=p, x=2)
-      >>$
+procedure tINV3(p,df);
+     << clear x;
+        rhs first num_solve(1-0.5*ibeta(df/2,0.5,df/(x^2+df))=p, x=2)
+     >> $
 
 % ----------------------- Example usage ----------------
 
@@ -82,6 +79,8 @@ X := {0.9,0.95,0.975,0.99}$
 
 matrix M(5,20)$
         
+Write "Please, wait some time ... START:";
+
 symbolic operator time; % use Lisp timer
 start_time := time();
 <<

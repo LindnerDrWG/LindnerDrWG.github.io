@@ -1,0 +1,65 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 5.5 a
+                      by W.G. Lindner 2026  $
+                      
+             
+%|         PEARSON's LINEAR REGRESSION LINE
+
+% ---------------------- helper functions ------------------
+procedure xapply(f,lst); lisp(f.cdr(lst))$       
+procedure sum_(lst);     xapply(+, lst)$ 
+procedure mean(lst);     xapply(+, lst)/length(lst)$ 
+define    dim = length$
+
+
+%      SECOND Solution using regression function
+%### --------------------------------------------------------------
+%###   regression : PEARSON's LINEAR REGRESSION LINE 
+%###           for  linear relation between X and Y, i.e. X ~lin Y
+%### --------------------------------------------------------------
+procedure regression(X,Y);
+    begin scalar n,mX,mY,sX,sY,sXY,a,b; 
+      n   := dim(X);
+      mX  := Mean(X);
+      mY  := Mean(Y);
+      sXY := for i:=1:n sum (part(X,i)-mX)*(part(Y,i)-mY);
+      sX  := for i:=1:n sum (part(X,i)-mX)^2;
+      a   := sXY/sX ;
+      b   := 1/n*(Sum_(Y)-a*Sum_(X));
+      write "a = ",a,"   ", "b = ",b;
+      % mat((a_, b_), (a,b))
+    END;
+    
+define lm = regression$         % alias for regression
+
+% ------------------------------------------------------ END
+
+% ............................ EXAMPLE 5.5 .............
+
+X := {19,25,30,36,40,45,50}$
+Y := {76.3, 77.8, 79.8, 80.8, 82.4, 83.9, 85.1}$
+
+%-- Determine the linear regression line through the points (X,Y).
+
+on rounded $
+print_precision 5$
+
+regression(X,Y)$
+lm(X,Y)$
+
+
+COMMENT resulkts
+regression(X,Y):
+┌                 ┐
+│    a       b    │
+│                 │
+│ 0.28757  70.807 │
+└                 ┘
+lm(X,Y)$
+┌                 ┐
+│    a       b    │
+│                 │
+│ 0.28757  70.807 │
+└                 ┘
+$

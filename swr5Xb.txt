@@ -1,0 +1,74 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 5.X b
+                      by W.G. Lindner 2026  $
+                   
+%|         Jackknife method '1-deleted'
+
+% ---------------------- helper functions ------------------
+procedure sum_(lst);   for each el in lst sum el $ 
+procedure mean(lst);   sum_(lst)/length(lst) $ 
+procedure listmake(m); for i:=1:m collect 0$
+procedure putNTH(L,k,v); begin scalar a:=L, b:={};;
+    for i:=1:(k-1) do
+         << b:=append(b,{first a}); a:=rest a>>;
+    b := append(b,{v}); a := rest a;
+    return append(b,a)  end;         
+	% example call:  putnth({1,2,3},2,9) --> {1,9,3};
+define    dim    = length $
+define    setNTH = putnth $
+
+
+%### ---------------------------------------------------------
+%###     ALGORITHM: Jackknife method '1-deleted'
+%### ---------------------------------------------------------
+
+procedure jack(X, alpha);
+begin scalar n,mX,mM,jac,D,su,sigma,SE,M,JCK;
+    n := dim(X);
+    M := listmake(n);
+    mX := mean(X);
+    for i:=1:n do
+        begin
+          h := part(X,i); X := setNTH(X,i,0); 
+          M := setNTH(M,i,n/(n-1)*Mean(X));  
+          X := setnth(X,i, h)
+        end;
+    mM  := mean(M);            
+    jac := n*mX - (n-1)*mM ;  
+    JCK := for i:=1:n collect   n*mX - (n-1)*part(M,i);    
+	D   := for i:=1:n collect   jac - part(JCK,i);
+	su  := for i:=1:n Sum       part(D,i)^2; 
+	sigma := sqrt(su/(dim(X)-1));  
+    SE  := sigma/sqrt(n);   
+    CI  := {Mean(JCK) - SE, Mean(JCK) + SE};
+    % alternative: CI := tINV(alpha/2,n-1)*SE
+    write("The nonparametric -leave-one-out- jackknife algorithm");
+    write "SE = ", se;
+    write "CI = ", CI
+    % load_package matrix;
+    % mat((SE_, CI_l, CI_h), (SE, mean(JCK)-SE, mean(JCK)+ SE))
+END;
+
+% ----- Test
+
+on rounded $
+print_precision 5$
+
+%-- Check with jack 
+
+X := {1,2,3,4}$
+jack(X, 0.05);
+
+
+COMMENT
+
+jack(X, 0.05)$
+The nonparametric 'leave-one-out' jackknife algorithm
+┌                         ┐
+│   SE     CI.l    CI.h   │
+│                         │
+│ 0.6455  4.5543  0.44574 │
+└                         ┘
+$
+

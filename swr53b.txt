@@ -1,0 +1,101 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 5.3.b
+                      by W.G. Lindner 2026  $
+                      
+                      
+%|         KENDALL's tau
+
+% ---------------------- helper functions ------------------   
+procedure MEAN(lst);  (for each el in lst sum el )/length(lst)$
+procedure LISTMAKE(m); for i:=1:m collect 0$
+procedure SP(X,Y);  % scalar product alias inner product
+          for i := 1:length(X) sum part(X,i) * part(Y, i)$
+                             % zip the sum of products 
+define    DOT = sp$
+
+
+rank(w) := block( [n, rg, positions, i, j], 
+    /* rank: contributed by Michel Gosse and Leo Butler */
+    local(rg),
+    n : length(w),
+    rg(v, sl, nl) := block([positions:[], k],
+        for k:1 thru nl do
+            if sl[k] = v then positions : append(positions, [k]),
+        lreduce("+", positions,0) / length(positions) ), 
+    makelist(rg(w[i], w, n), i, 1, n) )$
+
+/*-- Remark: Explanatory notes in Example.5.2.1 Father vs. Son */
+
+correspond(X,sX) := block([M, n],    /*-- input: X and sortedX */
+      M : listmake(dim(X)),  
+      n : dim(X),
+      for j:1 thru n do
+          for i:1 thru n do if(sX[i]=X[j]) then M[j]:rank(sX)[i],
+      M)$
+
+/*
+-- SECONDLY we calculate rho automatically using two helper
+--          functions sort(), rank() and correspond(ence)
+-- we need 2 self-made helper functions: sort1, rank, correspond */
+
+
+/* 
+=========== EXAMPLE from numiqo.com ===========
+
+-- Suppose two doctors rank 6 patients by descending physical health.
+-- One of the two doctors, in this case the female, is now defined as
+-- the reference and the patients are sorted from 1 to 6.
+
+-- We calculate Kendall's Tau τ with this formula:
+--              τ = (C-D)/(C+D)
+-- where C is the number of 'concordant' pairs ('inversions')  
+-- and     D is the number of 'discordant' pairs.
+-- Kendall's tau τ lies between -1 and +1.                                        
+*/
+
+
+/* SECOND  we abstract the whole process/procedure into a function.
+
+### --------------------------------------------------------------
+### FUNCTION kendall : general function KENDALL's tau
+### -------------------------------------------------------------- */
+
+kendall(X,Y) := block( [n,sX,sY,cY,p,q,w, tau],
+
+                 n  : dim(X),
+                 sX : sort(X),
+                 sY : sort(Y, 'ordergreatp),
+                 cY : correspond(Y, sY),
+                 p:0, q:0, w:0, 
+                for j:1 thru n-1 do
+                    for i:j+1 thru n do (
+                          w : signum(X[i] - X[j]) * signum(Y[i] - Y[j]),
+                          if w > 0 then p : p + 1,
+                         if w < 0 then q : q + 1 ),
+                tau : float((p - q)/(p + q)),                 /*--or:  tau : 2*(p-q)/n/(n-1),  */
+                print("---------- KENDALL tau ----------"),
+                print(matrix(["C","D","tau"], [q,p,tau])) 
+ )$
+/*### ---------------------------------------------------------- END */
+
+fpprintprec : 5$
+
+
+X : [1,2,3,4,5,6]$
+Y : [3,1,4,2,6,5]$
+
+kendall(X,Y)$
+
+fpprintprec : 5$
+%i8
+X : [1,2,3,4,5,6]$
+%i9
+Y : [3,1,4,2,6,5]$
+%i10
+kendall(X,Y)$
+---------- KENDALL tau ----------
+┌                ┐
+│ C  D     tau   │
+│                │
+│ 4  11  0.46667 │
+└                ┘

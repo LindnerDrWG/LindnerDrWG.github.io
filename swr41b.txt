@@ -1,0 +1,115 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 4.1 b
+                      by W.G. Lindner 2026  $
+                      
+%|             Z-Test alias Gauss test
+
+% ------------------- helper functions ---------------------
+%   To calculate the Z-TEST we need the functions
+%   stdnormCDF() and stdnormINV() as helper.    
+precision 10;
+procedure normCDF(x,m,s); 1/2+erf((x-m)/(s*sqrt(2)))/2 $
+procedure stdnormCDF(x);  normCDF(x, 0,1);   
+procedure normINV(q,m,s);
+     if q=0 then  infinity else if q=1 then -infinity else     
+     if 0<q and q<1 then
+     begin scalar y := 2*q-1, xx;
+        if y = 0 then return 0;
+        clear x;
+        xx := num_solve(erf x = y, x = y); % a list of equations
+        xx := rhs first xx;
+        return m + sqrt(2) * s * xx
+    end$
+procedure stdnormINV(q); normINV(q,0,1)$
+procedure MEAN(X);  (for each el in X sum el)/length(X);
+% ------------------- helper functions ----------------- END
+
+
+COMMENT
+-- Now we abstract the process to a function Ztest.
+-- II. automatic SOLUTION using Z-TEST function   $
+
+
+% ------------------- function ZTEST ---------------------
+procedure ztest(data, mu0, sigma, alpha, altHyp);
+%
+% default: mu0 = 0; sigma = 1; alpha = 0.05; altHyp = 0
+% input:   data       - sample (vector of values)
+%          mu0, sigma - parameter of normal distribution
+%          alpha      - significance level (0<=alpha<=1)
+%          altHyp     - mode of test
+%                          0 = two sided
+%                          1 = one sided greater
+%                         -1 = one sided smaller
+% output: Z-value, quantile, ConfidenceInterval CI, p-value
+
+begin scalar n:= length(data),MD,Z,quantil,CI,p, M;
+    mD := mean(data);
+    Z  := sqrt(n)*(mD - mu0)/sigma; 
+    
+    if not (althyp = 1 or althyp = -1 or althyp = 0) 
+       then rederr("ztest: altHyp must be 0,1 or -1.");
+    if altHyp = 0 then               %-- two-sided test */
+         <<
+            quantil := stdnormINV(1-alpha/2);
+            CI := {mD - quantil*sigma/sqrt(n), mD + quantil*sigma/sqrt(n)};
+            p  := min( 2*stdnormCDF(Z), 2*(1-stdnormCDF(Z))) 
+          >>;
+   if altHyp = 1 then                %-- one-sided test greater */
+         <<
+            quantil := stdnormINV(1-alpha);
+            CI := {-infinity, mD - quantil*sigma/sqrt(n)};
+            p  := 1 - stdnormCDF(Z)
+            >>;
+   if altHyp = -1 then               %-- one sided smaller */
+         <<
+            quantil := stdnormINV(1-alpha);
+            CI := {-infinity,  mD + quantil*sigma/sqrt(n)};
+            p := stdnormCDF(Z)
+          >>;
+
+write "Z          = ", Z;
+write "Quantile = ", quantil;
+write "CI_left  = ", first CI;
+write "CI_right = ", second CI; 
+write "          p = ", p;
+      
+write mat((Z_,p_,Quantile_),(Z,p,quantil));
+write mat((CIleft_,CI_right),(first CI, second CI));
+
+% following command does NOT WORK: ------------------------------ ??
+% write mat(( Z_,quantil_,CI_left_, CI_right_, p_),
+%           ( Z, quantil, first CI, second CI, p))
+
+END;
+
+
+%-------------------CHECK of ztest with above data --------------
+
+write("--- EXAMPLE : female blood pressure ---")$
+
+on rounded $
+print_precision 5 $
+
+X  := {141.5, 152.3, 121.2, 123.0, 151.6, 124.8, 
+       138.9, 137.4, 145.6, 135.6, 135.4, 121.5}; 
+
+%--       mu0   sigma  alpha  type */
+ztest(X, 124.6, 14.5, 0.05,  -1);
+%ztest(X, 124.6, 14.5, 0.05,  +1);
+%ztest(X, 124.6, 14.5, 0.05,  0);
+
+
+COMMENT
+-- CHECK using Octave:
+-- octave> pkg load statistics
+-- octave> X = [141.5, 152.3, 121.2, 123.0, 151.6, 124.8, 138.9,
+--              137.4, 145.6, 135.6, 135.4, 121.5]
+-- octave> [h, pval, ci, zvalue] = 
+--         ztest(X, 124.6, 14.5,"alpha", 0.05, "tail", "both") 
+--         ans =    h  = 1
+--               pval  = 7.8189e-03
+--               ci    = 127.53   143.94
+--              zvalue = 2.6598
+done $
+

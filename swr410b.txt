@@ -1,0 +1,109 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 4.10 b
+                      by W.G. Lindner 2026  $
+                      
+             
+%|         WILCOXON one sample signed rank test 
+
+% ----------------------- helper functions ----------------
+procedure SUM_(X);  for each el in X sum el$ 
+procedure mean(X);  Sum1(X)/length(X)$
+procedure sp(X,Y);  % scalar product alias inner product
+   for i := 1:length(X) sum part(X,i) * part(Y, i)$
+procedure quicksort(l);  % - by Gemini AI
+   if l = {} then {}
+   else begin
+      scalar pivot, rest_l, left, right, x;
+      pivot := first(l);  rest_l := rest(l);
+      left  := {};         right := {};
+      for each x in rest_l do
+         if x <= pivot then left  := x . left
+                       else right := x . right;
+      return append(quicksort(left), pivot . quicksort(right));
+   end;
+procedure putNTH(l,k,v);
+ begin scalar a,b; integer i;
+    a:=l; b:={};
+    for i:=1 step 1 until k-1 do
+         <<b:=append(b,{first a}); a:=rest a>>;
+    b:=append(b,{v}); a:=rest a;
+    return append(b,a)
+ end;
+procedure crank_aux(v, sL, nL);           
+% v : element of list L, sL: sorted L; nL: length L    
+% crank.red - Numeric Recipes CRANK, p.510 for REDUCE
+% Lisp'ish VERSION: W must be sorted increasingly
+% returns S, and W is modified in place with averaged ranks  
+   begin scalar positions:={};
+      for k:=1:nl do
+          if part(sl,k) = v 
+             then positions := append(positions, {k});
+      return sum_(positions) / length(positions)
+    end;
+procedure  crank(w);     % w should be sorted
+begin scalar s, n;
+    s := quicksort(w);   % or sortnumlist(w) of package assist
+    n := length(w);
+    return for i:=1:n collect crank_aux( part(w,i), s, n) 
+END ;
+procedure correspond(X,soX);  
+begin scalar n:=length(X);
+   M  := for i:=1:n collect 0;
+   rX := cRank(soX);
+   for j:=1:n do for i:=1:n do 
+       if    part(soX,i)=part(X,j) 
+       then  M := putnth(M, j, part(rX,i));
+   return M;
+END;
+define    DIM  = length $
+define    DOT  = sp $
+define    SORT = quicksort $
+
+
+
+%|         WILCOXON one sample signed rank test with REDUCE
+%###########################################################
+procedure  signrank(X,med);
+%###########################################################
+BEGIN scalar n:=length(X),D,sD,aD,cD,Z,ZR, T_;
+    D  := for i:=1:n collect part(X,i) - med;  
+    aD := map(abs, D); 
+    sD := sort(aD);
+    cD := correspond(aD,sD);
+    Z  := for i:=1:n collect if part(D,i)>0 then 1 else 0;
+    ZR := for i:=1:n collect part(Z,i)*part(cD,i);
+    W  := dot(Z,cd);
+    T_  := (W - n*(n+1)/4)/ sqrt(n*(n+1)*(2*n+1)/24);
+     write " (W,T)=", {W,T_}
+END;
+%####################################################### END
+
+
+% ----------   EXAMPLE 2.2 from PennState Eberly College
+% -- https://online.stat.psu.edu/stat415/lesson/20/20.2
+COMMENT 
+-- Let X_i denote the length, in centimeters, of a randomly 
+-- selected pygmy sunfish, i=1..10. 
+-- If we obtain the following data set
+--       5.0 3.9 5.2 5.5 2.8 6.1 6.4 2.6 1.7 4.3
+-- can we conclude that the median length of pygmy sunfish 
+-- differs significantly from 3.7 centimeters?     
+-- SOLUTION: 
+--       by WILCOXON one sample signed rank test         $ 
+
+on rounded $
+print_precision 5$
+
+Y := {5.0, 3.9, 5.2, 5.5, 2.8, 6.1, 6.4, 2.6, 1.7, 4.3};
+
+signrank(Y,3.7);
+
+
+COMMENT
+signrank(Y,3.7);
+┌              ┐
+│  W      T    │
+│              │
+│ 40.0  1.2741 │
+└              ┘
+$

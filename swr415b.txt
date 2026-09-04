@@ -1,0 +1,79 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 4.10 a
+                      by W.G. Lindner 2026  $
+                      
+             
+%|                    McNEMAR TEST
+
+%|  McNEMAR test needs cumulative Chi.square distribution 
+%|  and cumulative binomial distribution
+
+procedure binoCDF(k,n,p);
+          iBeta(n-k,k+1,1-p);
+
+procedure chi2CDF(x, k);
+          if x<=0 or k<=0 then 0.0 
+          else iGamma(k*0.5, x*0.5) $
+
+%### ------------------- McNEMAR test ----------------------
+%###     mcnemarTest(a,b,c,d,method)
+%###            method = "asymptotic", "corrected", "exact"
+%### ....................................................... 
+procedure mcnemarTest(a,b,c,d,method);
+begin
+  scalar n,chi,h,p;
+  if( a<=0 or b<=0 or c<=0 or d<=0) then rederr("Error: a,b,c,d ?");
+  n  :=  a+b+c+d;
+  if (method=asymptotic) then 
+                 <<chi := (b-c)^2 / (b+c);
+                   p   := 1-chi2CDF(chi, 1) >>
+  else if (method=corrected) then  %-- YATES correction
+                 << chi := (abs(b-c)-1)^2 / (b+c);
+                    p   := 1-chi2CDF(chi, 1) >>
+  else if (method=exact) then
+                 p := 2*binoCDF(b, b + c, 0.5) 
+  else rederr("mcnemarTest: method must be 
+                     asymptotic,corrected or exact");
+  Ho := if (p < 0.05) then 0 else 1;
+  write "chi =", chi;
+  write "p =", p;
+  write "0: reject Ho - 1: accept Ho";
+  write "Ho =", Ho
+  % result := mat( (chi_,  Ho_, p_),(chi, h, p ))
+  % return result
+END$
+%-------------------------------------------------------------END 
+
+on rounded $
+print_precision 5$
+
+% -- Check of Example 4.14 
+X := {37, 17, 9, 25}$
+mcnemarTest(part(X,1), part(X,2),  part(X,3), part(X,4), asymptotic);
+mcnemarTest(part(X,1), part(X,2),  part(X,3), part(X,4), corrected);
+mcnemarTest(part(X,1), part(X,2),  part(X,3), part(X,4), exact);
+
+
+COMMENT 
+
+mcnemarTest(X[1], X[2],  X[3], X[4], "asymptotic");
+┌                     ┐
+│  chi       p     Ho │
+│                     │
+│ 2.4615  0.11666  1  │
+└                     ┘
+
+mcnemarTest(X[1], X[2],  X[3], X[4], "corrected");
+┌                     ┐
+│  chi       p     Ho │
+│                     │
+│ 1.8846  0.16981  1  │
+
+mcnemarTest(X[1], X[2],  X[3], X[4], "exact");
+┌                 ┐
+│ chi    p     Ho │
+│                 │
+│ chi  1.9245  1  │
+└                 ┘
+$

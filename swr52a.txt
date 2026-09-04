@@ -1,0 +1,245 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 5.2 a
+                      by W.G. Lindner 2026  $
+                      
+
+% ----------------------- helper functions ----------------
+
+procedure SUM_(X);  for each el in X sum el$ 
+procedure mean(X);  Sum1(X)/length(X)$
+procedure quicksort(l);  % - by Gemini AI
+   if l = {} then {}
+   else begin
+      scalar pivot, rest_l, left, right, x;
+      pivot := first(l);  rest_l := rest(l);
+      left  := {};         right := {};
+      for each x in rest_l do
+         if x <= pivot then left  := x . left
+                       else right := x . right;
+      return append(quicksort(left), pivot . quicksort(right));
+   end;
+load_package assist;           %-- for use of sortnumlist
+define    DOT = sp$
+define    DIM = length$
+
+
+% ------------------------------------------------------ 
+%          SPERAMAN's rank correlation rho ρ
+% ------------------------------------------------------ 
+
+COMMENT ADVICE: submit each of the following command lines 
+        (separated by blank lines) one after the other to 
+		the Web.Reduce Input_Editor and then press [enter].$
+COMMENT
+   In this script we demonstrate the determination of 
+   Spearman's rank correlation coefficient ρ in three phases:
+   FIRSTLY  we calculate ρ manually with help of REDUCE.
+   SECONDLY we calculate ρ semi-automatic using two helper
+            functions cRank() and correspond(ence).
+   THIRDLY  we calculate ρ fully automatic using function 
+            spearman() with the help of cov(ariance) function.    
+            This is done in file 5.3.b     $
+
+
+%----------------------------------------------------------
+%          EXAMPLE: heigths of fathers vs sons
+%----------------------------------------------------------
+% PROBLEM: The heights of a sample of 12 fathers and their oldest 
+%          sons are measured giving the following data:
+%          Far : 65,63,67,64,68,62,70,66,68,67,69,71
+%          Son : 68,66,68,65,69,66,68,65,71,67,68,70
+%          cf. Spiegel p. 434 P 17.24
+% TASK:    Calculate the Spearman rank correlation rho ρ.
+
+%-- a. SOLUTION manually step-by-step by REDUCE-'hand'
+
+on rounded $
+print_precision 5$
+
+Far := {65, 63, 67, 64, 68, 62, 70, 66, 68, 67, 69, 71};
+Son := {68, 66, 68, 65, 69, 66, 68, 65, 71, 67, 68, 70};
+
+%-- we may sort both data sets by eye, because they are small :)
+
+sFar := {62, 63, 64, 65, 66, 67, 67, 68, 68, 69, 70, 71};
+sSon := {65, 65, 66, 66, 67, 68, 68, 68, 68, 69, 70, 71};
+
+COMMENT
+  -- Because sFar[4]=65, 65 has rank=4, 
+  --      we  set 4 in place Far[1]=65, etc.
+  --            1.
+  -- Far =     (65, 63,  67, 64, 68, 62, 70, 66, 68,  67,  69, 71)
+  --             |   |  ...
+  -- rankFar = ( 4,  2, 6.5,  3, 8.5, 1, 11,  5, 8.5, 6.5, 10, 12)
+  -- we rank equal data using mean values if 'ties' are seen!
+$
+
+rFar := { 4,    2, 6.5,   3, 8.5,   1,  11,   5, 8.5, 6.5,  10, 12};
+rSon := {7.5, 3.5, 7.5, 1.5,  10, 3.5, 7.5, 1.5,  12,   5, 7.5, 11};
+
+%-- we now calculate the differences of corresponding ranks 
+n := dim(Far);
+D := for i:= 1:n collect part(rFar,i) - part(rSon,i);
+
+%-- and their squared values D^2 to get positive signs
+D2 := for i:= 1:n collect part(D,i)^2;
+
+%-- we have row 1: D, row2 : D^2:
+{D, D2};
+
+procedure SUM_(X);  for each el in X sum el$ 
+
+sum_(D2);      % = 72.5
+
+
+%-- According to [1], Spearman's correlation rho is defined as 
+%--    r = 1 - 6*sum((ranks(x)-ranks(y)).^2)/(N*(N*N-1))
+
+rho_Spearman := 1 - 6*sum_(D2)/n/(n^2-1);
+
+
+
+%---------------------------------------------------------
+%  b.   emi-automatic solution using sort() and cRank()
+%---------------------------------------------------------
+% -- we need two helper functions: sort and Rank.
+% -- Because Rank() is used in REDUCE's as operator,
+% -- we name our rank'ing function cRank, cf. NR.  
+
+procedure quicksort(l);  % - by Gemini AI
+   if l = {} then {}
+   else begin
+      scalar pivot, rest_l, left, right, x;
+      pivot := first(l);  rest_l := rest(l);
+      left  := {};         right := {};
+      for each x in rest_l do
+         if x <= pivot then left  := x . left
+                       else right := x . right;
+      return append(quicksort(left), pivot . quicksort(right));
+   end;
+   
+% crank.red - Numeric Recipes CRANK, p.510 for REDUCE
+% Lisp'ish VERSION: W must be sorted increasingly
+% returns S, and W is modified in place with averaged ranks        
+
+procedure crank_aux(v, sL, nL);   
+   % v : element of list L, sL: sorted L; nL: length L      
+   begin scalar positions:={};
+      for k:=1:nl do
+          if part(sl,k) = v 
+             then positions := append(positions, {k});
+      return sum_(positions) / length(positions)
+    end;
+procedure  crank(w);     
+begin scalar s, n;
+    s := quicksort(w);   % or sortnumlist(w) of package assist
+    n := length(w);
+    return for i:=1:n collect crank_aux( part(w,i), s, n) 
+END ;
+
+%-- remebmer the data
+Far := {65, 63, 67, 64, 68, 62, 70, 66, 68, 67, 69, 71};
+Son := {68, 66, 68, 65, 69, 66, 68, 65, 71, 67, 68, 70};
+
+%-- we first sort both samples using function sort()
+%-- i.e. quicksort() or sortnumlist() of package assist
+
+define SORT = quicksort $
+
+sFar := sort(Far) ;
+
+sSon := sort(Son);   
+
+%-- we rank both _sorted_(!) data automatically 
+%-- using function cRank:
+
+rFar := cRank(sFar);
+
+rSon := cRank(sSon);
+
+%-- check:
+%-- rows: original sample, then sorted and then ranked Fathers:
+{Far, sFar, rFar};
+
+%-- sorted and ranked Sons:
+{Son, sSon, rSon};
+
+%..........................................................
+COMMENT   CONSTRUCT the CORRESPONDENCE
+   we now construct the correspondence between the 
+   original data and the rankings of the sorted data.
+   FIRST we demonstrate the idea for finding corresponding pairs $
+%..........................................................
+% -- We need Helper function putNTH.
+
+procedure putNTH(l,k,v);
+ %     putNTH sets k-th element of list L to value v
+ %     part(L,k) gives only _reading_ access
+ begin scalar a,b; integer i;
+    a:=l; b:={};
+    for i:=1 step 1 until k-1 do
+         <<b:=append(b,{first a}); a:=rest a>>;
+    b:=append(b,{v}); a:=rest a;
+    return append(b,a)
+ end;
+
+define    DIM = length$
+
+M := for i:=1:dim(Far) collect 0;
+
+for i:=1:dim(Far) do if part(sFar,i)=part(Far,1) 
+         then  M := putnth (M, 1, part(rFar,i));
+write M;
+
+for i:=1:dim(Far) do if part(sFar,i)=part(Far,2) 
+         then  M := putnth (M, 2, part(rFar,i));
+write M;
+
+for i:=1:dim(Far) do if part(sFar,i)=part(Far,3) 
+         then  M := putnth (M, 3, part(rFar,i));
+write M;
+        
+%--  we abstract to ..
+MF:= for i:=1:dim(Far) collect 0;
+
+for j:=1:dim(Far) do 
+for I:=1:dim(Far) do if part(sFar,i)=part(Far,j) 
+         then  MF := putnth (MF, j, part(rFar,i));
+write MF;
+
+COMMENT
+ -- NOW we abstract this process into a function 'correspond'
+ -- Because sX is a turtle operator, we use soX for the
+ -- sorted list X   $
+
+procedure correspond(X,soX);  
+begin scalar n:=length(X);
+   M  := for i:=1:n collect 0;
+   rX := cRank(soX);
+   for j:=1:n do for i:=1:n do 
+       if    part(soX,i)=part(X,j) 
+       then  M := putnth(M, j, part(rX,i));
+   return M;
+END;
+
+cF := correspond(Far, sFar);
+
+cS := correspond(Son, sSon);
+
+%-- now the rest of the process is the same as above: 
+%-- we now calculate the differences of corresponding ranks 
+
+D := for i:= 1:n collect part(cF,i) - part(cS,i);
+
+%-- and their squared values D^2 to get positive signs
+
+D2 := for i:= 1:n collect part(D,i)^2;
+
+sum_(D2);      % = 72.5
+
+%-- Spearman's correlation rho is
+%--   rho = 1 - 6*sum((ranks(x)-ranks(y)).^2)/(N*(N*N-1))
+
+rho_Spearman := 1 - 6*sum_(D2)/n/(n^2-1);
+

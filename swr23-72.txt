@@ -18,7 +18,7 @@ COMMENT-----------------------------------------------------
   -- nbinPDF(x,n,p) returns the negative binomial pdf at the 
   -- value in x using the corresponding number n of successes
   -- and probability p of success in a single trial.
-  ---------------------------------------------------------- ;
+  ---------------------------------------------------------- $
 
 % variant 1: implementation with factorial function 
 
@@ -32,7 +32,7 @@ COMMENT -----------------------------------------------------
    WARNING: Unlike some other math software, REDUCE does not use  
    the exclamation mark symbol "!" for factorials. 
    The following variant avoids the call to factorial().  
-   ----------------------------------------------------------- ;
+   ----------------------------------------------------------- $
 
 % variant 2 : implementation with gamma function 
 
@@ -47,6 +47,7 @@ nbinPDF1(5, 3, 0.1);
 nbinPDF2(5, 3, 0.1);
 
 
+%.  ------------------------------------------------------
 %%% SURPLUS: an implementaion of factorial, see Steeb, p.9
 %%%          using an goTo-construct ;(
 

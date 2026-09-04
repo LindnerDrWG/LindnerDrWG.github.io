@@ -1,0 +1,55 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 4.10 a
+                      by W.G. Lindner 2026  $
+                      
+%|         FISHER exact test
+             
+% ---------------- helper functions ----------------------
+procedure hgPDF(NN,RR,n,r); 
+          binomial(RR,r)*binomial(NN-RR, n-r)/binomial(NN,n)$
+procedure hgCDF(NN,RR,n, x);
+          for k:=0:floor(x) sum hgPDF(NN,RR,n,k) $ % 
+
+
+%### --------------------------------------------------------------
+%###   Fisher's exact test for alpha
+%### --------------------------------------------------------------
+
+procedure fishertest(a,b,c,d, alpha);
+begin scalar n,p;
+    if (a<=0 or b<=0 or c<=0 or d<=0) then rederr("a,b,c,d ?");  
+     n := a+b+c+d;
+     p := hgCDF(n, a+b,a+c, a);
+     Ho := if (p < alpha) then (0) else (1);
+     % mat((Ho_,p_),(Ho,p));
+     write "Ho = ", Ho;
+     write "p = ", p;
+END;
+
+COMMENT  REMARK
+-- Fisher test is a good approx, if n=a+b+c+d <= 40.
+-- The smaller the value of p, the greater the evidence for 
+-- rejecting the null hypothesis
+-- MATLAB: h = fishertest(x) returns a test decision for Fisher’s 
+-- exact test of the null hypothesis that there are no nonrandom 
+-- associations between the two categorical variables in x, against 
+-- the alternative that there is a nonrandom association. 
+-- The result h is 1 if the test rejects the null hypothesis at 
+-- the 5% significance level, or 0 otherwise.  $
+
+on rounded $
+print_precision 5$
+
+fishertest(1,4, 14,12, 0.05);   %-- alpha = 0.05
+
+
+COMMENT result
+
+fishertest(1,4, 14,12, 0.05)
+┌             ┐
+│ Ho     p    │
+│             │
+│ 1   0.18638 │
+└             ┘
+$

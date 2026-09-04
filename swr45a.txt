@@ -1,0 +1,95 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 4.5 a
+                      by W.G. Lindner 2026  $
+                      
+
+%|         tdiff test
+
+% ------------------- helper functions ---------------------
+COMMENT
+   To calculate the tDIFF score 'T' we need only function
+   tCDF() 
+$
+
+procedure tPDF(x,f);  
+          1/(sqrt(f)*Beta(1/2,f/2))*(1+ x^2/f)^(-0.5*(f+1)) $
+procedure tCDF(a,df);
+   if a=0 then 0.5 else 
+   if a<0 then 0.5 * ibeta(df/2, 0.5, df/(a^2 + df)) else
+           1 - 0.5 * ibeta(df/2, 0.5, df/(a^2 + df));
+procedure tinv(p,nu); 
+% needs tcdf and tpdf
+   begin scalar x, f, fx, dx,
+      tol:= 1.0e-8, maxit:= 100;
+      x := 0;  
+      repeat <<
+         f  := tcdf(x,nu) - p;
+         fx := tpdf(x,nu);
+         dx := f/fx;
+         x := x - dx;
+         maxit := maxit - 1
+      >> until abs dx < tol or maxit = 0;
+      return x
+   end$
+procedure SD(lst);
+   begin
+     scalar n, mu, ds;
+     n := length(lst);  
+     mu := (for each el in lst sum el) / n;
+     ds := for each el in lst sum (el - mu)^2;
+     return sqrt(ds/(n-1))       % with n-1, sample
+   end;
+procedure MEAN(X);  (for each el in X sum el)/length(X);
+procedure SUM_(X);  (for each el in X sum el);
+define    DIM = length$
+
+
+%#################################################
+%      EXAMPLE: monthly rainfall
+%#################################################*/
+%      We first do the tDIFF STEP-BY-STEP
+
+on rounded $
+print_precision 5$
+
+X := {52.4,37.4,41.2,71.5,51.3,21.6,17.7,21.2,41.3,32.0,53.0,61.4}$
+Y := {47.8,42.0,33.2,41.0,29.5,28.1,17.4,21.5,41.4,51.3,49.5,53.7}$          
+
+%-- significance level of rejecting the null hypothesis:
+alpha := 0.05 $ 
+
+n := dim(X) $
+df := n-1 $
+
+% -- D := X-Y is in Reduce
+D := for k:=1:n collect part(X,k)-part(Y,k); % without do ;)
+
+sum1 := Sum_(D);
+
+%  sum2 = D.D == sum(i,1,n, D[i]*D[i]) == 
+sum2 := for k:=1:n sum part(D,k)*part(D,k); 
+
+d_ := sqrt( (sum2 - sum1^2/n)/(n*(n-1.)) ); %(!) d would be same as D
+
+T_ := sum1/(n*d_);
+
+pValue := min( 2*tCDF(T_,df), 2*(1-tCDF(T_,df)) );
+
+if (pValue < 0.975) then write("accept H0") else write("reject H0");
+
+t95 := tINV(1-alpha/2, df);    %-- quantil method "both sided"
+CI  := {mean(D) - t95*T_, mean(D) + t95*T_};
+
+
+COMMENT ---------------------------------------- Result
+
+D=X-Y : [4.6, - 4.6, 8.0, 30.5, 21.8, - 6.5, 0.3, 
+          - 0.3, - 0.1, - 19.3, 3.5, 7.7]
+sum1  :  45.6
+sum2  :  1998.3
+d     :  3.7183
+T     :  1.022
+pValue:  0.32874
+CI    :  [1.5507, 6.0493]
+accept H0
+$

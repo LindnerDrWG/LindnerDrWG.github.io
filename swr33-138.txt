@@ -17,9 +17,10 @@ on rounded$
 print_precision 5$
 
 1 - tcdf(10,99);
-
-
 % tcdf(10,99) is nearly 1, so the result becomes 0. 
+
+for i:=-4:4 do write {i, tCDF(i, 5) };
+
 
 
 % REMARK on iBeta. ...................................
@@ -30,3 +31,30 @@ print_precision 5$
 % the beta distribution. 
 
 
+
+% ------------------- an elaborate tCDF ---------------------
+
+COMMENT    To use num_solve we have to adjust our function tCDF.
+    F.J. Wright explains:
+   'A REDUCE operator such as ibeta is written so that it remains 
+    symbolic with a symbolic argument, but that is not the case for the 
+    procedure tCDF. The problem in tCDF is a < 0, which requires a to 
+    be numerical. To make tCDF work symbolically, we need to use a more 
+    complicated definition, something like this:' $
+
+
+operator tCDF ;
+let tCDF(~a,~df) => num_tCDF(a,df) when numberp a;
+
+procedure num_tCDF(a,df);
+  if a=0 then 0.5 else 
+  if a<0 then 0.5 * ibeta(df/2, 0.5, df/(a^2+df)) else
+          1 - 0.5 * ibeta(df/2, 0.5, df/(a^2+df));
+
+on rounded$
+print_precision 5$
+
+% you need a fresh Session, i.e. Restart REDUCE:
+
+for i:=-4:4 do write {i, tCDF(i, 5) };
+tcdf(3,5) ; %% 0.987;

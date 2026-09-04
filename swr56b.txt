@@ -1,0 +1,67 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 5.6 b
+                      by W.G. Lindner 2026  $
+                      
+               
+%|         ANOVA1
+
+% ---------------------- helper functions ------------------
+procedure xapply(f,lst); lisp(f.cdr(lst))$       
+procedure sum_(lst);     xapply(+, lst)$ 
+procedure mean(lst);     xapply(+, lst)/length(lst)$ 
+define    dim = length$
+
+
+%### --------------------------------------------------------
+%###   anova1 : ONE WAY ANOVA  
+%###            X k-by-n list 
+%### --------------------------------------------------------
+
+procedure sq(x); x^2;
+
+procedure anova1(X);
+begin scalar Xsq, T_,V,VB,VW,MSb,MSw,F, a,b; 
+    a  := dim(X) ;
+    b  := dim(part(X,1));
+    T_ := for i:=1:dim(X) sum sum_ part(X,i);
+    Xsq := for i:=1:a collect map(sq, part(X,i));    
+    V   := (for i:=1:dim(X) sum sum_ part(Xsq,i)) - T_^2/(a*b);;
+    VB  := 1/b*(for i:=1:dim(X) sum (sum_ part(X,i))^2) - T_^2/(a*b);
+    VW  := V-VB ;
+    dfb := a-1;
+    dfw := a*(b-1);
+    dft := a*b-1;
+    MSb := VB/dfb;
+    MSw := VW/dfw;
+    F   := MSb/MSw;
+    write " ----- Anova1 -----";
+    write "MSb = ", MSb;
+    write "MSw = ", MSw;
+    write "F = ", F;
+END;
+%--------------------------------------------------- 
+
+% ........................ EXAMPLE 5.6 .............
+
+X := {{3,4,5,4},{2,4,3,3},{4,6,5,5}};   
+     %-- the table as list of lists
+
+on rounded $
+print_precision 5$
+
+anova1(X);
+
+
+COMMENT
+------------ anova1(X) -----------
+┌                                 ┐
+│ Source   df  SS    MS       F   │
+│                                 │
+│ Between  2   8     4.0     6.0  │
+│                                 │
+│ Within   9   6   0.66667    -   │
+│                                 │
+│  Total   11  14     -     ANOVA │
+└                                 ┘
+$$

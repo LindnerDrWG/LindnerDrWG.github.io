@@ -1,0 +1,178 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 5.3 a
+                      by W.G. Lindner 2026  $
+                      
+%|         KENDALL's tau
+
+% ----------------------- helper functions ----------------
+               % activate helper functions
+
+procedure SUM_(X);  for each el in X sum el$ 
+procedure mean(X);  Sum1(X)/length(X)$
+procedure sp(X,Y);  % scalar product alias inner product
+   for i := 1:length(X) sum part(X,i) * part(Y, i)$
+procedure quicksort(l);  % - by Gemini AI
+   if l = {} then {}
+   else begin
+      scalar pivot, rest_l, left, right, x;
+      pivot := first(l);  rest_l := rest(l);
+      left  := {};         right := {};
+      for each x in rest_l do
+         if x <= pivot then left  := x . left
+                       else right := x . right;
+      return append(quicksort(left), pivot . quicksort(right));
+   end;
+load_package assist;           %-- for use of sortnumlist
+define    DOT = sp$
+define    DIM = length$
+
+%-- we now calculate the differences of corresponding ranks 
+%-- correspond uses cRank(sd) i.e. rank sorted differences
+
+% -- Helper function putNTH 
+%    putNTH sets k-th element of list L to value v
+%    part(L,k) gives only _reading_ access
+
+procedure putNTH(l,k,v);
+ begin scalar a,b; integer i;
+    a:=l; b:={};
+    for i:=1 step 1 until k-1 do
+         <<b:=append(b,{first a}); a:=rest a>>;
+    b:=append(b,{v}); a:=rest a;
+    return append(b,a)
+ end;
+
+% crank.red - Numeric Recipes CRANK, p.510 for REDUCE
+% Lisp'ish VERSION: W must be sorted increasingly
+% returns S, and W is modified in place with averaged ranks
+
+procedure crank_aux(v, sL, nL);           
+   % v : element of list L, sL: sorted L; nL: length L      
+   begin scalar positions:={};
+      for k:=1:nl do
+          if part(sl,k) = v then positions := append(positions, {k});
+      return sum_(positions) / length(positions)
+    end;
+procedure  crank(w);     % w should be sorted
+begin scalar s, n;
+    s := quicksort(w);   % or sortnumlist(w) of package assist
+    n := length(w);
+    return for i:=1:n collect crank_aux( part(w,i), s, n) 
+END ;
+
+sd := {0.2, 0.6, 0.9, 1.1, 1.3 , 1.5, 1.8, 2.0, 2.4, 2.7} ;
+rD := crank(sd);
+
+% rD = {1,2,3,4,5,6,7,8,9,10}, because there are no ties (duplicates)
+
+
+%|         KENDALL rank correlation tau (τ)
+
+COMMENT
+-- In this script we demonstrate the determination of Kendall's
+-- rank correlation coefficient tau τ in three phases:
+-- FIRST  we calculate τ manually with REDUCE
+
+
+COMMENT ADVICE: submit each of the following command lines 
+        (separated by blank lines) one after the other to 
+		the Web.Reduce Input_Editor and then press [enter].$
+
+% =========== EXAMPLE from numiqo.com ===========
+
+COMMENT
+-- Suppose two doctors rank 6 patients by descending physical health.
+-- One of the two doctors, in this case the female, is now defined as
+-- the reference and the patients are sorted from 1 to 6.
+
+-- We calculate Kendall's Tau τ with this formula:
+--              τ = (C-D)/(C+D)
+-- where C is the number of 'concordant' pairs ('inversions')  
+-- and   D is the number of 'discordant' pairs.
+-- Kendall's Tau τ lies between -1 and +1.                  
+-- we show the steps by means of a 'video in scenes'. $
+
+
+on rounded $
+print_precision 5$
+
+X := {1,2,3,4,5,6}$
+Y := {3,1,4,2,6,5}$
+
+n := length(Y);
+p := 0$
+q := 0$
+w := 0$
+
+% sign tries to evaluate the sign of its argument. 
+% If this is possible sign returns one of 1, 0 or -1.
+
+% We  sum the number of 'concordant' pairs ('inversions')  in p
+% and sum the number of 'discordant' pairs in q:
+
+% > a single case
+p:=0$  %-------------------------- p,q for j=1 and i=2
+q:=0$
+w:=0$
+j:=1; ii:=2;      % i reserved identifier
+       w := sign( part(X,ii)-part(X,j)) * sign( part(Y,ii)-part(Y,j));
+       if (w > 0) then  p:=p+1; 
+       if (w < 0) then  q:=q+1;
+write("p= ",p,"  ","q= ",q);          % i.e. p=0 & q=1
+
+% > checking the first line
+p:=0$  %-------------------------- j=1 first line: doc1 doc2
+q:=0$
+w:=0$
+j:=1;
+    for i:=(j+1):n do 
+     begin
+       w := sign( part(X,i)-part(X,j)) * sign( part(Y,i)-part(Y,j));
+       if (w > 0) then  p:=p+1; 
+       if (w < 0) then  q:=q+1;
+      end; 
+write("p= ",p,"  ","q= ",q);       % i.e. p=3 & q=2
+
+
+% > now we do this process in one step: ---------------
+
+on rounded $
+print_precision 5$
+
+X := {1,2,3,4,5,6}$
+Y := {3,1,4,2,6,5}$
+
+n := length(Y);
+
+p:=0$
+q:=0$
+w:=0$
+for j:=1:(n-1) do          % j=1..5 
+    for i:=(j+1):n do 
+     begin
+       w := sign( part(X,i)-part(X,j)) * sign( part(Y,i)-part(Y,j));
+       if (w > 0) then  p:=p+1; 
+       if (w < 0) then  q:=q+1;
+      end; 
+;     % ends 2nd loop (!) 
+write("p= ",p,"  ","q= ",q);  
+                
+tau := (p - q)/(p + q);      %--or:  tau : 2*(p-q)/n/(n-1)
+
+
+COMMENT result
+
+ ┌                              ┐
+ │ doc1:  1  2  3  4  5  6      │
+ │                              │
+ │ doc2:  3  1  4  2  6  5      │
+ │                              │
+ │  p:    3  3  2  2  1  __  11 │
+ │                              │
+ │  q:    2  1  1  0  0  __  4  │
+ └                              ┘
+
+C : TX[3,8]  = 11  /*-- sum of the p */;
+D : TX[4,8]  = 4  /*-- sum of the q */;
+tau := (C-D)/(C+D) = 0.46667
