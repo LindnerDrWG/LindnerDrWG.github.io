@@ -5,7 +5,8 @@ COMMENT
 
 
 procedure stdnormCDF(x);  1/2*erfc(-x/sqrt(2)) $
-procedure Phi(x);         1/2*erfc(-x/sqrt(2)) $
+
+define  Phi = stdnormCDF$
 
 % ------------------- Example usage ---------------------
 

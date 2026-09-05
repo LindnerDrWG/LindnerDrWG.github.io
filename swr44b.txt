@@ -1,8 +1,8 @@
 COMMENT
            STATISTICS WITH REDUCE ch. 4.4 b
                       by W.G. Lindner 2026  $
-                      
-%|         ttest2
+                                 
+%|                    ttest2
 
              
 % ------------------- helper functions ---------------------
@@ -59,7 +59,6 @@ begin scalar n1,n2,m1,m2,s1,s2,df,T_,
      s2 := 1/n2*s2*s2;
      df := (s1+s2)^2/(s1^2/(n1-1) + s2^2/(n2-1));
      T_  := (m1-m2)/sqrt(s1+s2);  % T reserved identifier
-
      t95 := tINV(1-alpha/2, df);
      F   := sqrt(n1*n2/(n1+n2));
      N   := sqrt(((n1-1)*s1^2+(n2-1)*s2^2)/(n1+n2-2));
@@ -130,7 +129,7 @@ COMMENT -- to do: matrix output
    M
 $
 
-END;
+END; %.........................................................
 
 %
 %--  The null hypothesis $H_0$ states that the mean test score of the 

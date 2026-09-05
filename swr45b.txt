@@ -2,7 +2,7 @@ COMMENT
            STATISTICS WITH REDUCE ch. 4.5 b
                       by W.G. Lindner 2026  $
                       
-%|         tdiff test
+%|                    tdiff test
              
 % ------------------- helper functions ---------------------
 COMMENT

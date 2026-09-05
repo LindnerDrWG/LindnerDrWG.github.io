@@ -17,11 +17,11 @@ print_precision 5$
 
 
 % SOLUTION:
-% --- We have F(X>=3) = 1 - F(X<=2), so
+%-- We have F(X>=3) = 1 - F(X<=2), so
 
 1 - hgCDF(49,6,6, 2);
 
-% --- Table to draw 0..6 numbers right out of 49
+%-- Table to draw 0..6 numbers right out of 49
 
 for i:=0:6 do write { i, hgCDF(49,6,6,i) };
 

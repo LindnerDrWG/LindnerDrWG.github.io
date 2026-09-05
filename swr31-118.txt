@@ -6,7 +6,6 @@ COMMENT
 % ---------- inverse erf via Newton by Gemini AI -----------------
 %            for normINV
 
-
 procedure erfinv(x);
 % this code is from Gemini AI with minor corrections.
 % It implements a Newton-Raphson algorithm.
@@ -39,4 +38,5 @@ procedure stdnormINV(q); normINV(q,0,1) $
 on rounded $
 print_precision 5$
 
-stdnormINV(0.025); stdnormINV(0.975) ;
+stdnormINV(0.025); 
+stdnormINV(0.975) ;

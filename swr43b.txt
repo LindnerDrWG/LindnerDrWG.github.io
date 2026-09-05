@@ -45,6 +45,8 @@ procedure SD(lst);
 % ------------------- function T-TEST ---------------------
 procedure  ttest(X, mu0, alpha, method);
        %   method = "left","right","both" or -1,1,0
+% ------------------- function T-TEST ---------------------
+
 begin scalar n, df, xbar, s;
    n    := dim(X);
    df   := n-1;
@@ -94,7 +96,7 @@ COMMENT
      M[4,2] : critval,
 $
 
-END;
+END; %.......................................................
 
 
 

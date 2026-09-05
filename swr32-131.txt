@@ -7,9 +7,8 @@ COMMENT
 
 procedure expINV(p,m);        
           - log(1-p)/m $
-          
-procedure quantile_exp(q,m);  
-          1/m * (-log(1-q)) $
+
+define  quantile_exp = expINV $
 
 % ------------------- Example usage ---------------------
 

@@ -31,10 +31,9 @@ procedure count_eq(X,a);
 define    DIM = length$
 
 % ---------------------------------------------------
-
 procedure  signtest2(X, Y,  method);     
-
 %------------ method: left=-1, right=1,both=0 -------
+
 begin scalar n,p,p1,p2,s,nt, D;
   n  := dim(X);
   D  := for i:=1:n collect part(X,i)- part(Y,i); % D = X-Y
@@ -51,7 +50,8 @@ begin scalar n,p,p1,p2,s,nt, D;
    write "s= ",s;
    write "p_= ",p;
   % mat((s_, pp),(s,p));
-END;
+END; %...............................................
+
 
 %#################################################
 %     EXAMPLE:  IQ of twin pairs 

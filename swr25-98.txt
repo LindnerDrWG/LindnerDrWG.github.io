@@ -19,7 +19,7 @@ print_precision 5$
 1 - poissonCDF(4,2);
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% (?)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% (?)
 %%% Poisson CDF version using iGamma or iBeta
 %%% NOT YET WORKING - wL
 %%% does NOT evaluate 
@@ -33,7 +33,7 @@ print_precision 5$
 1 - poissonCDFg(4,2);      % 0.0526
 
 
-Comment ........................................
+Comment ..............................................
 
 REDUCE: 
      𝛾⁡(𝑎,𝑧) is provided by the binary function m_gamma, 

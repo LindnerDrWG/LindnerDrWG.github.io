@@ -12,7 +12,7 @@ procedure SUM1(X);
  
 procedure DOT(A,B); 
           for i := 1:length(A) sum part(A,i)*part(B,i)$
-          % part(A,i) means 'i-th element of list A
+          % part(A,i) means 'i-th element of list A'
 
 % ------------------- Example usage ---------------------
 

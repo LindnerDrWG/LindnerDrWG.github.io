@@ -11,7 +11,7 @@ COMMENT (a) ..............................................
         ...............................................  $
 
 
-% ---------- inverse erf via Newton; normINV -------------
+% ---------- inverse erf via Newton: normINV -------------
 
 on rounded; precision 10;
 

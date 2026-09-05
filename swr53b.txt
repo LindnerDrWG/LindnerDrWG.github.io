@@ -72,7 +72,8 @@ kendall(X,Y) := block( [n,sX,sY,cY,p,q,w, tau],
                           w : signum(X[i] - X[j]) * signum(Y[i] - Y[j]),
                           if w > 0 then p : p + 1,
                          if w < 0 then q : q + 1 ),
-                tau : float((p - q)/(p + q)),                 /*--or:  tau : 2*(p-q)/n/(n-1),  */
+                tau : float((p - q)/(p + q)),     
+                %--or:  tau : 2*(p-q)/n/(n-1), 
                 print("---------- KENDALL tau ----------"),
                 print(matrix(["C","D","tau"], [q,p,tau])) 
  )$

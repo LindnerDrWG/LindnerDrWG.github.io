@@ -42,7 +42,7 @@ $ ok
 
 % ---------------- procedural step-by-step example -------
 
-% Task: calculate fcdf(1.5,10) via incomplete Beta function
+% Task: calculate tcdf(1.5,10) via incomplete Beta function
 %       with comments by Google META AI
 
 on rounded;
@@ -58,7 +58,7 @@ x  := df / (a^2 + df);
 1-0.5 * ibeta(df/2, 0.5, x);  % ✅ for a>0
 
 
-% ------------------------- 2nd DEFINITION----------------------------;
+% ------------------------- 2nd DEFINITION---------------------------
 
 % Define the CDF by integrating the PDF from -infinity up to x;
 % needs tPDF as helper
@@ -81,8 +81,8 @@ $ ok
 % [1] 0.9177463
 
 
-% ------------------------- 3rd DEFINITION----------------------------;
-% under construction
+% ------------------------- 3rd DEFINITION----------------------------
+% ......................... under construction .......................
 
 load_package specfn2;   %  HYPERGEOMETRIC lives there
 

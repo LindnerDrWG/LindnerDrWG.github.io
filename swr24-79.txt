@@ -21,7 +21,7 @@ print_precision 5;
 hgPDF(100,70,20,14);
 
 
-% COMMENT -----------------  in Maxima we use
+% COMMENT ---------- REMARK   in Maxima we use
 %    load(distrib)$
 %    fpprintprec : 7$
 %    /*                 r  R  N-R    n  */

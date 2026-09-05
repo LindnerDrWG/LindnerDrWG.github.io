@@ -20,9 +20,8 @@ COMMNT
 
 %% NOW it is your turn :)
 
-procedure yourmode()
 
-procedure yourMODE(X);
+procedure yourMODE(v);
 begin 
   1;  % your task
 

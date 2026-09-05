@@ -42,6 +42,8 @@ COMMENT
 
 % ------------------- function ZTEST ---------------------
 procedure ztest2(X,Y, muX, muY, sigmaX, sigmaY, alpha, altHyp) ;
+% ------------------- function ZTEST ---------------------
+
 %    output: (Z-value, quantile, ConfidenceInterval, p-value) 
 begin scalar nX,nY,Z,SEdiff;
    nX  := dim(X);
@@ -96,7 +98,7 @@ write "          p = ", p;
 % write mat(( Z_,quantil_,CI_left_, CI_right_, p_),
 %           ( Z, quantil, first CI, second CI, p))
 ok$
-END;
+END; %............................................................
 
 
 %-------------------CHECK of ztest2 with above data --------------

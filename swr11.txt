@@ -1,7 +1,7 @@
 COMMENT
                   STATISTICS WITH REDUCE ch. 1.1 - 2
                      Dr. W.G. Lindner
-                     Leichlingen, Germany 2026
+                     Leichlingen, Germany 2026 $
                      
             
 % declare a field (’vector’) of 5 elements         

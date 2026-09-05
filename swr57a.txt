@@ -124,7 +124,7 @@ estS := sd(S);                     %-- i.e. estimated values */ ;
 mat( (estMean_, estSD_),(estM, estS));
 
 
-% ############ results
+COMMENT      ############ results
 
 /* here we construct an array T as Container */
 T : listarray (make_array (fixnum, 5));

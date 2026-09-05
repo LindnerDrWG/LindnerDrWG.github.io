@@ -4,12 +4,12 @@ COMMENT
                       by W.G. Lindner 2026  $
                       
 
+
 procedure hgPDF(NN,RR,n,r); 
           binomial(RR,r)*binomial(NN-RR, n-r)/binomial(NN,n)$
 
 procedure hgCDF(NN,RR,n, x);
           for k:=0:floor(x) sum hgPDF(NN,RR,n,k) $ 
-
 
 procedure hgINV(alpha,NN,RR,n);
    % optimized by F.J. Wright

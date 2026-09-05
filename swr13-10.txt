@@ -1,6 +1,6 @@
 
 COMMENT
-                  STATISTICS WITH REDUCE ch. 1.3 - Exercise 10
+                  STATISTICS WITH REDUCE ch. 1.3 -  10
                              by W.G. Lindner 2026  $
 
           
@@ -20,7 +20,6 @@ begin
   return sqrt(diff_sum/n)
 end;
 
- 
 procedure zscore(lst);
 begin
   scalar n, mu, Xmu, zscore1;

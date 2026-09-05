@@ -11,10 +11,8 @@ procedure nbinCDF1(x,n,p);
 procedure nbinCDF(k, r, p);
           iBeta(r, k + 1, p);
 
-
-% We do a search for k until success :
-
 procedure nbinINV(alpha,n,p);
+% We do a search for k until success 
 begin scalar x; x:=0; k:=0;
    repeat << k := k+1;
              x := nbinCDF(k,n,p); >>

@@ -3,7 +3,6 @@ COMMENT
                   STATISTICS WITH REDUCE ch. 1.1 - Exercise 1
                              by W.G. Lindner 2026 $
                      
-;
 
 procedure SUM1(X); 
           for i := 1:length(X) sum part(X, i)$
@@ -20,8 +19,7 @@ COMMENT
     Then we abstract the procedure to function meanA $
 
 procedure meanA(X,A);
-begin
- scalar XA;
+begin scalar XA;
  XA := for each el in X collect (el-A); 
  return sum2(XA)/length(X);
 end;

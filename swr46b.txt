@@ -3,7 +3,7 @@ COMMENT
                       by W.G. Lindner 2026  $
                       
 
-%|         varTest
+%|                    varTest
 
 % ------------------- helper functions ---------------------
 procedure chi2CDF(x, k);

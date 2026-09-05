@@ -31,10 +31,9 @@ procedure count_eq(X,a);
 define    DIM = length$
 
 % ---------------------------------------------------
-
   procedure  signtest(X, med,  method);     
-
 %------------ method: left=-1, right=1,both=0 -------
+
 begin scalar n,p,p1,p2,s,nt;
   %if method  else rederr("signtest: method must be left,right,both ");
   n  := dim(X);
@@ -52,7 +51,8 @@ begin scalar n,p,p1,p2,s,nt;
    write "s= ",s;
    write "p_= ",p;
   % mat((s_, pp),(s,p));
-END;
+END; 5...............................................
+
 
 %#################################################
 %     EXAMPLE:  FIRST MARRIAGE 

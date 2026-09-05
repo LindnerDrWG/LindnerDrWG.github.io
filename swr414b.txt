@@ -25,7 +25,8 @@ begin scalar n,p;
      % mat((Ho_,p_),(Ho,p));
      write "Ho = ", Ho;
      write "p = ", p;
-END;
+END; 
+%.................................................................
 
 COMMENT  REMARK
 -- Fisher test is a good approx, if n=a+b+c+d <= 40.

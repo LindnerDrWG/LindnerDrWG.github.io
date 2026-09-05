@@ -20,7 +20,7 @@ COMMENT-----------------------------------------------------
   -- and probability p of success in a single trial.
   ---------------------------------------------------------- $
 
-% variant 1: implementation with factorial function 
+%-- variant 1: implementation with factorial function 
 
 procedure nbinPDF1(x,n,p);
           gamma(n+x)/(factorial(x)*gamma(n)) * p^n*(1-p)^x $
@@ -34,7 +34,7 @@ COMMENT -----------------------------------------------------
    The following variant avoids the call to factorial().  
    ----------------------------------------------------------- $
 
-% variant 2 : implementation with gamma function 
+%-- variant 2 : implementation with gamma function 
 
 procedure nbinPDF2(x,n,p);
           gamma(n+x)/(gamma(x)*gamma(n)) * p^n*(1-p)^x $

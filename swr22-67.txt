@@ -4,6 +4,8 @@ COMMENT
                       by W.G. Lindner 2026  $
                       
 
+procedure geoPDF(k,p);
+          p*(1-p)^k;
 
 procedure geoCDF(n,p);
           1-(1-p)^(n+1) ;             % -- explicit formula

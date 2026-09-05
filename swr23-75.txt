@@ -12,7 +12,7 @@ COMMENT ..............................................................
    constant probability of success.
 .....................................................................$
 
-% 1st version using the mathematical definition 
+% -- 1st version using the mathematical definition 
 
 procedure nbinCDF1(x,n,p); 
           p^n * (for j:=0:x sum binomial(n+j-1,n-1)*(1-p)^j ) $
@@ -31,7 +31,7 @@ COMMENT --------------------------------------------------------------
         beta_incomplete_regularized(n,x,p) alias iBeta(n,x,p).
 ----------------------------------------------------------------------$
 
-% Definition of cumulative negative Binomial distribution with iBeta
+%--  Definition of cumulative negative Binomial distribution with iBeta
 
 procedure nbinCDF(k, r, p);
 begin
@@ -42,7 +42,7 @@ begin
 end;
 
 
-% if we leave out the comments, we could define 
+% if we leave out the comments, we define 
 % nbinCDF as a 1-liner:
 
 procedure nbinCDF(k, r, p);

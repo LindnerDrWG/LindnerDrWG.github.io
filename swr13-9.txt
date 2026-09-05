@@ -6,7 +6,6 @@ COMMENT
         
 procedure SUM1(lst); 
           for each el in lst sum el $
-             
 
 procedure MEAN(lst); 
           sum1(lst)/length(lst)$

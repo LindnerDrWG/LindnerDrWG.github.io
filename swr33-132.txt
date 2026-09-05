@@ -7,7 +7,7 @@ COMMENT
 procedure tPDF(x,f);  
           1/(sqrt(f)*Beta(1/2,f/2))*(1+ x^2/f)^(-0.5*(f+1)) $
 
-define student = tPDF;      %% -- alias 
+define student = tPDF;      %-- alias 
 
 
 % ------------------- Example usage ---------------------

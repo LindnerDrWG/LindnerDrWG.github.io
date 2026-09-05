@@ -5,8 +5,7 @@ COMMENT
                       
                       
 procedure rms(lst);
-begin
-  scalar n, me;
+begin scalar n, me;
   n        := length(lst);  
   me       := for each el in lst sum el^2;  % mean
   return sqrt(me / n)
