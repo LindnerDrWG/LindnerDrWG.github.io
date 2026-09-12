@@ -1,0 +1,121 @@
+Í<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+## Statistics with Eigenmath      § 2.1-64
+##            by Dr. W.G. Lindner  2026
+
+ 
+ "--- 12. ---  Excurs: binoCDF using incomplete beta"
+
+-- We may use the build-in function 'incbeta' of Eigenmath 
+-- version >3.50  to plot binoCDF version for 'continous' CDF.
+
+# DEFINITION
+---------------------------- binoCDF1 with incomplete beta 
+
+    binoCDF1(k,n,p) = incbeta(1-p, n-k,k+1)
+
+---------------------------------------------------------
+ 
+binoCDF1(4, 10,0.5)      -- ok 0.3769
+binoCDF1(4, 6,0.3)       -- ok 0.059535
+
+# DEFINITION
+"=============================== binoCDF - cumulative BINOMIAL" 
+
+   binoCDF(k,n,p) = sum(j,0,floor(k), choose(n,j)*p^j*(1-p)^(n-j) )
+
+--------------------------------------------------------------
+-- where
+-- n : counts the number of independent Bernoulli trials 0,1,2,..
+-- p : specifies a probability of success 0<=p<=1
+-- k : counts the number of successes 0,1,2,..
+-- binoCDF means _c_umulative BINOMIAL distribution
+-- WARNING: Eigenmath 'sum' function needs k to be an integer,
+--          so 'floor(k)' instead of k is necessary. 
+
+# DEFINITION
+"=============================== binoINV - Binomial INVerse"
+
+  binoINV(alpha,n,p, x,k) = do( k=0,
+               loop(k=k+1, x=binCDF(k,n,p), test(x>alpha, break))
+               x,k)
+
+---------------------------------------------------------
+-- This function is used to find the nth quantile of binoCDF, 
+-- that is to find k in P(x <= k).
+
+
+"--- 10. ---"
+
+-- PROBLEM 2: (Texas Instruments)
+-- Assume the toss of a fair coin 30 times. 
+-- What is the minimum number of heads you must observe such that 
+-- the cumulative probability for that number of observed heads 
+-- is at least 0.95?
+
+-- SOLUTION:
+-- we solve this TI problem using Eigenmath loop:
+-- IDEA: x = binCDF(k,30,0.5) and we use the table of values 
+-- (starting at 0 and increment by 1) to find when the cumulative
+-- probability is at or just above the given cumulative probability.
+-- This gives you a view of all values to make decisions. 
+-- For this example, search in the table to find the cumulative 
+-- probability just larger than 0.95. 
+-- So, the number of successes is 19.
+
+-- .. using binoCDF
+k=0
+loop(k=k+1, x=binoCDF(k,30,0.5), x,k, test(x>0.95, break))
+x
+k
+
+"Check: binCDF(k,30,0.5) >="
+binoCDF(19,30,0.5)
+
+
+"--- 11. --- binoINV"
+
+-- MOTIVATION for binoINV
+-- (quoting TI): The results on the screen first show that the
+-- minimum number of successes to obtain at least the given cumulative 
+-- probability of 0.95 is 19. 
+-- Next, the cumulative probability for up to 19 is computed using 
+-- binCDF and is approximately 0.9506314271 which meets the criteria
+-- of 0.9506314271≥0.95.  cf.:
+-- https://education.ti.com/html/webhelp/EG_TI84PlusCE/EN/Subsystems/e-guide_ref84plus_en/content/m_appxa/aa_appxa_i.HTML
+-- Abstracting this process we write a small function binoINV:
+
+
+
+"--- 11.a --- EXAMPLE in R"
+
+binoINV(0.95, 30,0.5)
+
+-- CHECK in R:
+-- R> qbinom(0.95, size=30, prob=0.5)       [1] 19
+--   'q' in _q_binom means _q_antile function
+
+"--- 11.b --- EXAMPLE in EXCEL"
+ -- checking the Excel formula in -9.-
+ --              32 = BINOM.INV(100, 0.3, 0.7)
+
+binoINV(0.7, 100, 0.3)
+"ok"
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

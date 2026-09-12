@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath      § 1.11-42
+##            by Dr. W.G. Lindner  2026
+
+
+"SKEWness"
+
+-- helper functions for skew
+mean(X)  = float( sum(X)/dim(X) )                -- empir.sample mean
+sd(X)    = sqrt(sum((X-mean(X))^2) /(dim(X)-1))  -- sample std.dev.
+moment(X,r) = float( sum((X-mean(X))^r)/dim(X) ) -- r-st moment
+
+⁠------------------------------------------------------ skew.ness
+
+  skew(X)  = moment(X,3)/ sqrt(moment(X,2)^3)          -- MatLab
+  skewR(X) = sum((X-mean(X))^3)/((dim(X)-1)*sd(X)^3)   -- R
+
+  skew1(X)  = 1/dim(X)* sum(((X - mean(X))/sd(X))^3 )
+  skew2(X)  = do(n= dim(X), sqrt( n*(n-1))/(n-2)*skew(X) )
+
+------------------------------------------------------- END
+
+" EXAMPLE from MATLAB"
+
+X = (0.5377,
+    1.8339,
+   -2.2588,
+    0.8622,
+    0.3188,
+   -1.3077,
+   -0.4336,
+    0.3426,
+    3.5784,
+    2.7694)
+
+skew(X)       -- 0.1060  R: typ=1, Matlab: default
+skewR(X)      -- 0.1006  R: ok by R-Blogger
+skew1(X)      -- 0.0905  R: typ=3, Matlab: ./.
+skew2(X)      -- 0.1258  R: typ:2, Matlab flag = 0
+"ok"
+
+-- CHECK with R
+-- R> library(e1071)
+--    skewness(X)                   -- default, we use skew1
+--    [1] 0.09058831
+--    skewness(X, type=3)           -- we use skew1
+--    [1] 0.09058831       
+--    skewness(X, type=1)           -- we use skew
+--    [1] 0.1060983
+--    skewness(X, type=2)           -- we use skew2
+--    [1] 0.1258171
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

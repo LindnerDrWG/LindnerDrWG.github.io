@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 5.3.b
+##            by Dr. W.G. Lindner  2026
+
+"========================= KENDALL's tau"
+
+"........... Prerequisites: sort, cRank, correspond"
+
+sort(v,i,k,n,t) = do( n = dim(v),      
+     loop( test(n < 2, break), k = 1,
+           for(i, 1, n - 1,
+               test(v[i] > v[i + 1], 
+                 do( t = v[i], v[i] = v[i + 1], v[i + 1] = t,
+                     k = i ))), n = k), v)
+
+sort1(v,i,k,n,t) = do( n = dim(v),         -- by me wL
+     loop( test(n < 2, break), k = 1,
+           for(i, 1, n - 1,
+               test(v[i] < v[i + 1], 
+                 do( t = v[i], v[i] = v[i + 1], v[i + 1] = t,
+                     k = i ))), n = k), v)
+
+cRank(W, i,j,k,n,t, Srank) = do(          -- by G. Weigt 8/25  
+         j = 1, n = dim(W), Srank = 0,
+         loop( test(j > n, break),
+               k = j + 1,
+               loop( test(k > n, break, W[j]==W[k], k=k+1, break)),
+               t = 0.5*(j + k - 1),
+               for(i, j, k-1, W[i] = t),
+               t = k - j, Srank = Srank + t^3 - t, j = k), W)
+
+correspond(X,sX, M) = do( M=zero(dim(X)),
+           for(j,1,dim(X),
+           for(i,1,dim(X), test(sX[i]=X[j], M[j]=cRank(sX)[i]))), M)
+
+
+-- we abstract the whole process/procedure into a function.             
+
+### --------------------------------------------------------------
+### FUNCTION kendall : general function KENDALL's tau
+### --------------------------------------------------------------
+    kendall(X,Y, n,sX,sY,cY,p,q,w) = do(
+                 n  = dim(X),
+                 sX = sort(X),
+                 sY = sort1(Y),
+                 cY = correspond(Y, sY),
+                 p=0, q=0, w=0,
+
+                 for(j,1,n,
+                   for(i,j,n, 
+                       do( w = sgn(sX[i]-sX[j])*sgn(cY[i] - cY[j]),
+                          test(w > 0, p=p+1), 
+                          test(w < 0, q=q+1) ))),
+                 tau = (q-p)/(p+q),
+                 -- tau = 2*(p-q)/n/(n-1),      -- alternative
+                 print("___ KENDALL tau ___"),
+                 (("C","D","tau"), (q,p,float(tau)))  )
+### ---------------------------------------------------------- END
+
+
+"check: EXAMPLE from numiqo.com"
+
+X=(1,2,3,4,5,6)
+Y=(3,1,4,2,6,5)
+
+kendall(X,Y)
+"ok"
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

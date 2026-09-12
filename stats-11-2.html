@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath  -  § 1.1-2
+##            by Dr. W.G. Lindner  2026
+
+"MEAN with frequency"
+
+----------------------------------- DEFINITION
+mean(X)       = float( sum(X)/dim(X) )          -- empir.sample mean
+
+meanF(X,f)    = float( dot(f,X)/sum(f) )        -- mean w. frequency
+meanA(X,A)    = float( A + sum(X-A)/dim(X) )    -- mean  w.r.t. A
+meanAF(X,f,A) = float( A + dot(f,(X-A))/sum(f)) -- meanF w.r.t. f & A
+------------------------------------------------
+
+
+"EXAMPLE (Spiegel p.108, P 4.14)"
+-- Use the frequency distribution 'f' of heights in 'in' 
+-- to calculate the mean height of 100 students.
+-- SOLUTION: the data is
+
+"the data set:"
+
+in = ("Height (in)","60-62","63-65","66-68","69-71","72-74")
+X = ("Marks (X)",    61,64,67,70,73)
+f = ("Frequency (f)", 5,18,42,27, 8)
+(in,X,f)      -- construct table of data
+
+-- in short:
+f = ( 5,18,42,27, 8)    -- freq
+X = (61,64,67,70,73)    -- marks
+
+meanF(X,f)
+"ok"
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

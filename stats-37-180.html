@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 3.7-180
+##            by Dr. W.G. Lindner  2026
+
+
+"========================== weibull1 - 1st optional parameterization"
+
+  weibullPDF1(x,k,b) = test( x<0, 0, 
+                      b*k*x^(k-1)*exp(-b*x^k) )
+
+  weibullCDF1(x,k,b) =  1 - exp(-b*x^k)                 -- for x>0
+
+  weibullINV1(p,a,b) = (-1/b * log(1-p))^(1/k) 
+
+-------------------------------------------------------------------
+## using transformation b=lambda^(-k), e.g. [6], p.12,64
+## https://en.wikipedia.org/wiki/Weibull_distribution
+
+"--- b. ---"
+
+""
+
+"--- b. ---"
+-- EXAMPLE:
+-- A particular switch has a Weibull distributed lifetime with 
+-- k:=alpha = 0.01 (1/year) and beta = 2. What guarantee period 
+-- can be given for the switch if the survival probability during 
+-- this time is to be 99%?
+
+-- SOLUTION: cf. [6], p.66
+
+1 - weibullCDF1(1,0.01,2)
+float
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+## Statistics with Eigenmath      § 2.3-73
+##            by Dr. W.G. Lindner  2026
+ 
+
+"============================== nbinPDF -  neg.binomial.density"
+
+   nbinPDF(x,r,p) = choose(x+r-1,x)*p^r*(1-p)^x
+
+   nbinPDF1(x,r,p) = tgamma(r+x)/(tgamma(r) * tgamma(x+1)) *
+                     (1-p)^x*p^r
+------------------------------------------------------------
+
+
+"EXAMPLE: https://de.mathworks.com/help/stats/nbinpdf.html"
+"a.  table of nbinPDF(x, 3, 0.5)"
+T = zero(2,11)
+for(i,1,11, T[1,i] = i-1)
+for(i,1,11, T[2,i] = float(nbinPDF(i-1,3,0.5)))
+transpose(T)
+
+"b.  plot of nbinPDF/1(x, 3, 0.5)"
+f = nbinPDF(x,3,0.5)    -- discrete plot due to choose() (integer)
+xrange = (0,10)
+yrange = (0,0.3)
+draw(f,x)
+
+f = nbinPDF1(x,3,0.5)  -- continous plot due to tgamma (real)
+xrange = (0,10)
+yrange = (0,0.3)
+draw(f,x)
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

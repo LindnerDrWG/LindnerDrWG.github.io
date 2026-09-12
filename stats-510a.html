@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 5.10.a
+##            by Dr. W.G. Lindner  2026
+
+
+-- We first follow the jackknife procedure with the small data sample
+-- used in the script.
+
+-------------------------------------------------------------
+"EXAMPLE: jackknife step-by-step"
+--------------------------------------------------------------
+
+"- a.- .......... CALCULATE THE CI USING SE (std.error.of.mean)"
+
+mean(X) = float( sum(X)/dim(X))    -- average of sample X
+
+X = (1,2,3,4)      -- the small data sample of the script
+X
+n = dim(X)
+n
+
+M   = zero(n)      -- container for the means 
+M
+mX = mean(X)       -- mean of X, 10/4 =2.5  ok
+mX
+
+".......... Using a 'video' (i.e. a for loop) to watch process:"
+-- how the sample X is repeatedly '1-deleted' and the 
+-- correspondent means recorded in M
+
+for(i,1,n, print("......................... new X '1-deleted'"), print(i),
+           h = X[i], -- save X[i] in helper h 
+           X[i] = 0, 
+                     -- print(mean(X)),
+           M[i] = n/(n-1)*mean(X),  
+                     -- i=1:  X=(0,2,3,4)  mean(X)= 4/3*2.25
+                     -- i=2:  X=(1,0,3,4). mean(X)
+                     -- i=3:  X=(1,2,0,4). mean(X)
+                     -- i=4:  X=(1,2,3,0). mean(X)
+                     -- i.th element of X becomes 0, i.e. 'deleted'
+                     -- and afterwards reconstructed
+                     -- container M collects new Means                 
+           print((X,M)),  
+                     -- 1st row: X with one entry 'deleted'
+                     -- 2nd row: mean of the 1st row
+           X[i] = h  -- restore X[i] from helper h           
+           )
+
+"... the Jackknife means collected in M:"
+M
+(X,M)            -- X and M as a 2 x 4 matrix, X 1st row, M 2nd row
+
+"... the mean of the Jackknife means of M:"
+  
+theta = mean(M)              -- theta is mean of means in M
+theta    
+        
+jac = n*mX  - (n-1)*theta    -- mean of the means
+jac                     
+
+"... calculate the pseudovariables Ji"
+
+JCK = zero(n)    -- container vector for the pseudovariables Ji
+    for(i,1,n, JCK[i] = n*mX - (n-1)*M[i] )
+JCK         
+
+D  = jac - JCK
+D
+
+su = sum(D^2)
+su
+
+sigma = float( sqrt(su/(dim(X)-1)))  
+sigma
+
+"... calculate standard error of mean"
+
+SE = sigma/sqrt(n)        -- or: se = sqrt(var(JCK)/n)
+SE                        -- using var(iance)
+
+"... calculate Confidence Interval CI using std.error (SE) of mean"
+
+CIm = mean(JCK) - SE
+CIm
+
+CIp = mean(JCK) + SE
+CIp
+
+CI = (CIm, CIp)
+CI
+"RESULT: mean 2.5 is between 1.85 and 3.14, ok"
+
+-- We give an alternative calculation of the confidence interval
+-- using quantils of the t-distribution (tINV)
+
+"- b.- .......... CALCULATE THE CI USING tINV QUANTILS"
+
+"... calculate CI via critical values and tINV quantils"
+-- To calculate the confidence interval CI we need tINV.
+-----------------------------------------------------------
+   tINV(x, df) = tdistinv(x, df)
+-----------------------------------------------------------
+
+X  = (1,2,3,4)                   -- the sample from above
+X
+n  = dim(X)
+nu = n - 1                       -- Degree of freedom
+
+conf  = 0.95                     -- confidence level 95 %
+alpha = 1 - conf
+pLo   = alpha/2
+pLo
+pUp   = 1 - alpha/2
+pUp
+
+"... Compute the critical values for the confidence bounds"
+-- critical values via tINV quantiles
+
+crit = ( tINV(pLo, nu), tINV(pUp, nu) )
+crit   
+
+SE                               -- cite std.error of mean
+
+ci = tINV(1-alpha/2,n-1)*SE
+ci
+
+jac                              -- cite the bootstrap mean
+
+CI = (jac - ci, jac + ci)        -- confidence interval
+CI
+
+"ok"
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

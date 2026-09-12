@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 5.7.a
+##            by Dr. W.G. Lindner  2026
+
+"=======================  he buildin random number generator"
+
+".......... rand : the buildin random number generator of Eigenmath"
+
+-- We know from the Eigenmath help:
+--    rand : Returns a random floating point value from the 
+--           interval [0,1).
+-- It is not necessary to invoke rand with function brackets:
+
+rand()
+rand
+""
+"..... we generate 5 random's"
+for(i,1,5, print(rand))
+""
+
+".....  we now generate a random number which is in 1,2,3"
+n = 3
+floor(1+n*rand)
+""
+
+for(i,1,5, print( floor(1+n*rand) ))
+""
+".....  here we get randomly elements of list (2,1,3,4,7)"
+-- please, run this example several times to watch the effect:
+ 
+X = (2,1,3,4,7)
+n = dim(X)
+for(i,1,5, print( 1 + mod( floor(1+n*rand), n) ))
+""
+for(i,1,5, print( X[1 + mod( floor(1+n*rand), n)] ))
+
+
+-- Now we are prepared to understand the procedure BOOTSTRAP1.
+-- Boot1 determines an estimated mean resp. sd of a sample X.
+
+"=======================  BOOTSTRAP1 for dependend samples"
+
+"Prerequisites: mean, std.deviation sd"
+  mean(X)= float(sum(X)/dim(X))
+  sd(X)  = sqrt(sum((X-mean(X))^2) /(dim(X)-1)) -- sample std.dev.
+
+"..... the data set"
+
+X=(4,5,4,7,2)
+
+IT =10                 -- number of iterations
+IT
+n = dim(X)             -- number of samples
+n
+
+M = zero(IT)           -- container for all samples
+M
+S = zero(IT)           -- container for all samples
+Mboot = zero(n)        -- save a mean sample
+Sboot = zero(n)        -- save a sd sample
+              
+"..... start randomly "
+rand( mod(31,117))    
+              
+"..... start bootstrap samples"          
+    
+for(j,1,IT,             
+    for(i,1,n,              -- create one resample of X
+        r = 1 + mod(floor(1+n*rand),n),
+        Mboot[i] = X[r],
+        Sboot[i] = X[r]
+        ),                  -- bootstrap new sample
+    M[j] = mean(Mboot),     -- j.th bootstrap mean
+    S[j] = sd(Sboot),       -- j.th bootstrap sd
+    print(M[j],S[j])        -- show intermediate results
+	)                    
+
+"..... bootstrap sample mean/sd "
+estM = float(mean(M))  
+estM
+estS = float(sd(S))            -- i.e. estimated values
+estS
+
+print("  _____ bootstrap _____")
+(("est.mean", "est.sd"),(estM, estS)) 
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

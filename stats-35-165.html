@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 3.5-165
+##            by Dr. W.G. Lindner  2026
+ 
+"=============================== chi2INV3 "
+  chi2PDF(x, k) = 1/(2^(k/2)*tgamma(k/2))*x^(k/2-1)*exp(-x/2.)
+
+  GammaP(x,k)  = x^k*exp(-x) * sum(m,0,100, x^m/tgamma(k+m+1))
+  chi2CDF(x,k) =  test( or(x<=0,k<=0), 0,
+                   float( GammaP(x*0.5, k*0.5 )) )
+
+  chi2INV3(x,alp, ...) = do(...) 
+-------------------------------------------------------------- END
+-- implementation of the inverse cumulative chi2-distribution
+
+"Check:"
+
+for(i,1,10, print( chi2INV3(0.1*i,10) ))
+
+-- CHECK
+-- octave> chi2inv(0.1:0.1:1.0, 10)
+-- ans = 4.8652 6.1791 7.2672 8.2955 9.3418  10.4732 11.7807 13.4420
+--       15.9872  Inf (is our right limit b=20 ;)
+"ok"
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

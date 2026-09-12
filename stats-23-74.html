@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+## Statistics with Eigenmath      § 2.3-74
+##            by Dr. W.G. Lindner  2026
+ 
+
+"============================== nbinPDF -  neg.binomial.density"
+
+   nbinPDF(x,r,p) = choose(x+r-1,x)*p^r*(1-p)^x
+
+   nbinPDF1(x,r,p) = tgamma(r+x)/(tgamma(r) * tgamma(x+1)) *
+                     (1-p)^x*p^r
+------------------------------------------------------------
+
+
+"WIKIPEDIA: example 3"
+
+-- Notation:     X ~ NB(r,p) 
+-- https://en.wikipedia.org/wiki/Negative_binomial_distribution
+-- r >0        : number of successes until stop
+-- k = 0,1,2,..: number of failures       
+-- p in [0,1]  : success probability in each experiment
+--               k failures, given r successes.
+
+"  3.a candy problem"
+-- EXAMPLE (Selling candy)
+-- Pat Collis is required to sell candy bars to raise money for the 
+-- 6th grade field trip. Pat is (somewhat harshly) not supposed to 
+-- return home until five candy bars have been sold. So the child goes 
+-- door to door, selling candy bars. At each house, there is a 0.6 
+-- probability of selling one candy bar and a 0.4 probability of 
+-- selling nothing.
+-- What's the probability of selling the last candy bar at 
+-- the n-th house?
+
+-- SOLUTION:
+-- The number of trials (i.e. houses) this takes is therefore k+5=n.
+-- What we are interested in is the number of houses, 
+-- so we substitute k = n − 5 into a NB(5, 0.4) mass function
+
+nbinPDF(10-5,5,0.4)         -- ok, 0.100329, n=10, k=n-5, f(n)
+
+"   3b. "
+-- What's the probability that Pat finishes on or before 
+-- reaching the eighth house?
+
+f(n) = choose((n-5)+5-1, n-5)*(1-0.4)^5*0.4^(n-5)
+f(5)
+f(6)
+f(7)
+f(8)
+
+sum(i,5,8, f(i))
+
+"  3c. "
+-- What's the probability that Pat exhausts all 30 houses 
+-- that happen to stand in the neighborhood?
+
+finist5to30 = 1 - sum(j,5,30, f(j))
+finist5to30 -- ok
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

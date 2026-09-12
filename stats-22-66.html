@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+## Statistics with Eigenmath      § 2.2-66
+##            by Dr. W.G. Lindner  2026
+ 
+
+"=============================== geoPDF - GEOMETRIC density"
+
+   geoPDF(k,p) = float( p*(1-p)^k  )
+
+----------------------------------------------------------
+
+"--- a. --- Geometrical PDF table for k=0..10, p=1/6"
+T = zero(2,11)
+for(i,0,10, T[1,i+1] = i)
+for(i,0,10, T[2,i+1] = float(geoPDF(i, 1/6)) )
+transpose(T)
+
+"--- b. --- Geometrical PDF plot for k=0..10, p=1/6"
+yrange = (0,0.2)
+xrange = (0,10)
+draw( geoPDF(x, 1/6), x)  -- warning: plot is 'continous'
+
+y = T[2]
+draw(y[floor(x)],x)       -- draw version 2
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

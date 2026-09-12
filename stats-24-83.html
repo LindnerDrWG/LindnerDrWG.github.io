@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+## Statistics with Eigenmath      § 2.4-83
+##            by Dr. W.G. Lindner  2026
+ 
+ 
+"Wikipedia ibid.: working example"
+# REMARK:
+# hypergeometric PDF definition in wiki is hgPDF1(r,N,R,n)
+
+""--------------------------------------- WIKIPEDIA hgPDF "
+   hgPDF(N,R,n,r) = float( choose(R,r)*choose(N-R, n-r)/choose(N,n) )     
+
+   hgPDF1(r,N,R,n) = float(  hgPDF(N,R,n,r)  )
+
+----------"r N R n"-----------------------------------------
+-- where
+-- N is the population size,
+-- R is the number of success states in the population,
+-- n is the number of random draws without replacement in each trial,
+-- r is the number of observed successes.
+
+
+"------------------------- EXAMPLE: drawing r red marbles in n draws"
+
+-- we are interested in calculating the probability of 
+-- drawing r red marbles in n draws, given that there are R red
+-- marbles out of a total of N marbles. 
+
+-- For this example, assume that there are 5 red and 45 green marbles
+-- in the urn. Standing next to the urn, you close your eyes and 
+-- draw 10 marbles without replacement. 
+-- What is the probability that exactly 4 of the 10 are red?
+
+-- This problem is summarized by:
+--
+--                drawn	     not-drawn      total
+-- red   marbles:	 r =  4    R-r = 1        R   = 5
+-- green marbles:	 n-r= 6    N+r-n-R= 39    N-R = 45
+-- total	       :  n = 10	  N-n = 4        N   = 50
+
+--     (r,     N,    R,     n   )   wikipedia invoking parameters
+--      red    all   reds   draw
+
+"hgPDF1(r=4,   N=50, R=5, n=10) ="
+hgPDF1(   4,     50,   5,   10)
+"ok"
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

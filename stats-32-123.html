@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 3.2-123
+##            by Dr. W.G. Lindner  2026
+ 
+"============================== expPDF - exponential prob. density"
+
+    expPDF(x, L) = test( x>=0, L*exp(-L*x), x<0 , 0)
+-------------------------------------------------------------------
+
+"------ lifetime of a product"
+
+-- cf. [1], p.68
+-- The lifetime of a product with the parameter L=1/2
+-- is exponentially distributed. What is the probability that 
+-- the product will fail in a period between three and five years?
+-- SOLUTION: 
+-- Y=life_time, Pr(3<Y<5) =: P3Y5 =
+
+L = 1/2
+P3Y5 = defint( L*exp(-L*t), t,3,5)    -- solution with integral 
+P3Y5
+float
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

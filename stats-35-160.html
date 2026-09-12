@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 3.5-160
+##            by Dr. W.G. Lindner  2026
+ 
+ 
+"=============================== CDF for CHI^2 distribution"
+  GammaP(x,k) = x^k*exp(-x) * sum(m,0,100, x^m/tgamma(k+m+1))
+
+  chi2CDF(x, k) =  test( or(x<=0,k<=0), 0,
+                   float( GammaP(x*0.5, k*0.5 )) )
+
+------------------------------------------------------------------
+-- Cumulative probability function (cdf) for chi-squared
+
+
+"------ chi^2 table for df=3" 
+
+-- EXAMPLE: Reproduce the following table:
+-- Values for chi^2 with 3 degrees of freedom, i.e. df=3
+--  x   Chi^2(x)   P value (df=3)
+--  x   Chi^2cdf   P-value
+--  1   0.198748   0.801252
+--  2   0.427593   0.572407
+--  4   0.738536   0.261464
+--  8   0.953988   0.046012
+-- 16   0.998866   0.001134
+-- 32   0.999999   0.000001
+
+X = (1,2,4,8,16,32)
+"     x      chi2CDF(x)      P-value" 
+T = zero(3,6)  
+for(i,1,6, T[1,i] = X[i])
+for(i,1,6, T[2,i] = chi2CDF(X[i],3))
+for(i,1,6, T[3,i] = 1-chi2CDF(X[i],3))
+transpose(T)
+"ok"
+
+
+"                      chi2CDF for k=3"
+xrange = (0,8)
+yrange = (0,1)
+draw( chi2CDF(x,3) )  
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

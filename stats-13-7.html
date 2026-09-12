@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+## Statistics with Eigenmath  -  § 1.3-7
+##            by Dr. W.G. Lindner  2026
+
+"STANDARD DEVIATION"
+
+mean(X)       = float( sum(X)/dim(X) )        -- empir.sample mean
+meanF(X,f)    = float( dot(f,X)/sum(f) )      -- mean w. frequency
+
+var(X)  = float( sum((X-mean(X))^2) / (dim(X)-1) ) -- sample var.
+var0(X) = float( sum((X-mean(X))^2) / (dim(X)-0) ) -- population var.
+
+-- For a finite-length vector X made up of n=dim(X) scalar 
+-- observations, the standard deviation 'sd' is defined as
+
+
+-----------------------------------------------# DEFINITION 
+sd(X)  = sqrt(sum((X-mean(X))^2) /(dim(X)-1)) -- sample sd
+
+sd0(X) = sqrt(sum((X-mean(X))^2) /dim(X))     -- population sd
+           --  float( sqrt(var(X)) )          -- using var
+---------------------------------------------------- 
+-- alternative
+
+sd1(X)  = float( sqrt(mean(X^2) - mean(X)^2) )  -- Std.Deviation
+
+
+"EXAMPLE"
+
+-- Suppose that the entire population of interest is eight students 
+-- in a particular class. Their marks are the following eight values:
+
+"marks : 2,4,4,4,5,5,7,9"
+X = (2,4,4,4,5,5,7,9)
+
+-- The following formula is valid only if the eight values with which 
+-- we began form the complete population. If the values instead were 
+-- a random sample drawn from some large parent population (for 
+-- example, there were 8 students randomly and independently chosen
+-- from a student population of 2 million), then one divides by 7 
+-- (which is n − 1) instead of 8 (which is n) in the denominator of 
+-- the last formula, and the result is
+
+-- SOLUTION:
+
+spop = sd0(X)     -- population var = 2
+spop
+
+float(sqrt(32/7))
+
+ssample = sd(X)   -- sample     var = 2.13
+ssample
+
+sd1(X)            -- is equvalent to sd0
+"ok"
+
+
+"--- check with R ---"
+-- R> sd(c(-5, 3,  1))
+--    [1] 4.163332
+
+
+
+
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+## Statistics with Eigenmath      § 1.5-19
+##            by Dr. W.G. Lindner  2026
+
+"mean absolute deviation - mad"
+
+mean(X) = float( sum(X)/dim(X) )          
+
+------------------------------------------ DEFINITION
+mad(X)  = mean(mag(X - mean(X)))        -- w.r.t. mean    
+--------------------------------------------------------
+ 
+-- we calculate for the contrast to the mean absolute deviation
+-- the MEAN SQUARED deviation 'dsquare' by hand:
+
+X=(4,36,45,50,75) 
+mX = mean(X)
+mX
+
+Xbar = X-mX
+Xbar
+
+Xbar2 = Xbar^2
+Xbar2
+
+dsquare = sum(Xbar^2)/dim(X)
+dsquare
+
+
+"EXAMPLE, wiki ibid."
+
+-- For example, for the data set {2, 2, 3, 4, 14} the MAD's are
+
+set = (2, 2, 3, 4, 14)
+mad(set)        -- default w.r.t. mean
+-- mad1(set)       -- w.r.t   median, below
+-- mad2(set)       -- w.r.t   mode, later
+"ok"
+
+--- Median abs.dev. around the median"
+
+-- EXAMPLE, wiki ibid.
+-- # Median absolute deviation around the median.
+-- For the example {2, 2, 3, 4, 14}: 3 is the median, so the absolute
+-- deviations from the median are {1, 1, 0, 1, 11} 
+-- (reordered as {0, 1, 1, 1, 11}) with a median of 1, 
+-- in this case unaffected by the value of the outlier 14, 
+-- so the median absolute deviation is 1.
+
+-- SOLUTION: 
+
+-- Prerequisties are sort and median (see 1.7)
+-- the definition of median needs a sort function.
+-- helper function SORT by G. Weigt, 19.7.2025:
+
+----------------------------------------- helper
+sort(v,i,k,n,t) = do( n = dim(v),       
+     loop( test(n < 2, break), k = 1,
+           for(i, 1, n - 1,
+               test(v[i] > v[i + 1], 
+                 do( t = v[i], v[i] = v[i + 1], v[i + 1] = t,
+                     k = i ))), n = k), v)
+
+median(X, xmed,Xs,n2,n2p) = do(
+          Xs   = sort(X),
+          n2   = floor(dim(X)/2),  
+          n2p  = n2+1,
+          xmed = test( not(mod(dim(X),2)=0), Xs[n2p], 
+                       0.5*(Xs[n2]+Xs[n2p])), float(xmed))
+--------------------------------------------------- END 
+
+-- we define the following versions of mad:
+--------------------------------------------------------
+mad1(X)  = mean(mag(X - median(X)))    -- w.r.t. median    
+mad3(X) = median(mag(X - median(X)))  -- med.abs.dev. w.r.t. median
+--------------------------------------------------------
+
+Y = (2, 2, 3, 4, 14)
+mad3(Y)
+"ok"
+
+"------ Example"
+
+mad( (1,2,3,4,5,6,7,8,9) )       -- default = mean
+"ok"
+
+mad3( (1,2,3,4,5,6,7,8,9) )   -- median abs.dev. around the median
+"ok - gives 2"
+
+-- R> mad(c(1:9), constant=1)
+--    [1] 2
+
+
+"------ EXAMPLE: a descriptive statistics"
+
+-- EXAMPLE (Beucher p.174)
+-- Here is a sample X=(0,1,5,10).
+-- Calculate dim, mean, variance, std.dev, median, range, m.a.d.
+
+-- SOLUTION:
+
+-- we calculate the range of the number list using
+-- vectorized versions of min() and max():
+
+# DEFINITION
+----------------------------------------- max, min, range
+max(v, i,m,n) = do( n = dim(v), m = v[1],    -- G. Weigt 7/2025
+                    for(i,2,n, test(v[i]>m, m=v[i])), m)
+
+min(v, i,m,n) = do( n = dim(v), m=v[1],      -- by wL
+                    for(i,2,n, test(v[i]< m, m=v[i])), m)
+
+range(X) = max(X) -  min(X)
+--------------------------------------------------------
+
+sd(X)  = sqrt(sum((X-mean(X))^2) /(dim(X)-1))   -- std.deviation s
+var(X) = sd(X)^2
+
+X=(0,1,5,10)
+
+-- construct the value table
+measure = ("VARIABLE:", "N", "Mean", "Variance", "St.Dev", "Median", 
+                        "Range", "m.a.d.")
+score   = ("SCORE:",  dim(X), mean(X), var(X),    sd(X),   median(X), 
+                     range(X), mad(X))
+(measure, score)
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

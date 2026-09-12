@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 5.9-262
+##            by Dr. W.G. Lindner  2026
+
+
+-- We repeat here the solution of example 59.b for comparison.
+
+"=======================  BOOTSTRAPci for confidence interval"
+
+------------------- sort & percentile ------------------------
+sort(v,i,k,n,t) = do( n = dim(v),         
+     loop( test(n < 2, break), k = 1,
+           for(i, 1, n - 1,
+               test(v[i] > v[i + 1], 
+                 do( t = v[i], v[i] = v[i + 1], v[i + 1] = t,
+                     k = i ))), n = k), v)
+
+  percentile(X, p) = do( Xs = sort(X),
+                         i  = ceiling(dim(X)*p/100),
+                         float((Xs[i])) )
+
+ min(a,b) = test(a<=b, a,b)
+ max(a,b) = test(a<=b, b,a)
+ mean(X) = float(sum(X)/dim(X))
+
+### --------------------------------------------------------------
+###    bootstrapping for Confidence Inteval CI
+### --------------------------------------------------------------
+
+bootci(X,IT,  r, M, Mboot, estimatedMean) = do(
+              --  IT : number of iterations
+              n = dim(X),             -- number of samples
+              M = zero(IT),           -- container for all samples
+              Mboot = zero(n),        -- save a sample
+              rand( mod(31,117)),     -- start randomly 
+              for(j,1,IT,             -- start bootstrap samples
+                  for(i,1,n,          -- create one resample of X
+                      r = 1 + mod(floor(1+n*rand()),n),
+                      Mboot[i] = X[r] ), -- bootstrap new sample
+                  M[j]= mean(Mboot)      -- j.th bootstrap mean
+                  ),                  -- bootstrap sample mean   
+              estimatedMean = float(mean(M)),
+              ci2 = percentile(M, 68.5),
+              ci1 = percentile(M, 2.5), 
+              print("    _____ bootCI _____"),
+              (("est.Mean", "CI.l", "CI.h"), 
+                (estimatedMean, ci1,ci2)) 
+              -- alternative CI using std.dev.:
+              -- interval = tINV(1 - (alpha/2),n-1) * (sX/sqrt(n)),
+              -- ci = (mean(X) - interval, mean(X) + interval),
+              -- (estimatedMean, ci[1], ci[2]) 
+              )
+               
+---------------------------------------------------------END
+
+-- check with the data from above
+--    1.  2. 3   4.  5   6   7   8   9.  10
+X = (25, 30, 35, 40, 45, 50, 55, 60, 65, 70)
+
+alpha = 0.05
+bootci(X,100)
+"ok"
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

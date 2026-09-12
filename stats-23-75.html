@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+## Statistics with Eigenmath      § 2.3-75
+##            by Dr. W.G. Lindner  2026
+ 
+"================================== nbinCDF - cumulative nbin" 
+
+   nbinCDF(x,r,p) = p^r*sum(j,0, floor(x), choose(r+j-1,r-1)*(1-p)^j)
+
+--------------------------------------------------------------
+-- for x>= 0 failures, else 0
+-- cf. https://de.mathworks.com/help/stats/nbincdf.html
+-- REMARK
+-- The nbinCDF function calculates the probability of a given number 
+-- of failures (x) before the number of successes specified by (r)
+-- is reached. The probability_success argument p determines the 
+-- constant probability of success.
+
+
+nbinCDF(1,2,0.5) -- = 0.5 ok
+
+nbinCDF(10, 5, 0.25)
+
+
+"EXAMPLE: identify five people"
+
+-- EXAMPLE: (EXCEL)
+-- You are asked to identify five people who have excellent reflexes,
+-- and you know the probability that any one candidate meets this 
+-- requirement is 0.25. nbinCDF (=NEGBINOM.DIST) calculates the 
+-- probability that you will interview a certain number of unsuitable
+-- candidates before identifying five suitable candidates.
+
+-- cf.: https://support.microsoft.com/de-de/office/
+        negbinom-vert-funktion-c8239f89-c2d0-45bd-b6af-172e570f8599
+
+-- SOLUTION:
+
+nbinCDF(10, 5, 0.25)
+"ok"
+
+-- R> pnbinom(10, 5, 0.25)
+--      [1] 0.3135141
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 5.7.b
+##            by Dr. W.G. Lindner  2026
+
+-- Now we are prepared to understand the following function boot1.
+-- Boot1 determines an estimated mean resp. sd of a sample X.
+
+"=======================  BOOTSTRAP1 for dependend samples"
+
+"Prerequisites: mean, std.deviation sd"
+
+  mean(X)= float(sum(X)/dim(X))
+  sd(X)  = sqrt(sum((X-mean(X))^2) /(dim(X)-1)) -- sample std.dev.
+
+----------------------- boot1 --------------------------------
+boot1(X,IT,  r, M, Mboot,Sboot, estM, estS) = 
+----------------------- boot1 --------------------------------
+           do(
+              --  IT : number of iterations
+              n = dim(X),             -- number of samples
+              M = zero(IT),           -- container for all samples
+              S = zero(IT),           -- container for all samples
+              Mboot = zero(n),        -- save a mean sample
+              Sboot = zero(n),        -- save a sd sample
+              rand( mod(31,117)),     -- start randomly 
+              for(j,1,IT,             -- start bootstrap samples
+                  for(i,1,n,          -- create one resample of X
+                      r = 1 + mod(floor(1+n*rand),n),
+                      Mboot[i] = X[r],
+                      Sboot[i] = X[r]
+                      ),              -- bootstrap new sample
+                  M[j] = mean(Mboot), -- j.th bootstrap mean
+                  S[j] = sd(Sboot)    -- j.th bootstrap sd
+                  ),                    
+              estM = float(mean(M)),  -- bootstrap sample mean/sd 
+              estS = float(sd(S)),    -- i.e. estimated values
+              print("    _____ boot1 _____"),
+              (("est.mean", "est.sd"),(estM, estS)) )
+----------------------- boot1 ---------------------------- END
+
+
+-- EXAMPLE from the text ch.5.7
+
+X=(4,5,4,7,2)
+
+boot1(X, 1000)      -- using 1000 repetitions ("resamples")
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

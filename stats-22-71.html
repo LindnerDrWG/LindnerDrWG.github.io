@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+## Statistics with Eigenmath      § 2.2-71
+##            by Dr. W.G. Lindner  2026
+ 
+
+"-------------------------------------------------- geoINV1"
+  geoCDF(n,p)  = float( 1-(1-p)^(n+1) )            -- helper
+
+  geoINV1(alpha, p, x,k) = do( k=0,
+        loop(k=k+1, x=geoCDF(k,p), x,k, test(x>alpha, break))
+        x, k)
+        
+   geoINV(u,p) = ceiling(( log(1-u)/log(1-p) - 1)) 
+---------------------------------------------------------
+
+-- Evaluate the inverse probability at pin = 0.25, p = 0.6835.
+-- Result: 3 ok
+
+geoINV(0.6835, 0.25)
+
+geoINV1(0.6835, 0.25)
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

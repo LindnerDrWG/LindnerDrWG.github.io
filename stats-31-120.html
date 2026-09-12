@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 3.1-120
+##            by Dr. W.G. Lindner  2026
+ 
+pi = float(pi)
+
+"=============================== normINV - quantiles of normCDF"
+   stdnormCDF(x) = 1/2*erfc(-x/sqrt(2))
+   Phi(x) = stdnormCDF(x)            -- classic notation
+
+   stdnormINV(x, a,b,k,t,y) = test(x=0, "-Inf", x=1, "+Inf",
+                 and(0<x,x<1),
+                  do( a = -10, b = 10,         -- x in [a,b]
+                    for(k,1,100, 
+                         t = (a+b)/2,
+                         y = stdnormCDF(t),
+                     test(abs(x-y)<0.0000001, break, y<x,a=t, b=t)
+                    ), float(t) ))
+
+   normINV(x,mu,sigma) = mu + sigma*stdnormINV(x)        -- (+)
+
+-------------------------------------------------------------- END
+
+
+".................... INVerse of standard Normal distribution"  
+xrange = (0,1)
+yrange = (-5,5)
+draw( stdnormINV(x), x)
+
+"                      INVerse of Normal distribution"  
+xrange = (0,1)
+yrange = (-5,5)
+draw( normINV(x,3,2), x)
+
+
+".................... EXAMPLE: The 68-95-99.7 rule"
+
+-- Let us determine the area under the std normal curve for 
+-- ±1 standard deviation, for ±2 standard deviations, and 
+-- for ±3 standard deviations.
+
+-- SOLUTION: remember Phi() = stdnormCDF().
+
+Phi(1) - Phi(-1)       # 1 standard deviation
+                       # 0.6826894921370859
+Phi(2) - Phi(-2)       # 2 standard deviations
+                       # 0.9544997361036416
+Phi(3) - Phi(-3)       # 3 standard deviations
+                       # 0.9973002039367398
+"ok"
+
+-- Awesome, we just confirmed the Empirical Rule, also known as the 
+---68-95-99.7 rule, which relates to the Chebyshev's theorem. 
+-- For a bell-shaped distribution the 3 rules are, that approximately
+-- 68% of the observations lie within   1 st.deviation of the mean,
+-- 95% of the observations lie within   2 st.deviations of the mean, 
+-- 99.7% of the observations lie within 3 st.deviations of the mean.
+
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

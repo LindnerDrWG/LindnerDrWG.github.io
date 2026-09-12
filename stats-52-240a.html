@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 5.1-240a
+##            by Dr. W.G. Lindner  2026
+
+"========================= SPEARMAN rank correlation rho "
+
+"........... Prerequisites: mean"
+
+mean(X) = float( sum(X)/dim(X) )  
+
+
+-- In this script we demonstrate the determination of Spearman's
+-- rank correlation coefficient rho in three phases:
+-- a. FIRSTLY  we calculate rho ρ manually with Eigenmath
+-- b. SECONDLY we calculate rho semi-automatic using two helper
+--          functions Rank() and correspond(ence)
+-- c. THIRDLY  we calculate rho fully automatic using function 
+--          spearman() with the help of cov(ariance) function.         
+
+
+###----------------------------------------------------------
+"--- a. EXAMPLE: heigths of fathers vs sons"
+###----------------------------------------------------------
+  
+# PROBLEM: The heights of a sample of 12 fathers and their oldest 
+#          sons are measured giving the following data:
+#          Far : 65,63,67,64,68,62,70,66,68,67,69,71
+#          Son : 68,66,68,65,69,66,68,65,71,67,68,70
+#          cf. Spiegel p. 434 P 17.24
+# TASK:    Calculate the Spearman rank correlation rho.
+
+".......... SOLUTION manually step-by-step by Eigenmath-'hand'"
+
+Far = (65, 63, 67, 64, 68, 62, 70, 66, 68, 67, 69, 71)
+Son = (68, 66, 68, 65, 69, 66, 68, 65, 71, 67, 68, 70)
+
+"..........  we may sort both data sets by eye, because they are small :)"
+--                  4. item
+sFar = (62, 63, 64, 65, 66, 67, 67, 68, 68, 69, 70, 71)
+sSon = (65, 65, 66, 66, 67, 68, 68, 68, 68, 69, 70, 71)
+
+-- Because sFar[4]=65, 65 has rank=4, we set 4 in place Far[1]=65,..:
+--            1.
+-- Far =     (65, 63,  67, 64, 68, 62, 70, 66,  68,  67, 69, 71)
+--             |   |  ...
+-- rankFar = ( 4,  2, 6.5,  3,8.5,  1, 11,  5, 8.5, 6.5, 10, 12)
+
+"..........  we rank equal data using mean values if 'ties' are seen:"
+
+rankFar = ( 4,    2, 6.5,   3, 8.5,   1,  11,   5, 8.5, 6.5,  10, 12)
+rankSon = (7.5, 3.5, 7.5, 1.5,  10, 3.5, 7.5, 1.5,  12,   5, 7.5, 11)
+
+-- we have the fathers table
+ 
+TF = zero(3,12)
+TF[1] = Far
+TF[2] = sFar
+TF[3] = rankFar
+TF
+
+-- and the sons table:
+
+TS = zero(3,12)
+TS[1] = Son
+TS[2] = sSon
+TS[3] = rankSon
+TS
+
+".......... we now calculate the differences of corresponding ranks"
+
+D = rankFar - rankSon
+
+-- and their squared values to get positive signs
+
+D2 = D^2
+
+"row 1: D, row2 : D^2:"
+(D, D2)
+
+sum(D^2)
+
+n = dim(Far)
+n
+
+"..........  According to [1], Spearman's correlation rho is" 
+--     defined as 
+--     r = 1 - 6*sum((ranks(x)-ranks(y)).^2)/(N*(N*N-1))
+
+rhoSpearman = 1 - 6*sum(D^2)/n/(n^2-1)
+rhoSpearman
+
+"ok"
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

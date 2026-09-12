@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 4.15.b
+##            by Dr. W.G. Lindner  2026
+
+"========================= McNEMAR TEST "
+
+"........... Prerequisites: Chi.square.CDF, .."
+
+  GammaP(x,k)    = x^k*exp(-x) * sum(m,0,100, x^m/tgamma(k+m+1))
+
+  chi2CDF(x, k)  =  test( or(x<=0,k<=0), 0,
+                    float(GammaP(x*0.5, k*0.5 )) )
+
+  binoCDF(k,n,p) = sum(j,0,floor(k), choose(n,j)*p^j*(1-p)^(n-j) )
+
+### ------------------- McNEMAR test ----------------------
+###     mcnemarTest(a,b,c,d,method)
+###            method = "asymptotic", "corrected", "exact"
+### .......................................................
+
+mcnemarTest(a,b,c,d,method,  n,chi,h,p) = 
+     do(     -- default = "asymptotic"
+       test( or(a<=0, b<=0, c<=0, d<=0), "Error"), 
+       n    = a+b+c+d,
+       test(method = "asymptotic",
+              do( chi = float((b-c)^2 / (b+c)),
+                  p   = 1-chi2CDF(chi, 1) ),
+            method="corrected",     -- YATES correction
+              do( chi = float((mag(b-c)-1)^2 / (b+c)),
+                  p   = 1-chi2CDF(chi, 1)),
+            method="exact", p = 2*(binoCDF(b, b + c, 0.5))),
+       Ho = test(p < 0.05, 0,1),    -- HORNIK
+       print(" ____ McNEMAR ____"),
+      (("chi", "p", "Ho"), (chi, p, Ho )))  
+      -- in 3rd case there is no chi --> $arg7 :)
+ 
+### ----------------------------------------------------- END
+
+-- REMARK
+-- See the implementation of mcnemarTest in
+--     https://en.wikipedia.org/wiki/McNemar%27s_test
+-- The smaller the value of p, the greater the evidence for 
+-- rejecting the null hypothesis
+
+-- REMARK: see wiki, ibid.: Python code excerpt
+-- chi2_statistic = (abs(n_min - n_max) - corr) ** 2 / 
+--                  (n_min + n_max)
+--         pvalue = chi2.sf(chi2_statistic, 1)
+-- (!) This pvalue is not in coincidence with R, see below 
+-- exercise 233.
+
+"...........  Check of Example 1 (fig.41)"
+
+X = (63, 20,  11, 6)
+mcnemarTest(X[1], X[2],  X[3], X[4], "asymptotic")
+mcnemarTest(X[1], X[2],  X[3], X[4], "corrected")
+mcnemarTest(X[1], X[2],  X[3], X[4], "exact")
+"ok"
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

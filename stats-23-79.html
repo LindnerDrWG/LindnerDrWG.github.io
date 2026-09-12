@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+## Statistics with Eigenmath      § 2.3-79
+##            by Dr. W.G. Lindner  2026
+ 
+
+
+"============================ nbinINV - neg.binom.quantile" 
+   nbinCDF(x,r,p) = p^r*sum(j,0, floor(x), choose(r+j-1,r-1)*(1-p)^j)
+
+   nbinINV(alpha,r,p, x,k) = 
+      do( k=0,
+          loop(k = k+1, 
+               x = nbinCDF(k,r,p), 
+               x,k, test(x>alpha, break)), x,k)
+---------------------------------------------------------
+-- This function is used to find the n.th quantile, 
+-- that is if P(X <= k) is given, it finds k.
+
+-- nbinINV(alpha, r, p) in R: qnbinom(alpha, size, prob) where
+-- alpha: The probability for which to find the quantile 
+--       (e.g., 0.95 for the 95th percentile).
+-- size: The target number of successes 
+--       (r in some parameterizations).
+-- prob: The probability of success on each trial 
+--       (p in some parameterizations).
+
+-- Interpretation:
+-- nbinINV(alpha, size, prob) returns the number of trials 
+-- (or failures before the size-th success) such that the probability
+-- of observing that many or fewer failures is at least p.
+
+"Check"
+
+nbinINV(0.99, 5, 0.25)
+
+nbinINV(0.95, 10, 0.7)
+"ok"
+
+-- CHECK
+-- R> qnbinom (0.95, size = 10, prob = 0.7)
+--    [1] 9
+
+nbinINV(0.75,3,0.5)
+
+-- This code will output the number of trials 
+-- (including successes with a success probability of 0.7)
+-- where the probability of getting 10 or fewer failures is at least
+-- 95%. You can then subtract 10 to find the number of failures.
+
+"EXAMPLE 3: flip a fair coin"
+
+-- EXAMPLE(MATLAB) https://de.mathworks.com/help/stats/nbininv.html
+-- How many times would you need to flip a fair coin to have a 99% 
+-- probability of having observed 10 heads?
+
+nbinINV(0.99, 10, 0.5)
+"ok"
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

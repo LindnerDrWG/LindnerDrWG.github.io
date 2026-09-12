@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 3.1-109
+##            by Dr. W.G. Lindner  2026
+ 
+pi = float(pi)
+
+"============================== normCDF - normal cumulative"
+
+  normCDF(x, mu,sigma) = 
+                  1/2 + 1/2*float(erf((x-mu)/(sqrt(2)*sigma)))
+
+  stdnormCDF(x) = normCDF(x, 0,1)          -- standard normal CDF
+  Phi(x)        = stdnormCDF(x)            -- classic notation
+
+--------------------------------------------------------------
+
+"a. ------ EXAMPLE in R"
+
+-- R: Calculate the probability of a value less than or equal to 1.96
+-- in a standard normal distribution.
+-- R> pnorm(1.96)
+--    [1] 0.9750021
+
+Phi(1.96)
+"ok"
+
+"b. ------ EXAMPLE in R"
+
+-- R: Probability of a value less than or equal to 2 in a normal 
+-- distribution with mean 1 and standard deviation 0.5?
+-- R> pnorm(2, mean = 1, sd = 0.5)
+--    [1] 0.9772499
+
+normCDF(2, 1.0,0.5)
+"ok"
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

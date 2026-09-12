@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+## Statistics with Eigenmath       § 4.2.a
+##            by Dr. W.G. Lindner  2026
+
+-- REMARK 
+-- To calculate the Two Sample Z-TEST we need the functions
+-- stdnormCDF() and stdnormINV() as helper: 
+
+--................................................. stdnormCDF/INV
+   stdnormCDF(x)       = 1/2*erfc(-x/sqrt(2))
+
+   stdnormINV(x, a,b,k,t,y) = test(x=0, "-Inf", x=1, "+Inf",
+                 and(0<x,x<1),
+                  do( a = -10, b = 10,         -- x in [a,b]
+                    for(k,1,100, t = (a+b)/2, y = stdnormCDF(t),
+                     test(abs(x-y)<0.0000001, break, y<x,a=t, b=t)
+                    ), float(t) ))
+--................................................ END helpers
+
+""
+"============================ process of two sample Z-TEST"
+"             EXAMPLE: BOYS AND GIRLS"
+--=========================================================
+
+-- We start with an example from the STATISTICS TUTORIAL
+-- https://statstutorial.com/two-sample-z-test-in-r-with-examples/
+-- to have a reference solution.
+
+-- Lets take IQ levels among boys and girls in 10th class are known 
+-- to be normally distributed each with population standard deviations 
+-- of 25. A teacher wants to know if the mean IQ level between girls
+-- and boys in class are different, so she selects a two random 
+-- samples of boys and girls each of size 40 from the class and 
+-- records their IQ levels.
+-- Lets perform the two sample z-test in R to determine if the mean
+-- IQ level is different between boys and girls with 5% level of 
+-- significance.
+
+-- SOLUTION:
+
+-- We will calculate the test statistic T (aka 'Z-score') by using 
+-- a two sample z-test for the mean.
+-- The procedure for Two Sample Z-Test for mean is as follows
+-- Step 1: Define the Null Hypothesis and Alternate Hypothesis.
+-- Step 2: Decide the level of significance α (alpha).
+-- Step 3: Calculate the test statistic T.
+-- Step 4: Interpret the two sample z-test results.
+-- Step 5: Determine the rejection criteria for the given confidence 
+--         level and conclude the result
+
+"..................... Define the datasets for boys and girls"
+
+-- boys data
+X = (79,118,99,117,98,102,112,111,102,73,114,97,114,122,90,115,
+84,105,84,126,83,96,111,151,147,103,104,118,132,108,95,118,121,88,94,
+92,94,109,105,123.)    -- we write '123.' to get float values
+
+-- girls data
+Y = (99,128,89,107,99,104,119,112,105,93,84,91,113,129,100,105,
+94,115,114,106,113,116,116,131,117,123,134,128,112,101,105,
+89,101,118,124,72,104,119,145,133.)
+
+".....................  Perform the two sample z-test"
+
+"-a.- H0: muBoys = muGirls"
+
+D = 0  -- = muX - muY
+
+nX  = dim(X)
+nY  = dim(Y)
+
+sigmaX = 25             -- known std.dev. for the boys
+sigmaY = 25             -- known std.dev. for the girls
+
+"-b.- level of significance alpha = 0.05"
+
+alpha = 0.05
+
+"-c.- calculate z-statistics T"
+
+mean(X) = sum(X)/dim(X)                  -- sample mean
+mean(X)
+mean(Y)
+
+T = ((mean(X)-mean(Y))-D)/sqrt(sigmaX^2/nX+sigmaY^2/nY)
+T                                   -- the Z-score
+"ok"
+
+Zcrit = stdnormINV(1-alpha/2)       -- alpha-quantile
+Zcrit                               -- 'critical value'
+
+"..................... Calculate p-value if hypothesis is 'two.sided'"
+
+min(a,b) = test(a<=b, a,b)
+
+p  = min( 2 * stdnormCDF(T), 2 * (1-stdnormCDF(T)))
+p
+
+-- or shorter
+
+pvalue = 2 * stdnormCDF(-abs(T))
+pvalue  
+"ok"
+
+".....................  Confidence interval CI"
+
+SEdiff = sqrt(sigmaX^2/nX + sigmaY^2/nY)  -- std.error of mean
+
+CI = ((mean(X)-mean(Y)) - Zcrit*SEdiff, 
+      (mean(X)-mean(Y)) + Zcrit*SEdiff)
+CI
+
+-- CI is for the difference D=mu1-mu2, NOT for the means itself!
+-- The formula is based on the difference between sample statistics,
+-- plus or minus the critical z-value multiplied by  
+-- the standard error of the difference. 
+
+-- RESULTS
+
+-- data: boys_dataset and girls_dataset
+-- z = -0.68424, p-value = 0.4938
+-- alternative hypothesis: true difference in means is not equal to 0
+-- at 95 percent confidence interval:  -14.781532 7.131532
+-- sample estimates:  mean of boys  mean of girls
+--                    106.350       110.175
+
+"-d.-  Interpretation of result and decision about H0"
+
+-- Compare Z-score 'T' with critical value and decide
+
+test( abs(T) > Zcrit, "Reject the null hypothesis.",
+                      "Accept the null hypothesis.")
+
+-- Since the p-value[ 0.4938] is greater than the level of 
+-- significance (α) = 0.05, we fail to reject the null hypothesis.
+-- This means we have sufficient evidence to say that IQ level for 
+-- boys and girls are equal in 10th class.
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

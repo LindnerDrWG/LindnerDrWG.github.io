@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 3.2-129
+##            by Dr. W.G. Lindner  2026
+ 
+"=============================== expINV - quantiles of exp"
+
+   expINV(p,L) = - log(1-p)/L 
+
+------------------------------------------------------------
+-- quantile function (INV) for exp-distibution for 0<p<1.
+-- https://de.mathworks.com/help/stats/expinv.html
+-- MATLAB: The result x is the value such that an observation from 
+-- an exponential distribution with parameter mu will falls in the
+-- range [0,x] with probability p. 
+
+-- known: the quantile function (or inverse CDF) is given by 
+-- F⁻¹(u) = -(1/λ) * ln(1 - u), where 0 < u < 1. This inverse 
+-- function takes a uniform random variable (between 0 and 1) as 
+-- input and produces a value that would be expected from the 
+-- exponential distribution. 
+
+"------ Example.3 : median lifetime"
+
+-- EXAMPLE (MATLAB): 
+-- Assume that the lifetime of light bulbs are exponentially
+-- distributed with a mean of 700 hours. 
+-- Find the median lifetime using expinv.
+-- SOLUTION:
+
+"expINV(0.50,1/700) ="
+expINV(0.50,1/700)    
+"ok"
+
+
+-- MATLAB> expinv(0.50,700)
+--         ans = 485.2030
+-- .. Half of the light bulbs will burn out within the first 485 
+-- .. hours of use.
+
+-- R> qexp(0.5, 1/700)
+--    [1] 485.203
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

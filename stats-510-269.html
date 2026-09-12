@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 5.10-269
+##            by Dr. W.G. Lindner  2026
+
+--------------------------------------------------------------
+"a. .......... EXAMPLE: birth weights - step-by-step"    
+--------------------------------------------------------------
+-- PROBLEM   cf. HERRMANN [6, p. 212]
+-- The birth weights of 72 boys and 48 girls born in the first half of
+-- 1981 at the Freiburg (Germany) clinic were examined. 
+-- From a sample of size 120, there are 120 jackknife samples 
+-- generated and their mean is determined. 
+-- This is intended to provide a non-parametric 95% confidence 
+-- interval for the sample mean. 
+-- > The available point estimate for the mean is 3352.8. 
+-- > The non-parametric 95% confidence interval for the mean is 
+--   [3267.9, 3437.7].
+
+-- SOLUTION:  procedure step-by-step without comment ;)
+
+-- the data
+X = (2990,3700,3800,3040,3080,3350,2930,3355,3360,3170.0,
+     3220,3850,3080,3440,3840,3320,2640,3020,2850,3700,
+     4630,3670,3400,3580,3270,3360,3600,3220,4060,2670,
+     3550,3690,2510,1980,3700,3730,3170,3580,3720,2910,
+     3500,3430,3510,1520,3420,4630,3470,3400,3290,3250,
+     2420,3580,3100,3480,3830,3050,3680,3330,3650,3200,
+     3810,3350,3390,3550,3350,3200,4190,3050,4020,2880,
+     3020,3010,3560,3030,3200,2830,3120,3000,4010,3050,
+     3980,3530,3245,3415,3660,4350,3740,3220,3350,3350,
+     3780,3620,3310,3630,3290,3800,4130,3380,3100,3430,
+     3620,3060,2610,3560,3720,3030,3630,3400,3580,3700,
+     3470,2810,2330,1960,3300,2880,3660,3150,3160,3300)
+
+mean(x) = float( sum(x)/dim(x) )
+
+mu = mean(X)
+n  = dim(X)
+M  = zero(n)       
+mX = mean(X)       
+
+for(i,1,n, h=X[i], X[i]=0, M[i] = n/(n-1)*mean(X),  
+           X[i]=h )
+
+"... CI with SE"
+
+theta = mean(M)         
+jac   = n*mX  - (n-1)*theta                       
+
+JCK   = zero(n)    
+for(i,1,n, JCK[i] = n*mX - (n-1)*M[i] ) 
+
+D     = jac - JCK
+su    = sum(D^2)
+sigma = float( sqrt(su/(dim(X)-1)) )  
+SE    = sigma/sqrt(n) 
+
+CIm = mean(JCK) - SE
+CIp = mean(JCK) + SE
+CI  = (CIm, CIp)        -- confidence interval using SE
+
+"... CI with tINV"
+
+conf  = 0.95
+alpha = 1 - conf
+
+pLo   = alpha/2
+pLo
+
+pUp   = 1 - alpha/2
+pUp
+
+"...  Compute the critical values for the confidence bounds"
+-- we need tINV as helper
+--------------------------------------
+   tINV(x, df) = tdistinv(x, df)
+--------------------------------------
+   
+nu = n - 1                                -- D.o.freedom
+crit = ( tINV(pLo, nu), tINV(pUp, nu) )
+crit
+
+SE                                        -- see above
+ci = tINV(1-alpha/2,n-1)*SE
+ci
+
+CI = (jac - ci, jac + ci)
+CI
+"ok"
+
+## Results:
+## mean.ext 3352.8    ok: theta = jac = m1
+## 3437.71  3267.88   here and C program by HERRMANN
+## 3437.69  3267.89   jknife, R code
+## 3458.1   3297.3    parametric CI cf. HERRMANN
+
+
+--------------------------------------------------------------
+"b. ...........  EXAMPLE: birth weights - automatically"    
+--------------------------------------------------------------
+   mean(X) = float( sum(X)/dim(X))    -- average of sample X
+   tINV(x, df) = tdistinv(x, df)
+
+##--------------------------------------------------------- jack
+##     Jackknife method 1-deleted
+## --------------------------------------------------------------
+
+jack(X, jac,d,m1,m2,sig,h,M,JCK) = do(
+        alpha = 0.05,
+        n = dim(X),
+        M = zero(n), 
+        mX = mean(X),
+        for(i,1,n, h=X[i], X[i]=0, M[i] = n/(n-1)*mean(X), X[i]=h),
+        mM  = mean(M),            
+        jac = n*mX - (n-1)*mM,    
+        JCK = zero(n),      
+        for(i,1,n, JCK[i] = n*mX - (n-1)*M[i]),
+        D   = jac - JCK,
+        su  = sum(D^2),
+        sigma = float( sqrt(su/(dim(X)-1))),  
+        SE  = sigma/sqrt(n),   
+        ci = tINV(alpha/2,n-1)*SE,
+        print("The nonparametric 'leave-one-out' jackknife algorithm")
+        print(" __________  jackknife  _________"),
+        (("SE", "CI.l", "CI.h"), (SE, jac - ci, jac + ci )))
+### ---------------------------------------------------------- END
+
+-- Check with jack
+
+X = (2990,3700,3800,3040,3080,3350,2930,3355,3360,3170.0,
+     3220,3850,3080,3440,3840,3320,2640,3020,2850,3700,
+     4630,3670,3400,3580,3270,3360,3600,3220,4060,2670,
+     3550,3690,2510,1980,3700,3730,3170,3580,3720,2910,
+     3500,3430,3510,1520,3420,4630,3470,3400,3290,3250,
+     2420,3580,3100,3480,3830,3050,3680,3330,3650,3200,
+     3810,3350,3390,3550,3350,3200,4190,3050,4020,2880,
+     3020,3010,3560,3030,3200,2830,3120,3000,4010,3050,
+     3980,3530,3245,3415,3660,4350,3740,3220,3350,3350,
+     3780,3620,3310,3630,3290,3800,4130,3380,3100,3430,
+     3620,3060,2610,3560,3720,3030,3630,3400,3580,3700,
+     3470,2810,2330,1960,3300,2880,3660,3150,3160,3300)
+     
+jack(X)
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

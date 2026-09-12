@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 5.1-228
+##            by Dr. W.G. Lindner  2026
+
+
+"========================= FISHER EXACT TEST "
+
+"........... Prerequisites: hgPDF, .."
+
+   hgPDF(k,N,R,n) = float(choose(R,k)*choose(N-R, n-k)/choose(N,n))    
+ 
+   hgCDF(x,N,R,n) = float( sum(k,0,x, hgPDF(k, N,R,n)) )
+
+   hgINV(alpha,N,R,n, x,k) = do( k=0,
+          loop(k=k+1, x=hgCDF(N,R,n,k), x,k, test(x>alpha, break))
+          x, k)
+
+
+### --------------------------------------------------------------
+### FUNCTION fishertest : Fisher’s exact test for alpha 0.05
+### --------------------------------------------------------------
+
+fishertest(a,b,c,d,  n,p) =
+        do( test( or(a<=0, b<=0, c<=0, d<=0), "Error"),  
+            n = a+b+c+d,
+            p = hgCDF(a, n,a+b,a+c),
+            Ho = test(p < 0.05, 0,1),    -- test of Ho level 0.05
+            print(" __ FISHER test __"),
+            (("Ho", "p"), (Ho, float(p))) )   
+ 
+### -------------------------------------------------------- END
+
+"..........  two formulas"
+
+-- EXERCISE: calculate P for the following four-fields-table.
+--
+--                   Men   Women  Row Total
+--    Studying	      0	   10	     : 10       a=0  b=10
+--    Non-studying   12	    2	     : 14       c=12 d=2
+--                   .................
+--    Column Total	 12	   12	     : 24
+
+-- SOLUTION:
+
+-- a. For this table the probability is 
+
+P = choose(10,0) choose(14,12) / choose(24,12)
+P
+P = float(P)
+P                -- ≈ 0.000033652
+
+-- b. or using the alternative formula for P
+
+do( a = 0,  b = 10, c = 12, d = 2 )
+n = a+b+c+d
+P = (a+b)! (c+d)! (a+c)! (b+d)! /  (n! a! b! c! d!)
+P
+"ok"
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

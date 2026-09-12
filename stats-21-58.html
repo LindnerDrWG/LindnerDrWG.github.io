@@ -1,0 +1,68 @@
+Í<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+## Statistics with Eigenmath      § 2.1-58
+##            by Dr. W.G. Lindner  2026
+
+ 
+# DEFINITION
+"=============================== binoPDF - BINOMIAL probability" 
+
+   binoPDF(k,n,p) = choose(n,k)*p^k*(1-p)^(n-k)
+
+----------------------------------------------------------------
+-- where
+-- n : counts the number of independent Bernoulli trials 0,1,2,..
+-- p : specifies a probability of success, 0<=p<=1
+-- k : counts the number of successes 0,1,2,..
+
+-- We use the notation convention of Matlab/Octave: binopdf
+-- P(X=k): represents the probability of getting exactly k successes
+-- binoPDF : binomial probability (or: density, mass) function
+
+
+"EXAMPLE 1 (wiki, ibid., coin example)"
+
+-- Suppose a biased coin comes up heads with probability 0.3 when
+-- tossed. Calculate the probability of seeing exactly 4 heads 
+-- in 6 tosses.
+
+binoPDF(4, 6, 0.3)     -- look up every value form a bino-'table'
+
+-- CHECK                         
+-- R> dbinom(4, size=6, prob=0.3)  [1] 0.059535
+--    'd' in dbinom means _d_ensity function
+
+
+"EXCURS: expection value E for binoDF"
+
+-- expection value E (mean), variance Var for binoDF
+--                    X*f(k)
+
+   binoPDF(k,n,p) = choose(n,k)*p^k*(1-p)^(n-k)
+
+E(k,n,p) = sum(j,0,n, k*binoPDF(k,n,p))             -- or: = n*p
+E(3,5,0.5)
+
+--                      (X - EX )^2
+Var(k,n,p) = sum(j,0,n, (k - n*p)^2*binoPDF(k,n,p)) -- or: =n*p*(1-p)
+Var(3,5,0.5)
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

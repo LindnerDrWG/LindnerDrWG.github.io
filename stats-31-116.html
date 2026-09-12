@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 3.1-116
+##            by Dr. W.G. Lindner  2026
+ 
+pi = float(pi)
+
+"=============================== normINV - quantiles of normCDF"
+   stdnormCDF(x) = 1/2*erfc(-x/sqrt(2))
+
+   stdnormINV(x, a,b,k,t,y) = test(x=0, "-Inf", x=1, "+Inf",
+                 and(0<x,x<1),
+                  do( a = -10, b = 10,         -- x in [a,b]
+                    for(k,1,100, 
+                         t = (a+b)/2,
+                         y = stdnormCDF(t),
+                     test(abs(x-y)<0.0000001, break, y<x,a=t, b=t)
+                    ), float(t) ))
+
+   normINV(x,mu,sigma) = mu + sigma*stdnormINV(x)        -- (+)
+
+-------------------------------------------------------------- END
+
+"------ EXAMPLE (MatLab: norminv)"
+
+-- Compute the inverse of cdf values evaluated at the probability 
+-- values in p for the normal distribution with mean mu=2 and standard 
+-- deviation sigma=1.
+-- SOLUTION
+
+p = (0, 0.25, 0.5, 0.75, 1)       -- p=0:0.25:1
+for(i,1,5, print( normINV(p[i],2,1)) )
+
+-- CHECK with MatLAB
+--     p = 0:0.25:1; mu = 2; sigma = 1;
+--     norminv(p,mu,sigma)
+--     ans = -Inf  1.3255   2.0000   2.6745    Inf
+"ok"
+
+
+"------ EXAMPLE (MatLab)"
+
+-- 
+-- Compute the inverse of cdf values evaluated at 0.5 for various 
+-- normal distributions with different mean parameters at sigma=1.
+-- SOLUTION
+
+mu = (-2,-1,0,1,2)     
+for(i,1,5, print( normINV(0.5,mu[i],1)) )
+
+-- CHECK
+--    mu = [-2,-1,0,1,2];  sigma = 1;
+--    norminv(0.5,mu,sigma)
+--    ans =    -2    -1     0     1     2
+"ok"
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

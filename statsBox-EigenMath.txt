@@ -1,0 +1,239 @@
+
+##| STATSBOX for Eigenmath  -  collection of statisrics functions from
+##| Book https://lindnerdrwg.github.io/Statistics-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2026
+
+-------------------------------------------- helper functions
+
+  sort(v,i,k,n,t) = do( n = dim(v),     -- by G. Weigt, 7/2025
+     loop( test(n < 2, break), k = 1,
+           for(i, 1, n - 1,
+               test(v[i] > v[i + 1], 
+                 do( t = v[i], v[i] = v[i + 1], v[i + 1] = t,
+                     k = i ))), n = k), v)
+
+  median(X, xmed,Xs,n2,n2p) = do(      -- needs sorted data
+          Xs   = sort(X),
+          n2   = floor(dim(X)/2),  
+          n2p  = n2+1,
+          xmed = test( not(mod(dim(X),2)=0), Xs[n2p], 
+                       0.5*(Xs[n2]+Xs[n2p])), float(xmed))
+
+  mode(v, i,j,k,m,n) =                 -- mode by G. Weigt 8/2025
+    do( n = 0,
+      for(i,1,dim(v), k = 0,
+          for(j,1,dim(v), test(v[i] == v[j], k = k + 1)),
+          test(or(k > n, and(k == n, v[i] < m)), 
+               do(n = k, m = v[i]))), m)
+			   
+  max(v, i,m,n) = do( n = dim(v), m = v[1],    
+                      for(i,2,n, test(v[i]>m, m=v[i])), m)
+
+  min(v, i,m,n) = do( n = dim(v), m=v[1],      
+                      for(i,2,n, test(v[i]< m, m=v[i])), m)
+
+  range(X) = max(X) -  min(X)
+
+  Beta(a,b) = test( or(a<=0, b<=0), -1,  
+			        tgamma(a)*tgamma(b)/tgamma(a+b) )    
+
+  GammaP(x,k) = x^k*exp(-x) * sum(m,0,100, x^m/tgamma(k+m+1))
+                -- alias 'gammainc' (incomplete gamma function)
+
+  cRank(W, i,j,k,n,t, Srank) = do(            -- by G. Weigt 8/25  
+         j = 1, n = dim(W), Srank = 0,
+         loop( test(j > n, break),
+               k = j + 1,
+               loop( test(k > n, break, W[j]==W[k], k=k+1, break)),
+               t = 0.5*(j + k - 1),
+               for(i, j, k-1, W[i] = t),
+               t = k - j,
+               Srank = Srank + t^3 - t,
+               j = k), Srank,W)
+
+  correspond(X,sX, M) = do(      -- X and sortedX, by  W. Lindner 8/25
+         M=zero(dim(X)),
+         for(j,1,dim(X),
+            for(i,1,dim(X), test(sX[i]=X[j], M[j]=cRank(sX)[i]))),  M)
+
+-------------------------------------------- END of helper functions
+
+mean(X)       = float( sum(X)/dim(X) ) 
+
+-- variance
+var(X)  = float( sum((X-mean(X))^2) / (dim(X)-1) ) -- sample var.
+var0(X) = float( sum((X-mean(X))^2) / (dim(X)-0) ) -- population var.
+
+-- standard deviation
+sd(X)  = sqrt(sum((X-mean(X))^2) /(dim(X)-1)) -- sample sd
+sd0(X) = sqrt(sum((X-mean(X))^2) /dim(X))     -- population sd
+
+-- std. error of mean
+sem(X) = sd(X)/sqrt(dim(X))
+
+-- mean absolute deviation
+mad(X)  = mean(mag(X - mean(X)))         -- default: m)ad w.r.t. mean
+mad1(X) = mean(mag(X - median(X)))       -- m)ad w.r.t. median
+mad2(X) = mean(mag(X - mode(X)))         -- m)ad w.r.t. mode
+
+-- root mean square
+rms(X) = float( sqrt(sum(X^2)/dim(X)) )  
+
+-- quantile
+quantile(X,p) = test(
+                  p = 100, max(X),
+                  p =   0, min(X),
+                  do( Xs = sort(X),                 -- pick sorted
+                      i  = ceiling(dim(X)*p/100),   -- always round
+                      float(Xs[i])) )               -- return value   
+                    --  float((Xs[i]+Xs[i+1])/2)) ) -- alternative
+
+percentile(X,p) = quantile(X,p)  -- alias for Matlab compatibility
+
+Qp(X,p) = quantile(X,p)          -- relax notation        
+
+-- moment
+moment(X,r)    = float( sum((X-mean(X))^r)/dim(X) ) -- .. about mean
+moment0(X,r)   = float( sum(X^r) /dim(X) )          -- .. about 0
+momentA(X,A,r) = float( sum((X-A)^r)/dim(X) )       -- .. about A
+
+-- skewness
+skew(X)  = moment(X,3)/ sqrt(moment(X,2)^3)          -- MatLAB
+skewR(X) = sum((X-mean(X))^3)/((dim(X)-1)*sd(X)^3)   -- R
+skew1(X)  = 1/dim(X)* sum(((X - mean(X))/sd(X))^3 )
+skew2(X)  = do(n= dim(X), sqrt( n*(n-1))/(n-2)*skew(X) )
+
+-- kurtosis
+kurtosis(X)   = moment(X,4)/moment(X,2)^2
+kurtosisM(X)  = moment(X,4)/sd(X)^4          
+kurtosis1(X)  = float(dim(X)* sum((X-mean(X))^4) / 
+                              sum((X-mean(X))^2)^2 )
+kurtosis0(X, n) = do( n=dim(X),     -- MatLab's kurtosis with flag=0
+                 test( n<4 , "n must be >=4",
+                 (n-1)/((n-2)*(n-3))*((n+1)*kurtosis(X) -3*(n-1))+3 ))
+kurtosisR1(X) = moment(X,4)/moment(X,2)^2 - 3  -- R type 1
+kurtosisR2(X) = do( n=dim(X),                  -- R type 2; also SAS, SPSS
+                     ((n+1)*kurtosisR1(X)+6)*(n-1)/((n-2)*(n-3)) )  
+kurtosisR3(X) = moment(X,4)/moment(X,2)^2 *(1 - 1/dim(X))^2 - 3 
+                                     -- R type 3; also MINITAB
+
+-- covariance 
+cov(X,Y)  = 1/dim(X)     * sum( (X-mean(X)) * (Y-mean(Y)) )
+covR(X,Y) = 1/(dim(X)-1) * sum( (X-mean(X)) * (Y-mean(Y)) )
+                                        
+-- BINOMIAL DISTRIBUTION 
+nCk(n,k)        = tgamma(n+1) / (tgamma(k+1)*tgamma(n-k+1))
+binoPDF(k,n,p)  = choose(n,k)*p^k*(1-p)^(n-k)
+binoCDF(k,n,p)  = sum(j,0,floor(k), choose(n,j)*p^j*(1-p)^(n-j) )
+binoCDF1(k,n,p) = incbeta(1-p, n-k,k+1)
+binoCDF2(k,n,p) = sum(j,0,floor(k), nCk(n,j)*p^j*(1-p)^(n-j) )
+binoINV(alpha,n,p, x,k) = do( k=0,
+               loop(k=k+1, x=binCDF(k,n,p), test(x>alpha, break))
+               x,k)
+
+-- GEOMETRIC Distribution
+geoPDF(k,p)  = float( p*(1-p)^k  )
+geoCDF(n,p)  = float( 1-(1-p)^(n+1) )    -- explicit formula
+geoCDF1(n,p) = sum(k,0,n, geoPDF(k,p))   -- math. definition
+geoINV(u,p)  = ceiling(( log(1-u)/log(1-p) - 1)) 
+
+-- NEGATIVE BINOMIAL Distribution
+nbinPDF(x,r,p) = choose(x+r-1,x)*p^r*(1-p)^x
+nbinPDF1(x,r,p) = tgamma(r+x)/(tgamma(r) * tgamma(x+1)) *
+                  (1-p)^x*p^r
+nbinCDF(x,r,p) = p^r*sum(j,0, floor(x), choose(r+j-1,r-1)*(1-p)^j)
+nbinINV(alpha,r,p, x,k) = 
+      do( k=0, loop(k = k+1, 
+               x = nbinCDF(k,r,p), 
+               x,k, test(x>alpha, break)), x,k)
+			   						   
+-- HYPERGEOMETRIC Distribution
+hgPDF(N,R,n,r) = float( choose(R,r)*choose(N-R, n-r)/choose(N,n) )     
+hgPDF1(r,N,R,n) = float(  hgPDF(N,R,n,r)  )      -- for wikipedia
+hgPDF2(x, n, k, m) = hgPDF(m,k,n,x) -- for EXCEL
+hgCDF(N,R,n, x) = sum(k,0, floor(x), hgPDF(N,R,n,k)) 
+hgINV(alpha,N,R,n, x,k) =  do( k=0,
+     loop(k=k+1, x=hgCDF(N,R,n,k), x,k, test(x>alpha, break)) x, k)
+
+-- POISSON Distribution
+poissonPDF(L, k) = float(  L^k*1/k! * exp(-L)  )
+poissonCDF(L,x) = sum(k,0,floor(x), poissonPDF(L,k) )
+poissonCDF1(lambda,k, p) = 
+               test( or(k<0, lambda <=0), -1,  -- BAD PARAMETER
+                 do( p=-lambda,
+                     for(i,1,k, p = p+log(lambda)-log(i)),
+                     float( exp(p) )))
+poissonINV(alpha,L, x,k) =  do( k=0,
+          loop(k = k+1, x = poissonCDF(L,k), 
+               x,k, test(x>alpha, break)) x,k)
+
+-- NORMAL Distribution
+normPDF(x,mu,sigma) = 
+              1/sqrt(2.*pi)/sigma*exp(-0.5*((x-mu)/sigma)^2)
+phi(x,mu,sigma) = normPDF(x,mu,sigma)      -- classic notation
+normCDF(x, mu,sigma) = 
+                  1/2 + 1/2*float(erf((x-mu)/(sqrt(2)*sigma)))
+stdnormCDF(x) = normCDF(x, 0,1)          -- standard normal CDF
+ Phi(x)       = stdnormCDF(x)            -- classic notation
+normCDF2(a,b,mu,sigma) =        -- Calculate Pr( a<=X<=b )
+             1/2 * float( erf( (b-mu)/(sigma*sqrt(2)) )) -
+             1/2 * float( erf( (a-mu)/(sigma*sqrt(2)) ))
+stdnormCDF1(x)       = 1/2*erfc(-x/sqrt(2))    -- using erfc
+normCDF1(x,mu,sigma) = stdnormCDF1((x-mu)/sigma)
+stdnormINV(x, a,b,k,t,y) = test(x=0, "-Inf", x=1, "+Inf",
+                 and(0<x,x<1),
+                  do( a = -10, b = 10,         -- x in [a,b]
+                    for(k,1,100, t = (a+b)/2, y = stdnormCDF(t),
+                     test(abs(x-y)<0.0000001, break, y<x,a=t, b=t)
+                    ), float(t) ))
+normINV(x,mu,sigma) = mu + sigma*stdnormINV(x)   
+
+-- Exponential distribution
+expPDF(x, L) = test( x>=0, L*exp(-L*x), x<0 , 0)
+expCDF(x, L) = test( x>=0, 1-exp(-L*x), x <0, 0)
+expINV(p, L) = - log(1-p)/L 
+
+-- t distribution
+tPDF(x,f) = 1/(sqrt(f)*Beta(1/2,f/2))*(1+ x^2/f)^(-0.5*(f+1))
+Student(x,f) = tPDF(x,f)                            -- alias
+tCDF(x, df) = tdist(x, df)                          -- alias
+tINV(x, df) = tdistinv(x, df)
+
+-- F distribution
+fPDF(x,f1,f2) = float( sqrt(((f1*x)^f1*f2^f2)/(f1*x+f2)^(f1+f2)) /
+                            (x*Beta(f1/2,f2/2)) )
+fCDF(t, df1, df2) = fdist(t, df1, df2)
+fINV(x,df1,df2, a,b,k,t,y) = do( a = -10.0, b = 10.0,
+           for(k,1,100,  t = (a + b) / 2, y = fCDF(t,df1,df2),
+                         test(abs(x - y) < 0.000001, break, 
+                         y < x, a = t, b = t)),  t)  
+
+-- CHI-SQUARED distribution
+chi2PDF(x,k)  = 1/(2^(k/2)*tgamma(k/2))*x^(k/2-1)*exp(-x/2.)
+chi2CDF(x, k) = test( or(x<=0,k<=0), 0,
+                      float(GammaP(x*0.5, k*0.5 )) )
+chi2INV(x,alp, a,b,k,t,y) = do( a = -30.0, b = 30.0,    -- x in [a,b]
+           for(k,1,100,  t = (a + b) / 2, y = chi2CDF(t,alp),
+                         test(abs(x - y) < 0.000001, break, 
+                         y < x, a = t, b = t)),  t)
+						 
+-- PARETO distribution
+paretoPDF(x,m,a) = test( x<m, 0, float( a * m^a / x^(a+1) ))
+paretoCDF(x,m,a) = test( x<m, 0, float( 1 - (m/x)^a  ))
+paretoINV(p,m,a) = float( m * (1-p)^(-1/a)  )
+
+-- WEIBULL distribution
+weibullPDF(x,a,b) = test( x<0, 0, 
+                    float( b/a*(x/a)^(b-1)*exp(-(x/a)^b) ))
+weibullCDF(x,a,b) =  1 - exp(-(x/a)^b)        -- for x>0
+weibullINV(p,a,b) = abs( -a * ( log(1-p) )^(1/b) )
+##  1st optional parameterization (wikipedia)
+weibullPDF1(x,k,b) = test(x<0, 0, b*k*x^(k-1)*exp(-b*x^k) )
+weibullCDF1(x,k,b) =  1 - exp(-b*x^k)            -- for x>0
+weibullINV1(p,a,b) = (-1/b * log(1-p))^(1/k) 
+## 2nd optional parameterization (wikipedia)
+weibullPDF2(x,k,beta) = test( x<0, 0, 
+                        beta*k*(beta*x)^(k-1)*exp(-(beta*x)^k) )
+weibullCDF2(x,k,b)    =  1 - exp(-(beta*x)^k)       -- for x>=0
+weibullINV2(p,k,beta) = 1/beta * ( - log(1-p))^(1/k) 
+

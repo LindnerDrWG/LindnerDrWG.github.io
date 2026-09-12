@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 4.3-194
+##            by Dr. W.G. Lindner  2026
+
+
+
+"- 1. -   abstract the process 't-test'"
+--        into a function ttest():
+
+-- REMARK One Sample t-Test
+-- To calculate the 1-sample-t-TEST score 'T' we need the functions
+-- tCDF() and tINV() from t-distribution.txt as helper, see Ch.3.3 
+
+--........................................................ tINV tCDF
+  tCDF(x, df) = tdist(x, df)     
+  tINV(x, df) = tdistinv(x, df)
+--........................................................ END
+--................................................ END helpers
+
+#############################################################
+ttest(x, mu0, alpha, method) =
+#################### method = "left","right","both" or -1,1,0
+  do(print("   ______ One Sample t-test ______"),
+     n    = dim(x),
+     df   = n - 1,
+     xbar = mean(x),
+     s    = sd(x),
+
+     # calculate test statistic T
+     tstat = (xbar - mu0) / (s/sqrt(n)),
+
+     # calculate critical value
+     test( method == -1,                   # for left-tailed test
+              do( critval = tINV(alpha, df), 
+                  test(tstat < critval, print("left: reject H0"),  
+                                        print("left: accept H0"))),
+           method == 1,                    # for right-tailed test
+              do( critval = tINV(alpha, df),
+                  test(tstat > critval, print("right: reject H0"),  
+                                        print("right: accept H0"))),
+           method == 0,                    # for two-sided test
+              do( critval = tINV(alpha/2, df), 
+                  test( or( abs(tstat) >  abs(critval), 
+                           -abs(tstat) < -abs(critval)), 
+                        print("both: reject H0"), 
+                        print("both: accept H0")))) ,
+     M = zero(4,2),
+     M[1,1] = "Significance level:",
+     M[2,1] = "Degrees of freedom:",
+     M[3,1] = "Test statistic:",
+     M[4,1] = "Critical value:",
+     M[1,2] = alpha,
+     M[2,2] = df,
+     M[3,2] = tstat, 
+     M[4,2] = critval,
+     M )
+####################################################### ttest END
+
+
+"------  p-value and confidence interval"
+
+-- We calculate also the p-value and the confidence interval CI: 
+
+X = (64.4 , 68.5 , 64.8 , 58.9 , 64.5 , 68.6 , 68.7 , 62.9 , 73.5)
+
+mu0   = 70.8
+alpha = 0.05
+
+n
+df
+alpha
+
+T = (xbar - mu0) / (s/sqrt(n))    -- calculate test statistic T
+T
+                   
+p = tCDF(T,df)                    -- calculate p-value
+p
+
+tquantil = tINV(1-alpha/2, df)    -- method "both sided"
+
+mD = mean(X)
+s  = sd(X)
+
+CI = ( mD - tquantil*s/sqrt(n), mD + tquantil*s/sqrt(n) )
+CI
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

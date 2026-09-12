@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath      § 1.11-45
+##            by Dr. W.G. Lindner  2026
+
+
+"SKEWness"
+
+-- helper functions for skew
+mean(X)  = float( sum(X)/dim(X) )                -- empir.sample mean
+sd(X)    = sqrt(sum((X-mean(X))^2) /(dim(X)-1))  -- sample std.dev.
+moment(X,r) = float( sum((X-mean(X))^r)/dim(X) ) -- r-st moment
+
+⁠------------------------------------------------------ skew.ness
+
+  skew(X)  = moment(X,3)/ sqrt(moment(X,2)^3)          -- MatLab
+  skewR(X) = sum((X-mean(X))^3)/((dim(X)-1)*sd(X)^3)   -- R
+
+  skew1(X)  = 1/dim(X)* sum(((X - mean(X))/sd(X))^3 )
+  skew2(X)  = do(n= dim(X), sqrt( n*(n-1))/(n-2)*skew(X) )
+
+------------------------------------------------------- END
+
+"EXAMPLE: reconstruct Figure 10"
+
+-- EXERCISE: Reconstruct the experimental data of figure.9 
+-- and calculate their skewness.
+-- SOLUTION:
+
+X =(2,2,2,2,2,2,2,2,
+    3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
+    4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+    5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,6,
+    6,6,6,6,6,6,6,6,6,6,6,6,6,6,
+    7,7,
+    8,8,8,
+    9,
+    10)
+
+skew(X)    
+skewR(X)    
+skew1(X)
+skew2(X)   
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

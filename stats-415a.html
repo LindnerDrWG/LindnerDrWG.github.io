@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+## Statistics with Eigenmath       § 4.15.a
+##            by Dr. W.G. Lindner  2026
+
+
+"=========================  McNEMAR TEST"
+
+".............. The McNEMAR test needs Chi.square.CDF"
+
+  GammaP(x,k)    = x^k*exp(-x) * sum(m,0,100, x^m/tgamma(k+m+1))
+
+  chi2CDF(x, k)  =  test( or(x<=0,k<=0), 0,
+                    float(GammaP(x*0.5, k*0.5 )) )
+
+  binoCDF(k,n,p) = sum(j,0,floor(k), choose(n,j)*p^j*(1-p)^(n-j) )
+--............................................................ END
+
+
+".......... EXAMPLE: McNemar test, Herrmann [6, p. 163]"
+".......... difficulty of exam problems"
+
+-- We check he null hypothesis of the equal difficulty of the 
+-- two problems A and B w.r.t the splitted contingency table  
+--
+--          A\B  +    -
+--           +: [63   20] a+b = 83
+--           -: [11    6] c+d = 17
+--               74   26
+--               a+c  b+d
+
+"..........  SOLUTION step-by-step"
+
+X = ((63, 20),(11, 6))
+X
+
+do( a = X[1,1],  b = X[1,2], c = X[2,1], d = X[2,2] )
+b
+b+c
+
+n    = a+b+c+d
+n
+
+yates = test( or(b+c<=30 , n<=40), 1, 0)
+yates
+
+z    = mag(b-c) - yates
+z
+
+chi  = z*z/(b+c)             -- test statistics chi
+chi = float(chi)             -- nach wiki/R
+"ok"
+
+critVal = chi2CDF(chi,1)      -- critical value at chi
+critVal
+"ok"
+
+p    = 1 - chi2CDF(chi,1)     -- p value; Herrman: p=chi.. ?
+p
+
+h = test(p < 0.05, 0,1)       -- 0: reject Ho
+h                             -- 1: accept Ho
+
+(("chi",  "Ho",  "p"),(chi, h, p )) 
+
+-- Result: The null hypothesis h of the equal difficulty of the 
+-- problems can be rejected only with 11.2 % of error.
+"ok  w.r.t Herrmann"
+
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

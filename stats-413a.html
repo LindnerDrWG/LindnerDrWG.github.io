@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+## Statistics with Eigenmath       § 4.13.a
+##            by Dr. W.G. Lindner  2026
+
+
+"========================= PEARSON's Chisq test"
+
+"........... Prerequisites: GammaP, chi2CDF, chi2INV"
+
+  GammaP(x,k)   = x^k*exp(-x) * sum(m,0,100, x^m/tgamma(k+m+1))
+
+  chi2CDF(x, k) =  test( or(x<=0,k<=0), 0,
+                   float(GammaP(x*0.5, k*0.5 )) )
+
+  chi2INV(x,alp, a,b,k,t,y) = do(
+           a = -30.0, b = 30.0, 
+           for(k,1,100,  t = (a + b) / 2,
+                         y = chi2CDF(t,alp),
+                         test(abs(x - y) < 0.000001, break, 
+                              y < x, a = t, b = t)),  t) 
+
+
+###########################################
+"EXAMPLE: vitamin C prophylaxis"
+###########################################
+
+-- EXAMPLE (HERRMAN, cf. [6], p.159 ff)
+-- Studies by the physician {\sc G. Ritzel} from 1961, who tested the
+-- influence of vitamin C on cold prophylaxis on skier in a 
+-- double-blind, randomized experiment, was given in the following
+-- four-field 'contingency table' table. 
+--              Cold  no.cold 
+--           C:[  17  122]
+--     placebo:[  31  109]
+
+-- Check Ho: Pr[cold] = Pr[nocold] for a 5% probability 
+-- of significance.
+
+".......... SOLUTION in the following steps:"
+
+    do(a=17, b=122, c=31 , d=109)   -- the data of the table
+
+    n   = a+b+c+d
+    n
+
+    z   = mag(a*d-b*c) - 0.5*n
+    z                -- with YATES correction -0.5*n
+
+    chi = z*z*n/((a+b)*(c+d)*(a+c)*(b+d))
+    chi
+
+    p   =  1 - chi2CDF(chi,1)    -- p-value nach R
+    p                            -- Herrmann: p=1-.. ?
+
+    phi = sqrt(chi/n)            -- contingency coefficient
+
+    print("Summary: Chi - p - phi:")
+    (chi, p, phi)                -- test statistics
+
+-- pval = 1 - chi2CDF(chi, 1)    
+-- p    = 1 - chi2INV(1-0.05/2, 1)
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

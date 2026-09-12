@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 4.12-217
+##            by Dr. W.G. Lindner  2026
+
+"========================= MANN-WHITNEY-U-test"
+
+"........... Prerequisites: sort, cRank, correspond, stdnormCDF"
+
+median(X, xmed,Xs,n2,n2p) = do(
+          Xs   = sort(X),
+          n2   = floor(dim(X)/2),  
+          n2p  = n2+1,
+          xmed = test( not(mod(dim(X),2)=0), Xs[n2p], 
+                       0.5*(Xs[n2]+Xs[n2p])), float(xmed))
+
+stdnormCDF(x)  = 1/2*erfc(-x/sqrt(2))
+
+sort(v,i,k,n,t) = do( n = dim(v),         -- by G. Weigt 7/2025
+     loop( test(n < 2, break), k = 1,
+           for(i, 1, n - 1,
+               test(v[i] > v[i + 1], 
+                 do( t = v[i], v[i] = v[i + 1], v[i + 1] = t,
+                     k = i ))), n = k), v)
+
+cRank(W, i,j,k,n,t, Srank) = do(            -- by G. Weigt 8/25  
+         j = 1, n = dim(W), Srank = 0,
+         loop( test(j > n, break),
+               k = j + 1,
+               loop( test(k > n, break, W[j]==W[k], k=k+1, break)),
+               t = 0.5*(j + k - 1),
+               for(i, j, k-1, W[i] = t),
+               t = k - j,
+               Srank = Srank + t^3 - t,
+               j = k), Srank,W)
+
+correspond(X,sX, M) = do(   -- X and sortedX, by W. Lindner 7/25
+    M=zero(dim(X)),
+    for(j,1,dim(X),
+    for(i,1,dim(X), test(sX[i]=X[j], M[j]=cRank(sX)[i]))), M)
+
+min(a,b) = test(a<=b, a,b)
+
+
+################################################################
+          ranksum(X,Y, Z,Zs,Zr, R1,R2,U1,U2) = 
+################################################################
+   do( -- we use pValue criterion instead of Ucritical
+       mX = median(X),  
+       mY = median(Y),  
+       n1 = dim(X),
+       n2 = dim(Y),
+       Z  = zero(dim(X)+dim(Y)), 
+             for(i,1,dim(X), Z[i]=X[i]),
+             for(i,1,dim(Y), Z[i+dim(X)]=Y[i]),
+       Zs = sort(Z),      
+       Zc = correspond(Z,Zs),       
+       R1 = sum(i,1,dim(X), Zc[i]),         
+       R2 = sum(i,1,dim(Y), Zc[i+dim(X)]),  
+       n  = dim(X)+dim(Y),
+       U1 = R1 - n1*(n1+1)/2,
+       U2 = R2 - n2*(n2+1)/2,
+       U  = min(U1,U2),      
+       T  = (R2-0.5*n2*(n+1))/sqrt(n1*n2*(n+1)/12),
+       pValue = stdnormCDF(mag(T)),
+       print("  _______ ranksum _______"),
+       Ho = test(pValue < 0.975, "accept H0", "reject H0"),
+      (("U", "p", "Ho"), (U, pValue, Ho )))
+########################################################### END
+
+X = (6, 15, 35, 35, 62, 73, 98, 112)
+Y = (1, 4, 8, 17, 23, 34, 43)
+
+signrank2(X,Y)
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

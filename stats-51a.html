@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 5.1.a
+##            by Dr. W.G. Lindner  2026
+
+"=======================  Pearson's rho Correlation coefficient"
+
+"........... Prerequisites: mean"
+
+mean(X) = float( sum(X)/dim(X) )  
+
+
+".......... EXAMPLE of Pearson's product-moment formula in steps"
+
+-- step-by-step calculation of CORRELATIONcoeff r
+-- we program product-moment formula in Spiegel p.370
+
+".......... EXAMPLE: Height and weight of 12 persons"
+
+X = (60,65,72,70,74,63,66,68,67,69,70,64)
+Y = (120,140,180,184,190,160,155,158,170,190,210,150)
+
+xbar = mean(X)
+ybar = mean(Y)
+xbar
+
+Xm = (X - xbar)
+Xm
+
+Ym = (Y - ybar)
+Ym
+
+".......... zip the sum of products of vectors using sumprod"
+
+sumprod(X,Y, acc) = do( acc=0,
+                        for(i,1,dim(X), acc = acc + X[i]*Y[i]),
+                        acc)
+
+-- (!) numerator, denominator are reserved names of EIGENMATH
+
+numer = sumprod( Xm, Ym)
+numer
+
+denom = sqrt( sum(Xm^2) * sum(Ym^2) )
+denom
+
+r = numer/denom
+r
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

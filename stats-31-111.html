@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 3.1-111
+##            by Dr. W.G. Lindner  2026
+ 
+pi = float(pi)
+
+"============================== normCDF - normal cumulative"
+
+  normCDF(x, mu,sigma) = 
+                  1/2 + 1/2*float(erf((x-mu)/(sqrt(2)*sigma)))
+
+  stdnormCDF(x) = normCDF(x, 0,1)          -- standard normal CDF
+  Phi(x)        = stdnormCDF(x)            -- classic notation
+
+--------------------------------------------------------------
+
+"------ EXAMPLE: screws"
+
+-- From an assortment of screws distributed via N(10,0.3^2) in a  
+-- all screws larger than 10.5 mm or smaller than 9.5 mm are 
+-- removed. What is the probability that one of the remaining screws 
+-- is smaller than 10.3 mm?         Cf. [4, p.51: 0.8333 ??]
+
+-- SOLUTION:  P(X<10.3)
+
+a = Phi((10.3-10)/0.3) - Phi((9.5-10)/0.3)
+b = Phi((10.5-10)/0.3) - Phi((9.5-10)/0.3)
+a/b
+
+
+---------------------------- normCDF2 : Calculate Pr( a<=X<=b )
+
+normCDF2(a,b,mu,sigma) = 
+             1/2 * float( erf( (b-mu)/(sigma*sqrt(2)) )) -
+             1/2 * float( erf( (a-mu)/(sigma*sqrt(2)) ))
+
+------------------------------------------------------------
+
+PX = normCDF2(9.5,10.3, 10, 0.3) / normCDF2(9.5,10.5, 10, 0.3)
+PX
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

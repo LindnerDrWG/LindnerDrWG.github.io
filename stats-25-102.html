@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+## Statistics with Eigenmath      § 2.5-102
+##            by Dr. W.G. Lindner  2026
+ 
+
+"============================ poissonINV - Poisson quantile" 
+   poissonPDF(L, k) = float(  L^k*1/k! * exp(-L)  )
+
+   poissonCDF(L,x) = sum(k,0,floor(x), poissonPDF(L,k) )
+
+   poissonINV(alpha,L, x,k) = 
+      do( k=0, loop(k = k+1, 
+                    x = poissonCDF(L,k), 
+                    x,k, test(x>alpha, break))  x,k)
+
+---------------------------------------------------------
+
+-- This function is used to find the n.th quantile, 
+-- that is if P(x <= k) is given, it finds k.
+
+"Exercise"
+
+-- Do the example in
+--           https://de.mathworks.com/help/stats/poissinv.html
+-- If the average number of defects (L) is two, 
+-- what is the 95th percentile of the number of defects?
+
+-- SOLUTION: 
+
+"a."
+poissonINV(0.95, 2)
+"ok"
+
+
+-- MATLAB> poissinv(0.95,2) = 5
+
+-- R> qpois(0.95, 2)
+--    [1] 5
+
+"b."
+poissonINV(0.5, 2)       -- medium number of defects
+"ok"
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

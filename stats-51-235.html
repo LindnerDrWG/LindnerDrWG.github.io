@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 5.1-235
+##            by Dr. W.G. Lindner  2026
+
+"========================= Pearson's rho Correlation coefficient "
+
+"........... Prerequisites: mean"
+
+mean(X) = float( sum(X)/dim(X) )  
+
+
+".......... DEFINITION (CORRELATION Coefficient rho alias r)"
+###########################################################
+corrcoef(X,Y,  numer,denom, Xm,Ym) = 
+                 do( numer = 0,
+                     Xm = X - mean(X),
+                     Ym = Y - mean(Y), -- variant of sumprod:
+                     for(i,1,dim(X), numer = numer + Xm[i]*Ym[i]),
+                     denom = sqrt( sum(Xm^2) * sum(Ym^2)),
+                     numer / denom)
+
+r(x,Y) = corrcoef(X,Y)
+####################################################### END
+
+".......... EXAMPLE: daily calorie intake"
+
+-- Use data from Zoefel [19, p.125]:
+-- In a study of 15 randomly selected countries, using the variables
+-- 'daily calorie intake' X and 'life expectancy' Y of men, is their 
+-- a positive correlation between calorie intake and life expectancy?
+
+X=(3113, 3216, 3495, 2021, 1916, 2375, 2751, 2288, 1932, 2166, 2217,
+   3482, 2036, 2581, 2639)
+
+Y=(68, 74,73,53,59,60,57,47, 46, 50,55, 74,41,71, 67)
+
+corrcoef(X,Y)
+"ok"
+
+-- test statistics
+n = dim(X)
+r = corrcoef(X,Y)
+t = abs(r) * sqrt(n-2)/sqrt(1 - r^2)  
+df =n-2
+t
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

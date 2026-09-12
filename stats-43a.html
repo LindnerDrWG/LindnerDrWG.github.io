@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+## Statistics with Eigenmath       § 4.3.a
+##            by Dr. W.G. Lindner  2026
+
+-- REMARK     One Sample t-Test
+-- To calculate the One Sample T-TEST we need the functions
+-- tCDF() and tmINV() as helper: 
+--........................................................ tINV tCDF
+  tCDF(x, df) = tdist(x, df)     
+  tINV(x, df) = tdistinv(x, df)
+  
+  mean(X) = sum(X)/dim(X)
+  sd(X)   = float( sqrt(sum((X-mean(X))^2) /(dim(X)-1)) )
+  sd1(X)  = float( sqrt(mean(X^2) - mean(X)^2) )  
+-------..........................................................
+
+
+#################################################
+"-----------  EXAMPLE: STUDENTS WEIGHT in Europe"
+#################################################
+
+-- Source: -- https://www.geo.fu-berlin.de/en/v/soga-r/Basics-of-statistics/
+--    Hypothesis-Tests/Hypothesis-Tests-for-One-Population-Mean/Sigma-Is-Unknown/index.html
+ 
+-- A students data set consists of 8239 rows, each of them 
+-- representing a particular student, and 16 columns, each of them 
+-- corresponding to a variable/feature related to that particular 
+-- student. 
+-- We examine the average weight of a random sample of students from 
+-- the students data set and compare it to the average weight of all
+-- European adults. {\sc Walpole} et al. (2012) published data on the 
+-- average body mass (kg) per region, including Europe. 
+-- They report the average body mass for the European adult population 
+-- to be 70.8 kg. We therefore set mu0, the population mean, 
+-- accordingly to mu0=70.8. Further, we take a random sample (X) with
+-- a sample size of n=9. The sample consists of the weights in kg 
+-- of 9 randomly picked students from the students data set.
+
+X = (64.4, 68.5, 64.8, 58.9, 64.5, 68.6, 68.7, 62.9, 73.5)
+
+-- The null hypothesis H_0 states that the average weight of students
+-- equals the average weight of European adults as reported. 
+-- In other words, there is no difference between the mean weight of
+-- students and the mean weight of European adults.
+
+-- SOLUTION
+
+"- a. -    We first do the t-test STEP-BY-STEP with Eigenmath:"
+
+X = (64.4, 68.5, 64.8, 58.9, 64.5, 68.6, 68.7, 62.9, 73.5)
+
+n  = dim(X)
+n
+
+df = n - 1              -- degrees of freedom
+df
+
+mu0   = 70.8            -- the population mean
+mu0
+
+alpha = 0.05            -- set significance level
+alpha
+
+-------.......................................   some definitions
+mean(X) = sum(X)/dim(X)
+sd(X)   = float( sqrt(sum((X-mean(X))^2) /(dim(X)-1)) )
+sd1(X)  = float( sqrt(mean(X^2) - mean(X)^2) )  
+-------..........................................................
+
+xbar = mean(X)
+xbar
+
+s = sd(X)
+
+".................... calculate test statistic T"
+T = (xbar - mu0) / (s/sqrt(n))       
+T
+
+"-- calculate critical value for lower.tail"
+critVal = tINV(alpha, df)
+critVal
+    
+"-- evaluate rejection region and decide about H0"
+test(T > critVal,  print("reject H0"),  print("accept H0")) 
+"ok"
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

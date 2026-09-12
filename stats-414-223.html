@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 4.14-223
+##            by Dr. W.G. Lindner  2026
+
+
+"========================= FISHER EXACT TEST "
+
+"........... Prerequisites: hgPDF, .."
+
+   hgPDF(k,N,R,n) = float(choose(R,k)*choose(N-R, n-k)/choose(N,n))    
+ 
+   hgCDF(x,N,R,n) = float( sum(k,0,x, hgPDF(k, N,R,n)) )
+
+   hgINV(alpha,N,R,n, x,k) = do( k=0,
+          loop(k=k+1, x=hgCDF(N,R,n,k), x,k, test(x>alpha, break))
+          x, k)
+
+
+### --------------------------------------------------------------
+### FUNCTION fishertest : Fisher’s exact test for alpha 0.05
+### --------------------------------------------------------------
+
+fishertest(a,b,c,d,  n,p) =
+        do( test( or(a<=0, b<=0, c<=0, d<=0), "Error"),  
+            n = a+b+c+d,
+            p = hgCDF(a, n,a+b,a+c),
+            Ho = test(p < 0.05, 0,1),    -- test of Ho level 0.05
+            print(" __ FISHER test __"),
+            (("Ho", "p"), (Ho, float(p))) )   
+ 
+### -------------------------------------------------------- END
+
+".......... EXAMPLE vitamin C, Herrmann, [6, p.151]"
+--         cf. example stats-413-section
+
+--             Cold notCold
+--  Vitamin C:[17    122] a+b 139
+--  Placebo  :[31    109] c+d 140
+--             48    231
+--            a+c    b+d
+
+-- SOLUTION:
+fishertest(17,122, 31,109)
+"ok"
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

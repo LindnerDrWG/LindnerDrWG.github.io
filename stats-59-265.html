@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 5.9-265
+##            by Dr. W.G. Lindner  2026
+
+"--- 2. ========== EXAMPLE: Duke Uni example"
+
+"--- 4. ---  EXAMPLE: cytokine responses"
+
+-- In these data we have reason to believe that the confidence 
+-- intervals will not always be symmetric about . 
+-- We use two methods to illustrate the differences in CI estimates. 
+-- Let the data be the cytokine responses (%) for a sample measured by 
+-- 16 laboratories. For the purposes of this example we will assume 
+-- independence among the samples.
+
+X = (0.4043, 0.5958, 0.5876, 0.5939, 0.6053, 0.4649, 0.5722, 0.6234, 0.5208, 0.6117, 0.6137, 0.7397, 0.6981, 0.7757, 0.7596, 0.532)
+
+bootci(X,100)      -- IT =1000 needs 1 min to calculate 
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

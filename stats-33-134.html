@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 3.3-134
+##            by Dr. W.G. Lindner  2026
+ 
+
+"============================== tPDF -  t probability density"
+  Beta(a,b) = test( or(a<=0, b<=0), -1,
+                   exp( lgamma(a)+lgamma(b)-lgamma(a+b)) )
+
+  tPDF(x,f) = 1/(sqrt(f)*Beta(1/2,f/2))*(1+ x^2/f)^(-0.5*(f+1))
+
+  Student(x,f) = tPDF(x,f)                            -- alias
+
+--------------------------------------------------------------
+
+"------  pdf at the mode"
+
+-- MATLAB: The value of the pdf at the mode is an increasing function
+-- of the degrees of freedom.
+-- EXAMPLE
+-- The mode of the Student's t distribution is at x = 0. 
+-- Compute the pdf at the mode for degrees of freedom 1 to 6.
+-- SOLUTION: 
+
+--           MATLAB: tpdf(0,1:6)
+--           ans =  0.3183  0.3536  0.3676  0.3750  0.3796  0.3827
+
+"Table of PDF of t-distribution for f=1..6 " 
+"    f      tPDF(0,f)    " 
+T = zero(2,6)   
+for(f,1,6, T[1,f] = f)
+for(f,1,6, T[2,f] = tPDF(0,f))
+transpose(T)
+"ok"
+
+"                     t PDF distribution for f=3, x>0"
+xrange = (0,10)
+yrange = (0,1)        -- negative part missing, cf. [3] p.53
+draw(tPDF(x, 3))
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 3.3-135
+##            by Dr. W.G. Lindner  2026
+ 
+
+"============================== tPDF -  t probability density"
+  Beta(a,b) = test( or(a<=0, b<=0), -1,
+                   exp( lgamma(a)+lgamma(b)-lgamma(a+b)) )
+
+  tPDF(x,f) = 1/(sqrt(f)*Beta(1/2,f/2))*(1+ x^2/f)^(-0.5*(f+1))
+
+  Student(x,f) = tPDF(x,f)                            -- alias
+
+--------------------------------------------------------------
+
+"------ t distribution converges to stdnormPDF"
+
+-- EXAMPLE: cf. https://de.mathworks.com/help/stats/tcdf.html
+-- The t distribution converges to the standard normal distribution 
+-- as the degrees of freedom approach infinity. 
+-- Compute the difference between the pdfs of the standard normal 
+-- distribution and the Student's t distribution pdf with 30 degrees -- of freedom. Reproduce the difference in Eigenmath.
+-- SOLUTION:
+
+
+pi = float(pi)
+stdnormPDF(x) = 1/sqrt(2.*pi)/exp(-0.5*(x))
+
+for(i,0,5, print((-2.5+i, tPDF(-2.5+i,30) - stdnormPDF(-2.5+i))))
+"~ ok"
+
+"                     t PDF distribution for f=3, x>0"
+xrange = (0,10)
+yrange = (0,1)        -- negative part missing, cf. [3] p.53
+draw(tPDF(x, 3))
+
+-- octave> -2.5:2.5
+--          ans = -2.5000  -1.5000  -0.5000  0.5000   1.5000  2.5000
+--     difference = tpdf(-2.5:2.5,30) - normpdf(-2.5:2.5)
+--     difference = 0.0035  -0.0006  -0.0042  -0.0042 -0.0006  0.0035
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

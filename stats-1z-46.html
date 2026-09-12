@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+## Statistics with Eigenmath      § 1.12-46
+##            by Dr. W.G. Lindner  2026
+
+
+"KURTOSIS"
+
+
+## WARNING: There are different methods to compute the KURTOSIS,
+## which leads to different results. See wiki:KURTOSIS and [+]
+## So we have comment a little about it.
+
+-- KURTOSIS needs these functions as helper
+   mean(X)     = float( sum(X)/dim(X) )          
+   sd(X)       = float( sqrt(sum((X-mean(X))^2) /(dim(X)-1)) ) 
+   moment(X,r) = float( sum((X-mean(X))^r)/dim(X) )
+
+# DEFINITION
+------------------------------------------------------ kurtosis
+  kurtosis(X)  = moment(X,4)/moment(X,2)^2
+------------------------------------------------------
+
+"EXAMPLE: experimental data for figure 10"
+
+X=(4,4,4,
+   5,5,5,5,5,5,
+   6,6,6,6,6,6,6,6,6,
+   7,7,7,
+   8,8,8,
+   10,10,10,
+   12,12,12,
+   13,13,13)
+
+kurtosis(X)      -- 2.2958  is kurtosis (org.def.) & R:'moments'
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

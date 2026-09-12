@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 3.1-107
+##            by Dr. W.G. Lindner  2026
+ 
+pi = float(pi)
+
+"============================== normCDF - normal cumulative"
+
+  normCDF(x, mu,sigma) = 
+                  1/2 + 1/2*float(erf((x-mu)/(sqrt(2)*sigma)))
+
+  stdnormCDF(x) = normCDF(x, 0,1)      -- standard normal CDF
+  Phi(x)        = stdnormCDF(x)        -- classic notation
+
+--------------------------------------------------------------
+
+"construct a table for normCDF for x = -2,-1,0,1,2"
+
+X = (-2,-1,0,1,2)
+p = (normCDF(-2,2,1), normCDF(-1,2,1), normCDF(0,2,1), 
+     normCDF( 1,2,1), normCDF( 2,2,1))
+(X,p)   
+"ok"
+
+-- CHECK
+-- MatLAB> x = [-2,-1,0,1,2]; mu = 2; sigma = 1;
+--       > p = normcdf(x,mu,sigma)
+--         p = 1×5
+--             0.0000    0.0013    0.0228    0.1587    0.5000
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

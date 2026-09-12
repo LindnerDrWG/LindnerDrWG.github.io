@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+## Statistics with Eigenmath      § 1.9-34
+##            by Dr. W.G. Lindner  2026
+
+
+"QUANTILE"
+
+
+----- quantile needs functions min, max, sort as helper
+
+sort(v,i,k,n,t) = do( n = dim(v),    --by G. Weigt 7/2025
+     loop( test(n < 2, break), k = 1,
+           for(i, 1, n - 1,
+               test(v[i] > v[i + 1], 
+                 do( t = v[i], v[i] = v[i + 1], v[i + 1] = t,
+                     k = i ))), n = k), v)
+
+max(v, i,m,n) = do( n = dim(v), m = v[1],   -- G. Weigt 7/2025
+                    for(i, 2, n, test(v[i] > m, m = v[i])), m)
+
+min(v, i,m,n) = do( n = dim(v), m = v[1],   -- by wL
+                    for(i, 2, n, test(v[i] < m, m = v[i])), m)
+
+
+-------------------------------------------- DEFINITION 
+quantile(X,p) = 
+        test( p = 100, max(X),
+              p =   0, min(X),
+              do( Xs = sort(X),               -- pick sorted
+                  i  = ceiling(dim(X)*p/100), -- always round
+                  float(Xs[i])) )             -- return value   
+              --  float((Xs[i]+Xs[i+1])/2)) ) -- alternative
+
+  percentile(X,p) = quantile(X,p)  -- alias for Matlab compatibility
+
+  Qp(X,p) = quantile(X,p)          -- relax notation        
+  
+  boxplot(X) = (( "0%", "25%", "50%", "75%", "100%"),
+                (Qp(X,0), Qp(X,25), Qp(X,50), Qp(X,75), Qp(X,100)))
+----------------------------------------------- quantile, Q1,Q2,Q3
+
+
+"MATLAB:  Do example, if A is [6 3 2 10 1]."
+
+A = (6, 3, 2, 10, 1)
+percentile(A,40)
+Qp(A,40)
+boxplot(A)
+"ok"
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+## Statistics with Eigenmath      § 2.3-72
+##            by Dr. W.G. Lindner  2026
+ 
+"============================== nbinPDF -  neg.binomial.density"
+
+     nbinPDF(x,r,p) = choose(x+r-1,x)*p^r*(1-p)^x
+
+------------------------------------------------------------
+-- where
+-- r >0        : number of successes until stop
+-- k = 0,1,2,..: number of failures       
+-- p in [0,1]  : success probability in each experiment
+--               k failures, given r successes.
+
+-- nbinPDF(x,r,p) returns the negative binomial pdf at the 
+-- value in x using the corresponding number r of successes
+-- and probability p of success in a single trial.
+-- cf. MATLAB> https://de.mathworks.com/help/stats/nbinpdf.html
+
+-- REMARK
+-- from EigenMath version >= 3.42 you may code advanced
+------------------------------------------------------------
+
+   nbinPDF1(x,r,p) = tgamma(r+x)/(tgamma(r) * tgamma(x+1)) *
+                     (1-p)^x*p^r
+------------------------------------------------------------
+
+"EXAMPLE 1"
+nbinPDF(5, 3, 0.1)
+
+nbinPDF(5,10,0.4)    
+nbinPDF(10,5,0.25)  
+nbinPDF(3,68,0.95)
+"ok"
+
+"-1a.-"
+
+nbinPDF1(5,10,0.4)    -- ok, 0.1632
+nbinPDF1(10,5,0.25)   
+nbinPDF1(3,68,0.95)   -- ok, 0,2091
+
+-- for(x,0,5, print((x,float(nbinPDF(x,10,0.4)))) )  -- List of values
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

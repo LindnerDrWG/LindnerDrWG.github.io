@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath      § 1.12
+##            by Dr. W.G. Lindner  2026
+
+
+"SKEWness"
+
+-- WARNING: There are very different methods to compute the skew,
+-- which leads to different results. See wiki:skewness.
+
+-- helper functions for skew
+mean(X)  = float( sum(X)/dim(X) )                -- empir.sample mean
+sd(X)    = sqrt(sum((X-mean(X))^2) /(dim(X)-1))  -- sample std.dev.
+moment(X,r) = float( sum((X-mean(X))^r)/dim(X) ) -- r-st moment
+
+"EXERCISE: define the skew version of R for Eigenmath"
+
+⁠------------------------------------------------------ skew.ness
+  skew(X)  = moment(X,3)/ sqrt(moment(X,2)^3)          -- MatLab
+  skewR(X) = ("your turn")                             -- R
+
+  skew1(X)  = 1/dim(X)* sum(((X - mean(X))/sd(X))^3 )
+  skew2(X)  = do(n= dim(X), sqrt( n*(n-1))/(n-2)*skew(X) )
+------------------------------------------------------- END
+
+-- REMARK
+-- This definition of skew() is very good to remember.
+-- This definition is used by MatLab as default.
+
+
+"EXAMPLE"
+
+X = (4, 36, 45, 50, 75)
+
+skew(X)     -- -0.306
+skewR(X)    -- -0.274
+skew1(X)    -- -0.219
+skew2(X)    -- -0.456
+"ok"
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

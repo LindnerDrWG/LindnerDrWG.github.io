@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+## Statistics with Eigenmath      § 2.5-99
+##            by Dr. W.G. Lindner  2026
+ 
+
+"========================== poissonCDF - Poisson Distribution" 
+   poissonPDF(L, k) = float(  L^k*1/k! * exp(-L)  )
+
+   poissonCDF(L,x) = sum(k,0,floor(x), poissonPDF(L,k) )
+
+--------------------------------------------------------------
+
+"                       PoissonCDF(4,k)"
+xrange = (0,10)
+yrange = (0,2)
+draw(poissonCDF(4, x),x)
+
+"                       List of poissonCDF(1,k), k=0..12"
+for(k,0,12, print( poissonCDF(1,k)) )
+
+-- Table 
+"                      Table of poissonCDF(1,k) "
+T = zero(2,13)
+for(i,0,12, T[1,i+1] = i)
+for(i,0,12, T[2,i+1] = float(poissonCDF(1,i)))
+transpose(T)
+
+
+"========================== EXCURS: approximation of PoissonCDF" 
+
+   poissonCDF1(lambda,k, p) = 
+               test( or(k<0, lambda <=0), -1,  -- BAD PARAMETER
+                 do( p=-lambda,
+                     for(i,1,k, p = p+log(lambda)-log(i)),
+                     float( exp(p) )))
+
+--------------------------------------------------------------
+-- cf. [3], p.45
+-- An alternative implementation uses the incomplete Gamma function
+
+poissonCDF1(2,4)
+
+1-poissonCDF1(2,4)
+
+
+" Reproduce table above using poissonCDF1"
+
+n=100
+p=0.01
+lambda = n*p   
+for(k,0,12, print( poissonCDF1(lambda,k)) )
+do( n=quote(n), p=quote(p))
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

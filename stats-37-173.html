@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 3.7-173
+##            by Dr. W.G. Lindner  2026
+ 
+"============================== weibullPDF - prob. density"
+
+  weibullPDF(x,a,b) = test( x<0, 0, 
+                      float( b/a*(x/a)^(b-1)*exp(-(x/a)^b) ))
+
+-------------------------------------------------------------------
+-- a: scale parameter    b: shape parameter
+-- We adpot the MATLAB parameter convention: (x, scale, shape)
+-- R parameter convention: (x, shape, scale)
+-- cf. https://de.mathworks.com/help/stats/wblpdf.html
+-- https://search.r-project.org/CRAN/refmans/ExtDist/html/Weibull.html
+
+
+"--- Example 1. ---"
+
+-- EXAMPLE: Compute the density of the observed value 3 in the 
+--          Weibull distribution with unit scale and shape.
+-- SOLUTION:
+
+weibullPDF(3,1,1) 
+"ok"
+
+-- R> dweibull(x = 3, shape = 1, scale = 1, log = FALSE)
+--    [1] 0.04978707
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

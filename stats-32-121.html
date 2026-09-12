@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 3.2-121
+##            by Dr. W.G. Lindner  2026
+ 
+"============================== expPDF - exponential prob. density"
+
+    expPDF(x, L) = test( x>=0, L*exp(-L*x), x<0 , 0)
+-------------------------------------------------------------------
+-- cf. [3], p.62
+-- R> returns the pdf of the exponential distribution with rate L,
+-- .. evaluated at the values in x.
+-- MATLAB> returns the pdf of the exponential distribution 
+-- .. with mean (!!) mu, evaluated at the values in x.
+-- https://de.mathworks.com/help/stats/exppdf.html
+-- R> dexp gives the _d_ensity function, 
+--    pexp gives the _p_robability function, 
+--    qexp gives the _q_uantile function.
+-- We adopt the convention of R.
+
+"------ Example.1"
+
+expPDF(5,1/3)
+float
+
+expPDF(5,1/2)      -- L=2, i.e mean = 1/2
+float
+
+-- R> dexp(5,1/2)
+--    [1] 0.0410425
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

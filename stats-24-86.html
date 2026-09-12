@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+## Statistics with Eigenmath      § 2.4-86
+##            by Dr. W.G. Lindner  2026
+ 
+
+ 
+"======================== hgCDF - hyperGEOMETRIC cumulative" 
+
+  hgPDF(N,R,n,r) = float( choose(R,r)*choose(N-R, n-r)/choose(N,n) )     
+
+  hgCDF(N,R,n, x) = sum(k,0, floor(x), hgPDF(N,R,n,k)) 
+
+--------------------------------------------------------------
+-- Description:
+-- hgCDF(N,R,n, x) computes the hypergeometric cdf at the 
+-- value in x using the corresponding size of the population N, 
+-- number of the desired items in the population R, 
+-- and the number of samples drawn n.
+ 
+
+"-------------------- EXAMPLE: defective floppy disks"
+
+-- Do https://de.mathworks.com/help/stats/hygeinv.html :
+-- Suppose you have a lot of 100 floppy disks and you know that 20 
+-- of them are defective. What is the probability of drawing zero 
+-- to two defective floppies if you select 10 at random?
+
+-- SOLUTION: MATLAB> p = hygecdf(2, 100,20,10) = 0.6812
+--                               x  M   K  N
+--                               x  N   R  n
+
+hgCDF(100,20,10, 2)
+float
+"ok"
+
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

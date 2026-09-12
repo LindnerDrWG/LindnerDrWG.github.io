@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+## Statistics with Eigenmath      § 2.4-89
+##            by Dr. W.G. Lindner  2026
+ 
+
+"=========================== hgINV - hyperGEOMETRIC quantile" 
+
+  hgPDF(N,R,n,r) = float( choose(R,r)*choose(N-R, n-r)/choose(N,n) )     
+  hgCDF(N,R,n, x) = sum(k,0, floor(x), hgPDF(N,R,n,k)) 
+
+  hgINV(alpha,N,R,n, x,k) = do( k=0,
+        loop(k=k+1, x=hgCDF(N,R,n,k), x,k, test(x>alpha, break))
+        x, k)
+---------------------------------------------------------
+
+-- This function is used to find the n.th quantile, 
+-- that is if P(x <= k) is given, it finds k.
+
+-- hgINV(alpha, N,R,n) returns the smallest integer x such that the 
+-- hypergeometric cdf evaluated at x equals or exceeds P. 
+-- You can think of alpha as the probability of observing x defective
+-- items in n drawings without replacement from a group of N items 
+-- where R are defective.
+
+"-------------------- EXAMPLE 3"
+
+-- Do https://de.mathworks.com/help/stats/hygeinv.html
+-- Suppose you are the Quality Assurance manager for a floppy disk 
+-- manufacturer. The production line turns out floppy disks in batches 
+-- of 1,000. You want to sample 50 disks from each batch to see if 
+-- they have defects. You want to accept 99% of the batches if there
+-- are no more than 10 defective disks in the batch. 
+-- What is the maximum number of defective disks should you allow 
+-- in your sample of 50?
+
+-- SOLUTION: MATLAB> x = hygeinv(0.99,1000,10,50)  ; = 3
+--                               P    M    K  N
+--           octave> ... same
+
+--    alpha N    R  n
+hgINV(0.99, 1000,10,50)
+"ok"
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

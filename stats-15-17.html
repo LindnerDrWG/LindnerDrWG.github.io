@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+## Statistics with Eigenmath      § 1.5-17
+##            by Dr. W.G. Lindner  2026
+
+"mean absolute deviation - mad"
+
+mean(X) = float( sum(X)/dim(X) )          
+
+-------------------------------------  DEFINITION
+mad(X)  = mean(mag(X - mean(X)))            
+-------------------------------------  mad, m.abs.dev.
+
+"EXAMPLE, wiki ibid."
+"
+-- For example, for the data set {2, 2, 3, 4, 14} the MAD is
+
+set = (2, 2, 3, 4, 14)
+mad(set)                     -- mean absolute deviation
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

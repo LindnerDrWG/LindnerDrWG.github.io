@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 3.1-117
+##            by Dr. W.G. Lindner  2026
+ 
+pi = float(pi)
+
+"=============================== normINV - quantiles of normCDF"
+   stdnormCDF(x) = 1/2*erfc(-x/sqrt(2))
+
+   stdnormINV(x, a,b,k,t,y) = test(x=0, "-Inf", x=1, "+Inf",
+                 and(0<x,x<1),
+                  do( a = -10, b = 10,         -- x in [a,b]
+                    for(k,1,100, 
+                         t = (a+b)/2,
+                         y = stdnormCDF(t),
+                     test(abs(x-y)<0.0000001, break, y<x,a=t, b=t)
+                    ), float(t) ))
+
+   normINV(x,mu,sigma) = mu + sigma*stdnormINV(x)        -- (+)
+
+-------------------------------------------------------------- END
+
+
+"------ Compare with R qnorm list"
+
+-- CHECK
+-- R> # Create 10 numbers between 0 and 2 incrementing by 0.1.
+-- R> x <- seq(0, 1, by = .1)
+-- R> # Choose the mean as 0 and standard deviation as 1.
+-- R> qnorm(x, mean = 0, sd = 1)
+--   [1] -Inf -1.2815516 -0.8416212 -0.5244005 -0.2533471  0.0 ..
+-- We collect these values in vector R to compare with normINV/1:
+
+R = (-Inf, -1.2815516, -0.8416212, -0.5244005, -0.2533471,  0.0,
+    0.2533471,  0.5244005,  0.8416212,  1.2815516,  Inf)
+
+"     inverse std. normal table for z = 0.0, 0.1, 0.2, .., 1.0" 
+"     i         normINV             R" 
+T = zero(3,11)                      -- T is a 3x11 table (matrix)
+for(i,1,11, T[1,i] = 0.1*(i-1))
+for(i,1,11, T[2,i] = normINV((i-1)*0.1,0,1))  
+for(i,1,11, T[3,i] = R[i])
+transpose(T)
+"ok"
+
+
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

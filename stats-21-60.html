@@ -1,0 +1,106 @@
+Í<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+## Statistics with Eigenmath      § 2.1-60
+##            by Dr. W.G. Lindner  2026
+
+ 
+
+# DEFINITION
+"=============================== binoCDF - cumulative BINOMIAL" 
+
+   binoCDF(k,n,p) = sum(j,0,floor(k), choose(n,j)*p^j*(1-p)^(n-j) )
+
+--------------------------------------------------------------
+-- where
+-- n : counts the number of independent Bernoulli trials 0,1,2,..
+-- p : specifies a probability of success 0<=p<=1
+-- k : counts the number of successes 0,1,2,..
+-- binoCDF means _c_umulative BINOMIAL distribution
+-- WARNING: Eigenmath 'sum' function needs k to be an integer,
+--          so 'floor(k)' instead of k is necessary. 
+
+
+"EXAMPLE 2"
+-- Compute the cdf of the binomial distribution 
+-- with 10 trials and the probability of success 0.5.
+
+binoCDF(4, 6,0.3)       -- ok 0.059535
+
+binoCDF(4, 10,0.5)      -- ok 0.3769
+
+-- Check with R
+-- R> pbinom(4, size=10, prob=0.5)        [1] 0.3769531
+--    'p' in pbinom means _p_robability 
+
+
+"EXCURS: binCDF approximative"
+
+-- a cumulative binomial distribution function, 2nd version
+-- without choose() in case 1st version does not work
+
+# DEFINITION
+------------------------------------------------------------
+binCDF1(k,n,p, s,b,q,r) =                    -- s=sum, b=bin
+    test( or(p<=0,p>=1,n<0,k<0, k>n), -1,
+      do(
+          q = 1-p,
+          r = log(p/q),
+          b = n*log(q),
+          s = exp(b),
+          for(i,1,k, 
+              do( b = b + r + log((n+1)/i-1)),
+                  s = s + exp(b) ), -- end do
+          float(s)           -- return value is probability
+        ))
+------------------------------------------------------- END
+
+
+binCDF1(190,200,0.9) 
+
+binCDF1(4, 6,0.3)       -- ok 0.9890
+
+
+"EXCURS: binoCDF using incomplete beta"
+
+-- We may use the build-in function 'incbeta' of Eigenmath 
+-- version >3.50  to plot binoCDF version for 'continous' CDF.
+
+# DEFINITION
+---------------------------- binoCDF1 with incomplete beta 
+
+    binoCDF1(k,n,p) = incbeta(1-p, n-k,k+1)
+
+---------------------------------------------------------
+ 
+binoCDF1(4, 10,0.5)      -- ok 0.3769
+binoCDF1(4, 6,0.3)       -- ok 0.059535
+
+
+"Binomial CDF continuos plot for n=10 & p=1/6"
+yrange = (0,1)
+xrange = (0,10)
+draw( binoCDF1(x, 10, 1/6) ,x)
+
+"Binomial CDF continuos plot for n=40 & p=0.5"
+yrange = (0,1)
+xrange = (0,40)
+draw( binoCDF1(x, 40, 0.5) ,x)
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

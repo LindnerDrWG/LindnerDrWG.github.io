@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 3.2-126
+##            by Dr. W.G. Lindner  2026
+ 
+"=============================== CDF for exp distribution"
+
+  expCDF(x, L) = test( x>=0, 1-exp(-L*x), 
+                       x <0, 0          )
+
+----------------------------------------------------------
+
+"------ lifespan of a light bulb"
+
+-- EXAMPLE, [3] p.63: 
+-- The lifespan of a light bulb is exponentially distributed and 
+-- averages 1,000 hours. What is the probability, that it will 
+-- last 800 hours?
+-- SOLUTION:    Pr(X>800) = 1 - Pr(X<=800) =
+
+1 - expCDF(800, 1/1000)
+float
+-- .. The light blub will last 800 hrs with prob. of 44.9%.
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

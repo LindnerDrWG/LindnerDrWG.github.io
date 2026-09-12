@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 3.2-128
+##            by Dr. W.G. Lindner  2026
+ 
+"=============================== CDF for exp distribution"
+
+  expCDF(x, L) = test( x>=0, 1-exp(-L*x), 
+                       x <0, 0          )
+
+----------------------------------------------------------
+
+
+"------ refrigeration unit"
+
+-- EXAMPLE, [3] p.63: 
+-- A refrigeration unit has a mean exponentially distributed lifespan 
+-- of ten years. What is the probability that it will last another
+-- five years, if it survives the first five years?
+-- SOLUTION: 
+--            Pr(X>10|X>5) = Pr(X>10)/Pr(X>5) =
+
+lambda = 1/10
+(1-expCDF(10, lambda)) / (1-expCDF(5, lambda))
+float
+-- .. with 60.7% the refrigerator will work ok for another 5 years.
+
+"alternative solution "
+-- EXAMPLE : alternative solution with expCDF
+
+L = 10
+P3Y5 = expCDF(5, L) - expCDF(3, L)   
+P3Y5
+float
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

@@ -1,0 +1,57 @@
+Í<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+## Statistics with Eigenmath      § 2.1-61
+##            by Dr. W.G. Lindner  2026
+
+
+"=============================== binoCDF - cumulative BINOMIAL" 
+
+binoCDF(k,n,p) = sum(j,0,floor(k), choose(n,j)*p^j*(1-p)^(n-j) )
+    
+binoCDF1(k,n,p) = incbeta(1-p, n-k,k+1)
+
+--------------------------------------------------------------
+-- where
+-- n : counts the number of independent Bernoulli trials 0,1,2,..
+-- p : specifies a probability of success 0<=p<=1
+-- k : counts the number of successes 0,1,2,..
+-- binoCDF means _c_umulative BINOMIAL distribution
+-- WARNING: Eigenmath 'sum' function needs k to be an integer,
+--          so 'floor(k)' instead of k is necessary. 
+
+
+"a.  Binomial CDF table for n=10 & p=1/6"
+T = zero(2,11)
+for(i,1,11, T[1,i] = i-1)
+for(i,1,11, T[2,i] = float(binoCDF(i-1,10, 1/6)) )
+transpose(T)
+
+"b.  Binomial CDF plot for n=10 & p=1/6"
+yrange = (0,1)
+xrange = (0,10)
+draw( binoCDF(x, 10, 1/6), x)
+
+"c.  Binomial CDF plot for n=10 & p=1/6 using incBeta"
+yrange = (0,1)
+xrange = (0,10)
+draw( binoCDF(x, 10, 1/6), x)
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

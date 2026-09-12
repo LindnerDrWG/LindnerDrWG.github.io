@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 3.6-170
+##            by Dr. W.G. Lindner  2026
+ 
+"=============================== CDF for PARETO distribution"
+
+  paretoCDF(x,m,a) = test( x<m, 0, 
+                     float( 1 - (m/x)^a  ))
+-------------------------------------------------------------
+
+"--- EXAMPLE (R). ---"
+
+-- 
+-- The cdf of a Pareto distribution with parameters location=2 and 
+-- shape=1, evaluated at 3, 4, and 5 is 
+-- SOLUTION:
+
+paretoCDF(3, 2,1) 
+paretoCDF(4, 2,1) 
+paretoCDF(5, 2,1) 
+"ok"
+
+-- R>  ppareto(3:5, 2, 1) 
+--     [1] 0.3333333 0.5000000 0.6000000
+
+
+"........................ Plot of Pareto-CDF for a=2 b=2"
+xrange = (0,5)
+yrange = (0,2)
+draw( paretoCDF(x,2,2))
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

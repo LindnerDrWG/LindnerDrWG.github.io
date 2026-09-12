@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 3.5-159
+##            by Dr. W.G. Lindner  2026
+ 
+ 
+"=============================== CDF for CHI^2 distribution"
+  GammaP(x,k) = x^k*exp(-x) * sum(m,0,100, x^m/tgamma(k+m+1))
+
+  chi2CDF(x, k) =  test( or(x<=0,k<=0), 0,
+                   float( GammaP(x*0.5, k*0.5 )) )
+
+------------------------------------------------------------------
+-- Cumulative probability function (cdf) for chi-squared
+
+
+"--- Your turn ---"
+
+"chi2CDF(3,5) ="
+chi2CDF(3,5) 
+
+--   R> pchisq(3, df = 5)    [1] 0.3000142
+
+
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

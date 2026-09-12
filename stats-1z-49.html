@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+## Statistics with Eigenmath      § 1.12-49
+##            by Dr. W.G. Lindner  2026
+
+
+"KURTOSIS"
+
+-- KURTOSIS needs these functions as helper
+   mean(X)     = float( sum(X)/dim(X) )          
+   sd(X)       = float( sqrt(sum((X-mean(X))^2) /(dim(X)-1)) ) 
+   moment(X,r) = float( sum((X-mean(X))^r)/dim(X) )
+
+# DEFINITION (kurtosis variants)
+------------------------------------------------------ kurtosis
+  kurtosis(X)   = moment(X,4)/moment(X,2)^2
+  
+  kurtosisM(X)  = moment(X,4)/sd(X)^4   -- R'e1071'+3 (=excess)
+  kurtosis1(X)  = float(dim(X)* sum((X-mean(X))^4) / 
+                                sum((X-mean(X))^2)^2 )
+
+kurtosis0(X,n) = do( n=dim(X),   -- MatLab's kurtosis with flag=0
+                 test( n<4 , "n must be >=4",
+                 (n-1)/((n-2)*(n-3))*((n+1)*kurtosis(X) -3*(n-1))+3 ))
+                 
+kurtosisR1(X) = moment(X,4)/moment(X,2)^2 - 3        -- R: type 1
+
+kurtosisR2(X) = do( n=dim(X),         -- R: type 2; also SAS, SPSS
+                     ((n+1)*kurtosisR1(X)+6)*(n-1)/((n-2)*(n-3)) )  
+
+kurtosisR3(X) = moment(X,4)/moment(X,2)^2 *(1 - 1/dim(X))^2 - 3 
+                                        -- R: ytpe 3; also MINITAB
+------------------------------------------------------
+-- REMARK:                      For compatibility with
+--     MATLAB     no flag       use: kurtosis(X) or kurtosis1(X)
+--     MATLAB     flag =0       use: kurtosis0(X)
+--     R>package "moments"      use: kurtosis(X)
+--     R>package "e1071" typ 1  use: kurtosisR1(X)
+--     R>package "e1071" typ 2  use: kurtosisR2(X)
+--     R>package "e1071" typ 3  use: kurtosisR3(X)
+
+
+"Check with R and library(e1071)"
+
+Y = (4,5,5,6,6,6,7,8,10,12,13)
+
+## check with R
+## > Y = c(4,5,5,6,6,6,7,8,10,12,13)
+## > library(moments)
+## > kurtosis(Y)
+## [1] 2.295884
+
+## > Y = c(4,5,5,6,6,6,7,8,10,12,13)
+## > library(e1071)
+## > kurtosis(Y)
+## [1] -0.1025    
+
+kurtosis(Y)       -- 2.295  
+kurtosis1(Y)      -- 2.295 
+kurtosis0(Y)      -- 2.695  
+kurtosisR3(Y)     -- -0.1025 R:e1071 Typ 3
+
+-- CHECK with MatLAB
+-- MATLAB>> Y = [4, 5, 5, 6, 6, 6, 7, 8, 10, 12, 13]
+--       >> kurtosis(Y)
+--          ans =    2.2959
+--       >> kurtosis(Y,0)
+--          ans =    2.6598
+ 
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

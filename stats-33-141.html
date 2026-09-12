@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 3.3-141
+##            by Dr. W.G. Lindner  2026
+ 
+
+"=============================== tINV1 - approximation of t distribution"
+   stdnormCDF(x) = 1/2*erfc(-x/sqrt(2))
+
+   stdnormINV(x, a,b,k,t,y) = test(x=0, "-Inf", x=1, "+Inf",
+                 and(0<x,x<1),
+                  do( a = -10, b = 10,         -- x in [a,b]
+                    for(k,1,100, 
+                         t = (a+b)/2,
+                         y = stdnormCDF(t),
+                     test(abs(x-y)<0.0000001, break, y<x,a=t, b=t)
+                    ), float(t) ))
+
+   tINV1(x,f, q,c,t) =               -- 0<x<1
+     do( PI = 3.1415926535898,
+       test( f==1, tan(PI*(x-0.5)),
+             f==2, do(t=2.*x-1., sqrt(2.)*t/sqrt(1.-t*t) ),
+             do( 
+                 q = stdnormINV(x),
+                 c = f -2/3 + 1/(10*f),
+                 c = (f-5/6)/(c*c),
+                 t = sqrt(f*exp(c*q*q)-f),
+                 test(x>0.5, t, -t) )))
+
+------------------------------------------------------------
+-- cf.: C code in [6], p.71, after Preizer & Pratt
+-- cf.: https://de.mathworks.com/help/stats/tinv.html
+
+-- check: ok
+
+tINV1(.95, 50)    
+
+-- MATLB> tinv(.95,50)  ans = 1.6759
+-- R>     qt(.95,50)    [1]   1.675905
+
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

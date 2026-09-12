@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 3.2-125
+##            by Dr. W.G. Lindner  2026
+ 
+"=============================== CDF for exp distribution"
+
+  expCDF(x, L) = test( x>=0, 1-exp(-L*x), 
+                       x <0, 0          )
+
+----------------------------------------------------------
+-- Cumulative probability function (cdf) for exp-distibution
+-- https://de.mathworks.com/help/stats/expcdf.html
+-- cf. [3], p.62
+
+"b.  exp-CDF for L=1/2"
+L = 1/2
+xrange = (0,5)
+yrange = (0,1)
+draw(expCDF(x,1/2))
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 5.2-240b
+##            by Dr. W.G. Lindner  2026
+
+"========================= SPEARMAN rank correlation rho "
+
+"........... Prerequisites: mean, sort, cRank"
+
+mean(X) = float( sum(X)/dim(X) )  
+
+sort(v,i,k,n,t) = do( n = dim(v),      
+     loop( test(n < 2, break), k = 1,
+           for(i, 1, n - 1,
+               test(v[i] > v[i + 1], 
+                 do( t = v[i], v[i] = v[i + 1], v[i + 1] = t,
+                     k = i ))), n = k), v)
+
+cRank(W, i,j,k,n,t, Srank) = do(          -- by G. Weigt 8/25  
+         j = 1, n = dim(W), Srank = 0,
+         loop( test(j > n, break),
+               k = j + 1,
+               loop( test(k > n, break, W[j]==W[k], k=k+1, break)),
+               t = 0.5*(j + k - 1),
+               for(i, j, k-1, W[i] = t),
+               t = k - j, Srank = Srank + t^3 - t, j = k), W)
+----..................................................... END 
+
+-- In this script we demonstrate the determination of Spearman's
+-- rank correlation coefficient rho in three phases:
+-- b. SECONDLY we calculate rho semi-automatic using two helper
+--          functions Rank() and correspond(ence)
+
+
+###----------------------------------------------------------
+"b. EXAMPLE: heigths of fathers vs sons"
+###----------------------------------------------------------
+  
+# PROBLEM: The heights of a sample of 12 fathers and their oldest 
+#          sons are measured giving the following data:
+#          Far : 65,63,67,64,68,62,70,66,68,67,69,71
+#          Son : 68,66,68,65,69,66,68,65,71,67,68,70
+#          cf. Spiegel p. 434 P 17.24
+# TASK:    Calculate the Spearman rank correlation rho.
+
+"SOLUTION semi-automatic with sort and cRank"
+
+-- the data
+Far = (65, 63, 67, 64, 68, 62, 70, 66, 68, 67, 69, 71)
+Son = (68, 66, 68, 65, 69, 66, 68, 65, 71, 67, 68, 70)
+
+"..........  we first sort both samples using function sort()"
+
+sFar = sort(Far)       -- sort Fathers
+
+sSon = sort(Son)       -- sort Sons
+
+"..........  we rank both _sorted_(!) data using function cRank"
+
+rFar = cRank(sFar)
+
+rSon = cRank(sSon)
+
+-- check:
+
+"rows: original sample, then sorted and then ranked Fathers:"
+(Far, sFar, rFar)
+
+"sorted and ranked Sons:"
+(Son, sSon, rSon)
+
+"..........  we now construct the correspondence" 
+-- between the original data
+-- and the rankings of the sorted data:
+
+"..... a. we demonstrate the idea for finding corresponding pairs"
+
+M = zero(dim(Far))
+    for(i,1,dim(Far), test(sFar[i]=Far[1], M[1]=cRank(sFar)[i]))
+    for(i,1,dim(Far), test(sFar[i]=Far[2], M[2]=cRank(sFar)[i]))
+    for(i,1,dim(Far), test(sFar[i]=Far[3], M[3]=cRank(sFar)[i])) 
+--  etc. we abstract to ..
+M
+
+MF = zero(dim(Far))
+     for(j,1,dim(Far),
+     for(i,1,dim(Far), test(sFar[i]=Far[j], MF[j]=cRank(sFar)[i])))
+MF
+
+MS = zero(dim(Son))
+     for(j,1,dim(Son),
+     for(i,1,dim(Son), test(sSon[i]=Son[j], MS[j]=cRank(sSon)[i])))
+MS
+
+"..... b.  we abstract this procedure into a function 'correspond'"
+
+correspond(X,sX, M) = do(              -- X and sortedX
+    M=zero(dim(X)),
+    for(j,1,dim(X),
+    for(i,1,dim(X), test(sX[i]=X[j], M[j]=cRank(sX)[i]))),
+    M)
+
+cF = correspond(Far, sFar)
+cF         
+
+cS = correspond(Son, sSon)
+cS         
+
+"........... now the rest of the procedure is the same as above:" 
+
+D = cF - cS       -- difference of corresponding sample items
+D
+
+D2 = D^2          -- differences squared
+D2
+
+n = dim(Far)
+
+rhoSpearman = 1 - 6*sum(D^2)/n/(n^2-1)
+rhoSpearman
+"ok"
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

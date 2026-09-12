@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath      § 1.6-23
+##            by Dr. W.G. Lindner  2026
+
+
+"ROOT MEAN SQUARE"
+
+mean(X)  = float( sum(X)/dim(X) )   
+
+------------------------------------ DEFINITION rms
+  rms(X) = float( sqrt(sum(X^2)/dim(X)) )  
+         # or: float( sqrt(mean(X^2)) )
+------------------------------------ root mean square 
+
+"Check"
+
+X=(4,2,-9)
+rms(X)
+"ok"
+
+-- MATLAB>> x = [4; 2; -9];
+--          y = rms(x)
+--          y = 5.8023
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

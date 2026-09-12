@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 5.9.a
+##            by Dr. W.G. Lindner  2026
+
+"=======================  BOOTSTRAPci for Confidence Interval"
+
+"EXAMPLE from AskPython"
+
+-- To understand the need for bootstrap sampling let’s consider an 
+-- example, suppose we want to calculate the average age of 1000 
+-- employees working for a particular company. 
+-- The first approach could be to ask all the 1000 employees their age 
+-- and then calculate the mean age.
+-- This can be a tedious task and a time-consuming approach, 
+-- another method is to consider a sample of 5 employees and collect 
+-- their ages this process can be repeated 20 times, and
+-- then average the collected age data of 100 employees. 
+-- This average age would be the estimate of all 1000 employees.
+
+-- SOLUTION:
+
+".......... FIRST We follow the example step by step:"
+
+"- a. - calculate the estimated population mean age"
+
+mean(X) = float(sum(X)/dim(X))
+
+-- read data into Eigenmath
+X = (25, 30, 35, 40, 45, 50, 55, 60, 65, 70)
+
+n = dim(X)
+n
+
+".......... choose number of bootstrap samples"
+
+numSamples = 3     -- better: 1000, but this runs a minute then..
+numSamples
+
+"..........  get random index r to resample with replacement"
+-- from the original sample to generate a bootstrap sample.
+
+r = 1 + mod(floor(1+10*rand()),10)    -- starting 'seed' i.e. first
+r                                     -- (r)andom number 
+
+r = 1 + mod(floor(1+10*rand()),10)    -- next (r)andom number ..
+r
+
+"..........  create a matrix to save the bootstrap results of 10 drawings"
+
+M = zero(n)
+M
+
+-- create a matrix as container to save the means of the drawings
+
+bootstrapMeans = zero(numSamples)
+
+"..........  now resample with replacement from the original sample X"
+-- to generate a bootstrap sample in M:
+
+rand( mod(31,117))                   -- start randomly 
+for( j,1,numSamples,                 -- perform bootstrap sampling 
+     for(i,1,n, 
+           r = 1 + mod(floor(1+10*rand()),10),
+           M[i] =  X[r]),
+     print(M),
+     -- Now calculate the mean age of the bootstrap sample M;
+     -- this calculated mean is stored in array bootstrapMeans
+     bootstrapMeans[j]= mean(M))     
+     
+".......... show bootstrap means in decimal values"
+bootstrapMeans   
+
+".......... Now we calculate the estimated population mean age"
+
+estimatedMean = mean(bootstrapMeans)
+estimatedMean
+
+
+"- b. - define a percentile function to calc CI"
+
+-- To calculate the confidence interval with method 'percentile',
+-- we need following helper functions: 
+
+------------------- sort & percentile ------------------------wL
+sort(v,i,k,n,t) = do( n = dim(v),         -- by G. Weigt 7/2025
+     loop( test(n < 2, break), k = 1,
+           for(i, 1, n - 1,
+               test(v[i] > v[i + 1], 
+                 do( t = v[i], v[i] = v[i + 1], v[i + 1] = t,
+                     k = i ))), n = k), v)
+
+  percentile(X, p) = do( Xs = sort(X),
+                         i  = ceiling(dim(X)*p/100),
+                         float((Xs[i])) )
+
+ min(a,b) = test(a<=b, a,b)
+ max(a,b) = test(a<=b, b,a)
+------------------------------------------------------------ END
+
+# REMARK
+# Percentiles divide a ranked data set into 100 equal parts. 
+# Each (ranked) data set has 99 percentiles that divide it into 100
+# equal parts. The 𝑘th percentile is denoted by 𝑃𝑘, where 𝑘 is an 
+# integer in the range 1 to 99. 
+# For instance, the 25th percentile is denoted by 𝑃25.
+# return sorted(data) [int(math.ceil((size * perc) / 100)) - 1]
+
+"..........  check percentile function"
+percentile((10.0, 9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0), 90)
+-- 9.0
+percentile((142, 232, 290, 120, 274, 123, 146, 113, 272, 119, 124, 277, 207), 50)
+-- 146
+"ok"
+
+"- c. -  Bootstrap Sampling for Confidence Interval (CI)"
+
+"..........  calc some confidence intervals via percentiles "
+-- for the bootstrapMeans
+
+bootstrapMeans = (47, 50, 51.5)         -- fix bsMeans from text
+
+ci1 = percentile(bootstrapMeans, 98.5)  -- 98..91 does not work ??
+ci1                                     -- would like have 98.5 %
+
+ci2 = percentile(bootstrapMeans, 2.5)
+ci2
+
+"... calculate the 90% confidence interval"
+
+ci1 = percentile(bootstrapMeans, (100-90)/2)     -- 5
+ci1                                  
+
+ci2 = percentile(bootstrapMeans, (100+90)/2)     -- 95
+ci2
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

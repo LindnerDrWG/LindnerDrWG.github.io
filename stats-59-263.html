@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 5.9-263
+##            by Dr. W.G. Lindner  2026
+
+"========== EXAMPLE: Duke Uni example"
+
+-- see: https://www.askpython.com/python/examples/bootstrap-sampling-introduction
+
+-- Ten university students were recruited to play the seminal video 
+-- game pac-man. After equal amounts of practice the students were 
+-- then asked to play the first stage and the time to completion was -- recorded. The following data in seconds were recorded.
+
+X = (63.1,64.6,63.4,65.6,63.4,65.7,64.6,63.1,65.9,63.3)
+
+-- Calculate the 95% confidence interval CI, which catch the true 
+-- population mean.
+
+-- SOLUTON:
+
+-- Because we do not know the population variance, the 
+-- sample standard deviation sd() can be used as a subsitute.
+-- For a finite-length vector X made up of N = dim(X) scalar 
+-- observations, the standard deviation is defined as
+
+sd(X) = float( sqrt(sum((X-mean(X))^2) /(dim(X)-1)) )
+
+sX = sd(X)
+sX              
+-- ok: std.dev. of X = 1.148960883194511
+
+-- now we calculate the confidence interval for the estimated mean
+-- at a significance level alpha = 0.05
+
+alpha = 0.05
+
+-- To calculate the confidence interval CI we need tINV.
+--------------------------------------------------------------
+   tINV(x, df) = tdistinv(x, df)
+--------------------------------------------------------------
+
+interval = tINV(1 - (alpha/2),n-1) * (sX/sqrt(n))
+interval
+
+ci = (mean(X) - interval, mean(X) + interval)
+ci
+
+-- RESULT
+-- We are 95% confident that the true population mean lies 
+-- between 63.45 and 65.09.
+"ok"
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

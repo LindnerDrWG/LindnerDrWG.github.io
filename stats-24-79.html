@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+## Statistics with Eigenmath      § 2.4-79
+##            by Dr. W.G. Lindner  2026
+ 
+-- REMARK: The following functions have 4 parameters, whose order
+-- is crucial, because of the multiple use of choose(). This order 
+-- differs between R, MATLAB/Octave, EXCEL etc. So take care!
+    
+"=========================== hgPDF - Hypergeometric density"
+
+   hgPDF(N,R,n,r) = float( choose(R,r)*choose(N-R, n-r)/choose(N,n) )     
+
+------- "N-R-n-r" ------------------------------------------
+-- where
+-- N is the population size,
+-- R is the number of success states in the population,
+-- n is the number of draws in each trial,
+-- r is the number of observed successes.
+
+-- Model: draw from an urn with N marbles, 
+--        R of them are red ('success'), 
+--        exactly n marbles and find r of them are red. 
+
+
+hgPDF(N,R,n,r)     -- the formula expanded for inspection
+
+
+"-------------------- EXAMPLE: selecting red marbles"
+
+-- prototypical PROBLEM:
+-- What is the probability of selecting x = 14 red marbles from a
+-- sample of k = 20 taken from an urn containing m = 70 red marbles
+-- and n = 30 green marbles (i.e. N=100 marbles at all)?
+-- SOLUTION:
+
+--    N   R  n  r
+hgPDF(100,70,20,14)                          
+
+--           r       R       N-R     n
+-- R> dhyper(x = 14, m = 70, n = 30, k = 20)
+--    [1] 0.2140911
+-- WATCH the other ordering of the parameter list in R !!
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

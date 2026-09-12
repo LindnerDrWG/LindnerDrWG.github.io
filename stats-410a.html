@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+## Statistics with Eigenmath       § 4.10.a
+##            by Dr. W.G. Lindner  2026
+
+
+"========================= WILCOXON one sample signed rank test"
+
+"........... Prerequisites: sort, cRank, correspond, normCDF"
+normCDF(L, mu,sigma) = 
+                1/2 + 1/2*float(erf((L-mu)/(sqrt(2)*sigma)))
+
+sort(v,i,k,n,t) = do( n = dim(v),         -- by G. Weigt 7/2025
+     loop( test(n < 2, break), k = 1,
+           for(i, 1, n - 1,
+               test(v[i] > v[i + 1], 
+                 do( t = v[i], v[i] = v[i + 1], v[i + 1] = t,
+                     k = i ))), n = k), v)
+
+cRank(W, i,j,k,n,t, Srank) = do(            -- by G. Weigt 8/25  
+         j = 1, n = dim(W), Srank = 0,
+         loop( test(j > n, break),
+               k = j + 1,
+               loop( test(k > n, break, W[j]==W[k], k=k+1, break)),
+               t = 0.5*(j + k - 1),
+               for(i, j, k-1, W[i] = t),
+               t = k - j,
+               Srank = Srank + t^3 - t,
+               j = k), Srank,W)
+
+correspond(X,sX, M) = do(   -- X and sortedX, by W. Lindner 7/25
+    M=zero(dim(X)),
+    for(j,1,dim(X),
+    for(i,1,dim(X), test(sX[i]=X[j], M[j]=cRank(sX)[i]))), M)
+
+
+##############################################################
+"EXAMPLE 2.2 from PennState Eberly College"
+##############################################################
+-- https://online.stat.psu.edu/stat415/lesson/20/20.2"
+
+-- Let X_i denote the length, in centimeters, of a randomly 
+-- selected pygmy sunfish, i=1..10. 
+-- If we obtain the following data set:
+--       5.0 3.9 5.2 5.5 2.8 6.1 6.4 2.6 1.7 4.3
+-- can we conclude that the median length of pygmy sunfish 
+-- differs significantly from 3.7 centimeters?
+
+-- SOLUTION:
+
+Y = (5.0, 3.9, 5.2, 5.5, 2.8, 6.1, 6.4, 2.6, 1.7, 4.3)
+
+".......... We formulate the null hypthesis H0:"
+--    H0 : m = m0, i.e. the median length is equal to m0 = 3.7 
+
+".......... METHOD of Wilcoxon signed-rank test statistics is"
+-- 1. we subtract the median from each measurement,
+-- 2. we find absolute values of the differences,|Xi− m0|
+-- 3. we rank the absolute values of the differences Xi− m0
+-- 4. we find the value of W, the Wilcoxon signed-rank test statistics
+--    by definition        W = ∑ Zi*Ri
+
+n    = dim(Y)
+sign = zero(n)
+d    = zero(n)
+med  = 3.7          -- null hypothesis: median m0=3.7
+
+d = Y - med         -- differences to the median
+d
+
+sign = sgn(d)
+sign
+
+"..........  Determine the rank of the absolute values" 
+"..........  (in ascending order) according to their magnitude."
+
+md = mag(d)         -- make differences positive
+md
+
+sd = sort(md)       -- sort the positive differences
+sd
+
+cd = correspond(md,sd)     -- correspond uses Rank(sd)
+cd                         -- i.e. rank sorted differences
+
+"..........  find indices with positive difference d>0"
+
+Z= zero(n)
+   for(i,1,n, test(d[i]>0, Z[i]=1))
+Z
+
+"..........   calculate statistics W"
+--  which is the vector of products Z[i]*cd[i]
+
+ZR = zero(n)
+     for(i,1,n, ZR[i]= Z[i]*cd[i])
+ZR
+
+W = sum(ZR)
+W
+
+id= zero(n)
+    for(i,1,n, id[i]=i)
+id
+
+"..........   summary:"
+-- ("No", "Yi" , "Yi-3.7", "|Yi-3.7|", "Rank Ri", "signed Ri")
+--      Y-3.7    |Y-3.7|   R   Z*R = W statistics
+(id, Y, Y-med, mag(Y-med), cd, ZR)
+
+--  test statistics
+W = dot(Z,cd)
+W
+"ok"
+
+-- cite ibid.:
+-- Determine if the observed value of W is extreme in light of the 
+-- assumed value of the median under the null hypothesis. 
+-- That is, calculate the P-value associated with W, and make a 
+-- decision about whether to reject or not to reject.
+
+-- When the null hypothesis is true, for large n,
+-- then T follows an approximate standard normal distribution N(0, 1).
+
+"..........   T statistics"
+T = (W - n*(n+1)/4)/ sqrt(n*(n+1)*(2*n+1)/24)
+T
+
+-- Well, in this case, with n = 10, our sample size is fairly small 
+-- so we can use the exact distribution of W. The upper and lower 
+-- percentiles of the Wilcoxon signed rank statistic when n = 10 are:
+
+"..........  Decision: n=10: Pr(T>=W=40) = 0.116"
+
+-- Therefore, our P-value is 2 × 0.116 = 0.232. 
+-- Because our P-value is large, we cannot reject the null hypothesis.
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

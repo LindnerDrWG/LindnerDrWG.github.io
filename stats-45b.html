@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 4.5.b
+##            by Dr. W.G. Lindner  2026
+
+"============================== Hypothesis Tests for two sample means"
+--................................................. helper
+  tCDF(x, df) = tdist(x, df)     
+  tINV(x, df) = tdistinv(x, df)
+  
+  mean(X) = sum(X)/dim(X)
+  sd(X)   = float( sqrt(sum((X-mean(X))^2) /(dim(X)-1)) )
+  sd1(X)  = float( sqrt(mean(X^2) - mean(X)^2) )  
+  min(a,b) = test(a<=b, a,b)
+  max(v, i,m,n) = do( n = dim(v), m = v[1],    -- G. Weigt 19.7.2025
+                    for(i, 2, n, test(v[i] > m, m = v[i])), m)
+                    -- vectorizized maximum
+  
+
+"---  we abstract the procedure to Eigenmath functon tdiff()"
+
+#############################################################
+tdiff(X,Y,alpha, T,p,df,D,d,n) = do(
+#############################################################
+      print(" _____ paired t-test _____"),
+      n  = dim(X),  -- = dim(Y)
+      df = n-1,
+      D  = X-Y,
+      sum1 = sum(D),
+      sum2 = dot(D,D),
+      d  = sqrt((sum2-sum1^2/n)/(n*(n-1.))),
+      T  = sum1/(n*d),
+      pValue = min( 2*tCDF(T,df), 2*(1-tCDF(T,df)) ),
+      test(pValue < 0.975, print("..... accept H0"), 
+                           print("..... reject H0")),
+      (("T:","p-value:"),(T,pValue)) )   
+
+######################################################## END
+
+-- Check:
+
+
+X = (52.4,37.4,41.2,71.5,51.3,21.6,17.7,21.2,41.3,32.0,53.0,61.4)
+Y = (47.8,42.0,33.2,41.0,29.5,28.1,17.4,21.5,41.4,51.3,49.5,53.7)
+
+tdiff(X,Y,0.05)
+"ok"
+
+D  = X-Y
+
+meanD = mean(D)
+meanD
+
+maxD = max(D)
+maxD
+
+sigmaD = sd(D)
+sigmaD
+
+maxD/sigmaD
+
+-- RESULT: 
+-- The mean value of the differences is here muD = 3.8 mm with the 
+-- standard deviation Sigma = 13.4. The largest difference 30.5 in the 
+-- rainfall amount occurs in May and is equal to 2.36 * sigmaD.
+
+
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

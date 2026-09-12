@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+
+## Statistics with Eigenmath       § 3.4-154
+##            by Dr. W.G. Lindner  2026
+ 
+
+"============================== helper functions"
+  
+  Beta(a,b) = test( or(a<=0, b<=0), -1,
+                     exp( lgamma(a)+lgamma(b)-lgamma(a+b)) )
+
+  fPDF(x,f1,f2) = float( sqrt(((f1*x)^f1*f2^f2)/(f1*x+f2)^(f1+f2)) /
+                         (x*Beta(f1/2,f2/2)) )
+                         
+  fCDF(t,df1,df2)  = incbeta(t/(t+df2/df1), 0.5 df1, 0.5 df2)
+
+-------------------------------------------------------------- 
+
+"It is your task"
+
+
+yourfINV(0.95, 4, 5)  -- ok
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<title>Demo</title>
+</head>
+<body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<table><tr><td>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:12pt">
+
+## Statistics with Eigenmath  -  § 1.3-8
+##            by Dr. W.G. Lindner  2026
+
+"STANDARD DEVIATION"
+
+mean(X)       = float( sum(X)/dim(X) )        -- empir.sample mean
+meanF(X,f)    = float( dot(f,X)/sum(f) )      -- mean w. frequency
+
+var(X)  = float( sum((X-mean(X))^2) / (dim(X)-1) ) -- sample var.
+var0(X) = float( sum((X-mean(X))^2) / (dim(X)-0) ) -- population var.
+
+-- For a finite-length vector X made up of n=dim(X) scalar 
+-- observations, the standard deviation 'sd' is defined as
+
+
+---------------------------------------# DEFINITION 
+sd(X)  = sqrt(sum((X-mean(X))^2) /(dim(X)-1)) -- sample sd
+
+sd0(X) = sqrt(sum((X-mean(X))^2) /dim(X))     -- population sd
+           --  float( sqrt(var(X)) )            -- using var
+---------------------------------------------------- 
+-- alternative
+
+sd1(X)  = float( sqrt(mean(X^2) - mean(X)^2) )  -- Std.Deviation
+
+
+
+"EXAMPLE: Find the std. deviation of 12,6,7,3,15,10,18,5."
+"
+-- SOLUTION: cf. Spiegel p. 106, P 4.10
+
+X = (12,6,7,3,15,10,18,5)
+sd(X)
+"ok"
+
+
+</textarea>
+</td><td>
+<button onclick="run()" style="font-size:20pt">Run</button>
+</td></tr></table>
+<p>
+<div id="stdout"></div>
+</body>
+</html>
