@@ -2,16 +2,47 @@
 COMMENT
            STATISTICS WITH REDUCE ch. 2.1-61
                       by W.G. Lindner 2026  $
-                      
-                     
-                 
+
+
+
 procedure binoCDF(k,n,p);
-          iBeta(n-k,k+1,1-p);
+          for j := 0:k sum binomial(n,j)*p^j*(1-p)^(n-j);
+
+% FJW 20/09/2026: This short finite sum is a much simpler expression
+% to evaluate than the special function ibeta, which REDUCE currently
+% does not evaluate reliably, although it should soon be revised.
 
 % --- a.
 
 on rounded $
-print_precision  5$
+print_precision 5$
 
-for i:=1:10 do write binoCDF(i, 10, 1/6);  
+for i:=1:10 do write binoCDF(i, 10, 1/6);
 
+% --- b.
+
+on demo; % to see each plot if inputting this file using the IN command
+
+% Line plot:
+plot(for i:=1:10 collect {i, binoCDF(i, 10, 1/6)},
+title="Binomial Cumulative Distribution Function binoCDF(k,10,1/6)",
+xlabel="k", ylabel="binoCDF");
+
+% Point plot:
+plot(for i:=1:10 collect {i, binoCDF(i, 10, 1/6)}, style=points,
+title="Binomial Cumulative Distribution Function binoCDF(k,10,1/6)",
+xlabel="k", ylabel="binoCDF");
+
+% --- c.
+
+% Line plot:
+plot(for i:=1:10 collect {i, binoCDF(i, 40, 0.5)},
+title="Binomial Cumulative Distribution Function binoCDF(k,40,0.5)",
+xlabel="k", ylabel="binoCDF");
+
+% Point plot:
+plot(for i:=1:10 collect {i, binoCDF(i, 40, 0.5)}, style=points,
+title="Binomial Cumulative Distribution Function binoCDF(k,40,0.5)",
+xlabel="k", ylabel="binoCDF");
+
+end;

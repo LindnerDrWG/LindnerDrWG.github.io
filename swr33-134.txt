@@ -19,4 +19,5 @@ print_precision 5$
 for  i:=1:6 do write {i, tPDF(0, i) };
 
 
+end;
 

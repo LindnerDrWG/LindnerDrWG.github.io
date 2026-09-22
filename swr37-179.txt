@@ -21,3 +21,5 @@ for each y in p do write {y, weibullINV(y,1,5)} ;
 % Interpret the answer of REDUCE. It seems 
 % p=1.0 is critical. Why? So we should cancel it.
 % TASK: formulate the loop using: for p:=0:10 ..
+
+end;

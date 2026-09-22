@@ -58,3 +58,5 @@ print_precision 5$
 
 for i:=-4:4 do write {i, tCDF(i, 5) };
 tcdf(3,5) ; %% 0.987;
+
+end;

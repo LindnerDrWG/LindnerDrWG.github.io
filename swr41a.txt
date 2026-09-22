@@ -101,3 +101,6 @@ procedure normINV(q,m,s);
           m + sqrt(2) * s * numeric_erfinv(2*q-1);
 
 procedure stdnormINV(q); normINV(q,0,1)$
+
+end;
+

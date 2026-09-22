@@ -21,6 +21,7 @@ procedure MEAN(X);  (for each el in X sum el)/length(X);
 procedure SUM_(X);  (for each el in X sum el);
 define    DIM = length$
 
+
 % ----------------------------------------------------------
 procedure varTest(X, Y, alpha);  
 % ----------------------------------------------------------
@@ -66,3 +67,5 @@ COMMENT ----------------------------------- result:
 │ 2.1163  0.42634  0.30882  11.185 │
 └                                  ┘
 $
+
+end;

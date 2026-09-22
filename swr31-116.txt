@@ -67,3 +67,4 @@ for each k in p do write {k, normINV(k,2,1)};
 % ok
 
 
+end;

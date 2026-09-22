@@ -27,3 +27,4 @@ X := for i:=-4:4 collect i;
 for each i in X  do write {i, student(i, 5) };
 
 
+end;

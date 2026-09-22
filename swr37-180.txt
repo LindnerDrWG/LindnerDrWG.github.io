@@ -22,3 +22,5 @@ print_precision 5$
 %-- SOLUTION: cf. [6], p.66 ad b:
 
 1 - weibullCDF1(1,0.01,2);   % = 0.13534
+
+end;

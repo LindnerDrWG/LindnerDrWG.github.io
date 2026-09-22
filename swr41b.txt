@@ -32,7 +32,8 @@ COMMENT
 
 % ------------------- function ZTEST ---------------------
 procedure ztest(data, mu0, sigma, alpha, altHyp);
-%
+% --------------------------------------------------------
+
 % default: mu0 = 0; sigma = 1; alpha = 0.05; altHyp = 0
 % input:   data       - sample (vector of values)
 %          mu0, sigma - parameter of normal distribution
@@ -81,7 +82,7 @@ write mat((CIleft_,CI_right),(first CI, second CI));
 % write mat(( Z_,quantil_,CI_left_, CI_right_, p_),
 %           ( Z, quantil, first CI, second CI, p))
 
-END;
+END; %...........................................................
 
 
 %-------------------CHECK of ztest with above data --------------

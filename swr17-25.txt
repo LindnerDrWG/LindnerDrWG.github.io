@@ -4,8 +4,6 @@ COMMENT
                       by W.G. Lindner 2026  $
                       
                       
-load_package assist;
-
 procedure  median(X);
 begin
   scalar  Xs,n2,n2p; % local vars
@@ -25,3 +23,4 @@ print_precision 5$
 X := {1,2,3,4, 5, 6,7,8,9}$
 median(X);
   
+end;

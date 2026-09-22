@@ -23,3 +23,5 @@ on rounded $
 print_precision 5$
 
 weibullINV(0.5, 200, 6);      % = 188.15, ok
+
+end;

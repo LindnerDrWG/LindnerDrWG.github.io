@@ -94,3 +94,6 @@ COMMENT check with R !!
 + dbinom(4, size=12, prob=0.5) +
 + dbinom(5, size=12, prob=0.5) 
 [1] 0.387207
+$
+
+end;

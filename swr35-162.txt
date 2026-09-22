@@ -38,3 +38,5 @@ on rounded $
 print_precision 5$
 
 chi2inv(0.95, 10);
+
+end;

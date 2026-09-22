@@ -16,3 +16,5 @@ print_precision 5 $
 
 binoPDF(4, 6, 0.3);      % 0.059535
 
+
+end;

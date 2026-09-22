@@ -18,4 +18,4 @@ X := { 1 }$
 moment(X,A,3);
 moment(X,0,3);
 
-
+end;

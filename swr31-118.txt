@@ -40,3 +40,5 @@ print_precision 5$
 
 stdnormINV(0.025); 
 stdnormINV(0.975) ;
+
+end;

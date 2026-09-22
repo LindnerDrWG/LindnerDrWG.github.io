@@ -20,3 +20,5 @@ print_precision 5$
 X := {1       }$
 rms(X);
   
+  
+end;

@@ -81,3 +81,5 @@ skew1(X);   % = -0.219  [R, type=3]
 
 skew2(X);   % = -0.456 [R, type=2]
 
+
+end;

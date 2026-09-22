@@ -27,3 +27,5 @@ T := 0.767;
 a := 1/(T^b);
 
 for x:=1:10 do write weibullPDF(x,a,b); 
+
+end;

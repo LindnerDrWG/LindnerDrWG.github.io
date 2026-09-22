@@ -11,7 +11,7 @@ We quote the REDUCE documentation:
 random(n) returns a random number 𝑟 in the range 0≤ 𝑟 <𝑛. 
 A type error occurs if the value of the argument is not 
 a positive integer in algebraic mode, or positive number 
-in symbolic mode. For example:    random(1000);  ->  191
+in symbolic mode. For example:    random(1000)  ->  191
 
 7.1.13 RANDOM_NEW_SEED
 random_new_seed(n) reseeds the random number generator to 
@@ -82,19 +82,9 @@ T_ := for i:=1:5 collect 0;
 %  -------------------------------------------------------------
 
 procedure listmake(m); for i:=1:m collect 0$
-
-procedure putNTH(L,k,v);
- %    putNTH sets k-th element of list L to value v
- %    because part(L,k) gives only _reading_ access
- begin scalar a:=L, b:={};;
-    for i:=1:(k-1) do
-         << b:=append(b,{first a}); a:=rest a>>;
-    b := append(b,{v}); a := rest a;
-    return append(b,a)
- end;         %  putnth({1,2,3},2,9) --> {1,9,3};
  
 on rounded $
-print_precision $
+print_precision 5$
 
 X := {2,1,3,4,7}$
 n := dim(X);                     %-- number of samples 
@@ -112,11 +102,11 @@ for j:=1:IT do
     begin                         %-- start bootstrap samples 
       for i:=1:n do               %-- create one resample of X
           begin r := 1 + random(n);  
-            putNTH( Mboot,i, part(X,r));
-            putNTH( Sboot,i, part(X,r))
+            Mboot := (part(Mboot,i):=part(X,r));
+            Sboot := (part(Sboot,i):=part(X,r));
            end;                    %-- bootstrap new sample 
-       putNTH( M,j,  Mean(Mboot)); %-- j.th bootstrap mean 
-       putNTH( S,j,  sd(Sboot));   %-- j.th bootstrap sd 
+       M := (part(M,j) := Mean(Mboot)); %-- j.th bootstrap mean
+       S := (part(S,j) := Sd(Sboot)); %-- j.th bootstrap sd 
        write M(j)," ; ",S(j)       %-- show intermediate results
      end;                     
 
@@ -128,3 +118,4 @@ load_package matrix$
 
 mat( (estMean_, estSD_),(estM, estS));
 
+end;

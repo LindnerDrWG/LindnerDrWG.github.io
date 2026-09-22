@@ -69,3 +69,5 @@ Mathematica / Wolfram
 C++    (boost::math) gamma_q(k + 1, lambda_)
 
 $
+
+end;

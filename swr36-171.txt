@@ -5,11 +5,11 @@ COMMENT
 
 
 COMMENT 
-/*  INV of a Pareto distribution with parameters 
+   INV of a Pareto distribution with parameters 
 -- m='mu'=location and a='alpha'=shape parameter.
 -- https://search.r-project.org/CRAN/refmans/EnvStats/html/Pareto.html
--- We adpot this R convention. */ $
-;
+-- We adpot this R convention.  $
+
 
 procedure paretoINV(p,m,a);
           m * (1-p)^(-1/a) $
@@ -20,3 +20,5 @@ on rounded $
 print_precision 5$
 
 paretoINV(0.25, 1,2);   % = 1.1547,  ok
+
+end;

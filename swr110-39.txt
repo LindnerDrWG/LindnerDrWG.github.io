@@ -34,3 +34,5 @@ f := {5, 18, 42, 27, 8};     % frequency
 
 momentF(X,f,2);
 
+
+end;

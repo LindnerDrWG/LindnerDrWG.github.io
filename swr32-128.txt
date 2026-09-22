@@ -20,3 +20,4 @@ lambd := 1/10 $
 
 %-- .. with 60.7% the refrigerator will work ok for another 5 years. 
 
+end;

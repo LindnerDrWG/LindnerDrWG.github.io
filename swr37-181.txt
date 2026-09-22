@@ -23,3 +23,5 @@ on rounded $
 print_precision 5$
 
 1 - weibullCDF2(1,0.01,2);   % =  0.36533
+
+end;

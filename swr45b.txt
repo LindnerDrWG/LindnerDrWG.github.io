@@ -67,3 +67,5 @@ COMMENT result:
 │ p-value:  0.32874 │
 └                   ┘
 $
+
+end;

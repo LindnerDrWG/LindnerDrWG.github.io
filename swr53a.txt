@@ -6,60 +6,40 @@ COMMENT
 %|         KENDALL's tau
 
 % ----------------------- helper functions ----------------
-               % activate helper functions
 
-procedure SUM_(X);  for each el in X sum el$ 
-procedure mean(X);  Sum1(X)/length(X)$
-procedure sp(X,Y);  % scalar product alias inner product
-   for i := 1:length(X) sum part(X,i) * part(Y, i)$
-procedure quicksort(l);  % - by Gemini AI
-   if l = {} then {}
-   else begin
-      scalar pivot, rest_l, left, right, x;
-      pivot := first(l);  rest_l := rest(l);
-      left  := {};         right := {};
-      for each x in rest_l do
-         if x <= pivot then left  := x . left
-                       else right := x . right;
-      return append(quicksort(left), pivot . quicksort(right));
-   end;
-load_package assist;           %-- for use of sortnumlist
-define    DOT = sp$
-define    DIM = length$
+procedure SORTINC(l);  sort(l, <);
+procedure SUM_(X);     for each el in X sum el$ 
+procedure LISTMAKE(m); for i:=1:m collect 0$
 
-%-- we now calculate the differences of corresponding ranks 
-%-- correspond uses cRank(sd) i.e. rank sorted differences
-
-% -- Helper function putNTH 
-%    putNTH sets k-th element of list L to value v
-%    part(L,k) gives only _reading_ access
-
-procedure putNTH(l,k,v);
- begin scalar a,b; integer i;
-    a:=l; b:={};
-    for i:=1 step 1 until k-1 do
-         <<b:=append(b,{first a}); a:=rest a>>;
-    b:=append(b,{v}); a:=rest a;
-    return append(b,a)
- end;
-
-% crank.red - Numeric Recipes CRANK, p.510 for REDUCE
-% Lisp'ish VERSION: W must be sorted increasingly
-% returns S, and W is modified in place with averaged ranks
-
-procedure crank_aux(v, sL, nL);           
-   % v : element of list L, sL: sorted L; nL: length L      
+procedure crank_aux(v, sL, nL);
    begin scalar positions:={};
       for k:=1:nl do
-          if part(sl,k) = v then positions := append(positions, {k});
+          if part(sl,k) = v
+             then positions := k . positions;
       return sum_(positions) / length(positions)
-    end;
-procedure  crank(w);     % w should be sorted
-begin scalar s, n;
-    s := quicksort(w);   % or sortnumlist(w) of package assist
-    n := length(w);
-    return for i:=1:n collect crank_aux( part(w,i), s, n) 
-END ;
+   end;
+
+procedure crank(w);
+   begin scalar s, n;
+       s := sortinc(w);
+       n := length(w);
+       return for each el in w collect crank_aux(el, s, n)
+   end;
+
+procedure correspond(X,soX);
+   begin scalar n:=length(X);
+       M  := for i:=1:n collect 0;
+       rX := cRank(soX);
+       for j:=1:n do for i:=1:n do
+           if    part(soX,i)=part(X,j)
+           then  M := (part(M,j):=part(rX,i));
+      return M;
+   end;
+
+define    DIM  = length $
+define    DOT  = sp $
+% ----------------------- helper functions ------------- END
+
 
 sd := {0.2, 0.6, 0.9, 1.1, 1.3 , 1.5, 1.8, 2.0, 2.4, 2.7} ;
 rD := crank(sd);
@@ -74,10 +54,9 @@ COMMENT
 -- rank correlation coefficient tau τ in three phases:
 -- FIRST  we calculate τ manually with REDUCE
 
-
 COMMENT ADVICE: submit each of the following command lines 
-        (separated by blank lines) one after the other to 
-		the Web.Reduce Input_Editor and then press [enter].$
+--  (separated by blank lines) one after the other to 
+--  the Web.Reduce Input_Editor and then press [enter].$
 
 % =========== EXAMPLE from numiqo.com ===========
 
@@ -173,6 +152,9 @@ COMMENT result
  │  q:    2  1  1  0  0  __  4  │
  └                              ┘
 
-C : TX[3,8]  = 11  /*-- sum of the p */;
-D : TX[4,8]  = 4  /*-- sum of the q */;
+C : TX[3,8]  = 11  /*-- sum of the p */
+D : TX[4,8]  = 4  /*-- sum of the q */
 tau := (C-D)/(C+D) = 0.46667
+$
+
+end;

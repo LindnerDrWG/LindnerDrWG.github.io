@@ -3,25 +3,63 @@ COMMENT
            STATISTICS WITH REDUCE ch. 2.1-64
                       by W.G. Lindner 2026  $
                       
+COMMENT - Preliminary Note
+  We showed two definitions for binoCDF:
+  - using a finite sum formula 
+  - using a 'closed' formula using special function iBeta
+  Therefore we get in principe two formula for binoINV. $
+  
 
-procedure binoCDF(k,n,p);
+% .................................... 1st version by wgL 
+
+% Looking at fig. 15 we go along the graph of binoCDF 
+% and calculate the CDF-values using the closed definition 
+% with ibeta until we reach the desired high:
+
+procedure binoCDF1(k,n,p);
           iBeta(n-k,k+1,1-p);
 
-procedure binoINV2(alpha,n,p);
-% SECOND version of binoINV using a search
-% method until we have success:
+% version of binoINV using a search method until we have success:
+procedure binoINV1(alpha,n,p);
 begin scalar x:=0; k:=0;
       repeat << k := k+1;
-                x := binoCDF(k,n,p);>> 
-      until x>alpha;
+                x := binoCDF1(k,n,p);>> 
+      until x >= alpha;
       return(k)
 end;
 
 
-% -------------------- Example usage ---------------------                    
+on rounded $
+print_precision 5 $
+binoINV1(0.95, 30, 0.5);
+
+
+% The second definition allows to stack binoPDF values on top of each 
+% other until the desired height on the CDF Graph '/' is reached.
+
+% ................................... 2nd version by fjW
+
+% 1st code re-evaluates the special function ibeta each time 
+% around the loop. But if we use the sum definition of binoCDF 
+% then we just need to add on the next term in the sum each 
+% time around the loop. The following procedure does that:
+
+
+procedure binoINV(alpha,n,p);
+   % Return the smallest positive integer k such that
+   % binoCDF(k,n,p) >= alpha, for real alpha>=0, p>=0 and integer
+   % n>=0.  Assume on rounded!
+   begin real cdf; integer j;
+      while cdf < alpha do <<
+         j := j + 1;
+         cdf := cdf + binomial(n,j)*p^j*(1-p)^(n-j);
+      >>;
+      return j
+   end;
+
                     
 on rounded $
 print_precision 5 $
-       
-binoINV2(0.95, 30, 0.5);
+binoINV(0.95, 30, 0.5);
 
+end;

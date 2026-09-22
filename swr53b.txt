@@ -6,40 +6,49 @@ COMMENT
 %|         KENDALL's tau
 
 % ---------------------- helper functions ------------------   
-procedure MEAN(lst);  (for each el in lst sum el )/length(lst)$
+
+procedure SORTINC(l);  sort(l, <);  % sort increasing
+procedure SORTDEC(l);  sort(l, >);  % sort decreasing
+
+procedure SUM_(X);     for each el in X sum el$ 
 procedure LISTMAKE(m); for i:=1:m collect 0$
 procedure SP(X,Y);  % scalar product alias inner product
           for i := 1:length(X) sum part(X,i) * part(Y, i)$
                              % zip the sum of products 
 define    DOT = sp$
+define    DIM  = length $
 
+procedure crank_aux(v, sL, nL);
+   begin scalar positions:={};
+      for k:=1:nl do
+          if part(sl,k) = v
+             then positions := k . positions;
+      return sum_(positions) / length(positions)
+   end;
 
-rank(w) := block( [n, rg, positions, i, j], 
-    /* rank: contributed by Michel Gosse and Leo Butler */
-    local(rg),
-    n : length(w),
-    rg(v, sl, nl) := block([positions:[], k],
-        for k:1 thru nl do
-            if sl[k] = v then positions : append(positions, [k]),
-        lreduce("+", positions,0) / length(positions) ), 
-    makelist(rg(w[i], w, n), i, 1, n) )$
+procedure crank(w);
+   begin scalar s, n;
+       s := sortinc(w);
+       n := length(w);
+       return for each el in w collect crank_aux(el, s, n)
+   end;
 
-/*-- Remark: Explanatory notes in Example.5.2.1 Father vs. Son */
+procedure correspond(X,soX);
+   begin scalar n:=length(X);
+       M  := for i:=1:n collect 0;
+       rX := cRank(soX);
+       for j:=1:n do for i:=1:n do
+           if    part(soX,i)=part(X,j)
+           then  M := (part(M,j):=part(rX,i));
+      return M;
+   end;
 
-correspond(X,sX) := block([M, n],    /*-- input: X and sortedX */
-      M : listmake(dim(X)),  
-      n : dim(X),
-      for j:1 thru n do
-          for i:1 thru n do if(sX[i]=X[j]) then M[j]:rank(sX)[i],
-      M)$
+% ----------------------- helper functions ------------- END
 
-/*
--- SECONDLY we calculate rho automatically using two helper
---          functions sort(), rank() and correspond(ence)
--- we need 2 self-made helper functions: sort1, rank, correspond */
+COMMENT
+   SECONDLY we calculate rho automatically using two helper
+   functions sortinc(), rank() and correspond(ence)
 
-
-/* 
 =========== EXAMPLE from numiqo.com ===========
 
 -- Suppose two doctors rank 6 patients by descending physical health.
@@ -49,54 +58,51 @@ correspond(X,sX) := block([M, n],    /*-- input: X and sortedX */
 -- We calculate Kendall's Tau τ with this formula:
 --              τ = (C-D)/(C+D)
 -- where C is the number of 'concordant' pairs ('inversions')  
--- and     D is the number of 'discordant' pairs.
--- Kendall's tau τ lies between -1 and +1.                                        
-*/
+-- and   D is the number of 'discordant' pairs.
+-- Kendall's tau τ lies between -1 and +1.
+$
 
 
-/* SECOND  we abstract the whole process/procedure into a function.
+% --------------------------------------------------------------
+% FUNCTION kendall : general function KENDALL's tau
+% -------------------------------------------------------------- 
 
-### --------------------------------------------------------------
-### FUNCTION kendall : general function KENDALL's tau
-### -------------------------------------------------------------- */
+procedure kendall(X,Y);
+begin scalar n,soX,soY,cY,p,q,w, tau;
+      n  := dim(X);
+      soX := sort(X,<);
+      soY := sort(Y,>);
+      cY  := correspond(Y, soY);
+      p   := 0; q:=0; w:=0; 
+      for j:=1:(n-1) do
+          for i:=(j+1):n 
+              do <<
+                 w := sign( part(X,i)-part(X,j)) * sign( part(Y,i)-part(Y,j));
+                 if w > 0 then p := p + 1;
+                 if w < 0 then q := q + 1;
+                 tau := (p - q)/(p + q)
+                 >>;    
+                write("---------- KENDALL tau ----------");
+                write("C: ",p);
+                write("D: ",q);
+                write("tau:",tau)
+end;
 
-kendall(X,Y) := block( [n,sX,sY,cY,p,q,w, tau],
+on rounded $
+print_precision 5$
 
-                 n  : dim(X),
-                 sX : sort(X),
-                 sY : sort(Y, 'ordergreatp),
-                 cY : correspond(Y, sY),
-                 p:0, q:0, w:0, 
-                for j:1 thru n-1 do
-                    for i:j+1 thru n do (
-                          w : signum(X[i] - X[j]) * signum(Y[i] - Y[j]),
-                          if w > 0 then p : p + 1,
-                         if w < 0 then q : q + 1 ),
-                tau : float((p - q)/(p + q)),     
-                %--or:  tau : 2*(p-q)/n/(n-1), 
-                print("---------- KENDALL tau ----------"),
-                print(matrix(["C","D","tau"], [q,p,tau])) 
- )$
-/*### ---------------------------------------------------------- END */
+X := {1,2,3,4,5,6};
+Y := {3,1,4,2,6,5};
 
-fpprintprec : 5$
+kendall(X,Y);
 
-
-X : [1,2,3,4,5,6]$
-Y : [3,1,4,2,6,5]$
-
-kendall(X,Y)$
-
-fpprintprec : 5$
-%i8
-X : [1,2,3,4,5,6]$
-%i9
-Y : [3,1,4,2,6,5]$
-%i10
-kendall(X,Y)$
----------- KENDALL tau ----------
+COMMENT
+--- KENDALL tau --
 ┌                ┐
 │ C  D     tau   │
 │                │
 │ 4  11  0.46667 │
 └                ┘
+$
+
+end;

@@ -12,12 +12,11 @@ procedure hgCDF(NN,RR,n, x);
           for k:=0:floor(x) sum hgPDF(NN,RR,n,k) $ 
 
 procedure hgINV(alpha,NN,RR,n);
-   begin scalar x:=0; k:=0;
-         repeat << k := k+1;
-                   x := hgCDF(NN,RR,n, k) >>
-         until x > alpha;
-         return(k)
-   end;
+   % optimized by F.J. Wright
+   begin scalar k := 0;
+         repeat k := k+1 until hgCDF(NN,RR,n,k) >= alpha;
+         return k
+   end$
 
 % -------------------- Example usage ---------------------
 
@@ -38,4 +37,4 @@ hgINV(0.9, 16,5,4);
 %    > 2
 %%%%%%%
 
-
+end;

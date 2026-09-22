@@ -33,3 +33,5 @@ if p_value < alpha then
 else
     write("H0 will be retained: no significant difference. p-value =", p_value);
 
+
+end;

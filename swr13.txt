@@ -6,12 +6,12 @@ COMMENT
                      
 procedure SD(lst);
 begin
-  scalar n, mu, diff_sum;
+  scalar n, mu, ds;
   n := length(lst);  
   if n = 0 then 0;  
   mu := (for each el in lst sum el)/n;
-  diff_sum := for each el in lst sum (el - mu)^2;
-  return sqrt(diff_sum/n)
+  ds := for each el in lst sum (el - mu)^2;
+  return sqrt(ds/n)
 end;
 
    % The square root function can be input using the name sqrt, 
@@ -19,7 +19,7 @@ end;
 
 procedure SD1(lst);
 begin
-  scalar n, mu, diff_sum;
+  scalar n, mu, ds;
   n := length(lst);
   if n = 0 then 0;  
   mu := (for each el in lst sum el)/n;
@@ -40,3 +40,5 @@ print_precision 5;
 sd(X);
 sd1(X);
 
+
+end;

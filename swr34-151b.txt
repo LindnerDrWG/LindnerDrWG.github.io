@@ -19,3 +19,4 @@ print_precision 5$
 
 finv(0.95,5,10);    % =3.3258
 
+end;

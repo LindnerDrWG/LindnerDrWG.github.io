@@ -18,3 +18,4 @@ for each y in shape do write {y, weibullCDF(1,1,y)} ;
 
 % the value for (1,1,5) is verified on the green graph.
 
+end;

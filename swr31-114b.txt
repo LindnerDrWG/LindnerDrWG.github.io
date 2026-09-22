@@ -1,5 +1,5 @@
 COMMENT
-           STATISTICS WITH REDUCE ch. 3.1-114b
+           STATISTICS WITH REDUCE ch. 3.1-114 b
                       by W.G. Lindner 2026  $
                       
 
@@ -8,7 +8,7 @@ COMMENT (b) ...............................................
         the following version of normINV uses a
         user-defined numeric inverse error function,  
         numeric_erfinv, which was contributed
-        by Francis J. Wright ............................ $
+        by Francis J. Wright .............................. $
 
 
 % ----- inverse erf and normINV by F.J. Wright------------
@@ -53,3 +53,5 @@ normINV(0.8, 0,1);
 normINV(0.6, 0,1);
 
 normINV(0.80, 170, 5);
+
+end;

@@ -19,3 +19,4 @@ X := for i:=0:10 collect i;
 for each i in X  do write {i, expCDF(i,5) };
 
 
+end;

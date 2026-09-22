@@ -10,11 +10,9 @@ procedure poissonCDF(x, lam);
           for k:=0:floor(x)  sum poissonPDF(k, lam);
 
 procedure poissonINV(alpha,lam);
-   begin scalar x:=0; k:=0;
-         repeat << k := k+1;
-                   x := poissonCDF(k, lam) >>
-         until x > alpha;
-         return(k)
+   begin scalar k := 0;
+         repeat k := k+1 until poissonCDF(k, lam) >= alpha;
+         return k
    end;
 
 % -------------------- Example usage ---------------------
@@ -28,7 +26,7 @@ poissonINV(0.3, 2.5);
 poissonINV(0.4, 2.5);
 poissonINV(0.5, 2.5);
 
-$$$$$ Now use a loop .. ;) 
+% Now use a loop .. ;) 
 
-
+end;
 

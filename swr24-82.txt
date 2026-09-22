@@ -19,3 +19,4 @@ print_precision 5$
 for i:=0:5 do write hgPDF(100,20,10, i);
 
 
+end;

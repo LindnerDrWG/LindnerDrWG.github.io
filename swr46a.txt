@@ -82,3 +82,5 @@ critValue : 16.919
 CI        :  [1.5354, 10.816]
 accept H0
 $
+
+end;

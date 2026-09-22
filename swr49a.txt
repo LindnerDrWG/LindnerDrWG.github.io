@@ -68,3 +68,5 @@ COMMENT -- RESULT:
 -- The null hypothesis, Ho: "IQ independent of weight",  
 -- can not be rejected with a 5 % probability of error. 
 $
+
+end;

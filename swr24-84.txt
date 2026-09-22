@@ -44,5 +44,5 @@ for k:=0:20 do write {k, hgPDFexcel(3,100,k,500)};
 
 % we look at the solution as k=15.
 
-
+end;
 

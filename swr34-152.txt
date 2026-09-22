@@ -15,3 +15,5 @@ on rounded $
 print_precision 5$
 
 for i:=1:10 do write {i*0.1, finv(i*0.1,5,2)};
+
+end;

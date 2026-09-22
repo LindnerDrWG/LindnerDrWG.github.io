@@ -76,3 +76,5 @@ dfrest   :  14       = n*(k-1)
 MQrest   :  11.071   = SAQrest / dfrest
 ICC      : 0.74316   = (MQrow-MQrest)/(MQrow+(k-1)*MQrest)
 $
+
+end;

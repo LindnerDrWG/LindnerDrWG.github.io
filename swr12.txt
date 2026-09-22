@@ -15,7 +15,6 @@ end;
 
 % ------------------- Example usage ---------------------
 
-
 on rounded$
 print_precision 5$
 
@@ -24,3 +23,5 @@ X := {4, 36, 45, 50, 75}$
 var(X);
 
 
+
+end;

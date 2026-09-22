@@ -23,7 +23,7 @@ COMMENT ------------------ Remark ----------------------------------
 % ------------------------ tINV  ---------------------------------
 
 % The following definition works because the derivative of ibeta 
-% is defined by a let  rule in the REDUCE source code.     - fjW
+% is defined by a let rule in the REDUCE source code.     - fjW
 
 
 procedure tINV(p,df);
@@ -43,3 +43,4 @@ for i:=1:6 do write {i, tinv(0.99,i)};
 % gives  31.8205 6.9646 4.5407 3.7469 3.3649 3.1427
 
 
+end;

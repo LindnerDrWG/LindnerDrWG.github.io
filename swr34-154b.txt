@@ -52,3 +52,4 @@ for each i in X do write {i, finv_NR(i,10,20)};
 % finv_NR(0.50, 4, 4);
 
 
+end;

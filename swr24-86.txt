@@ -21,4 +21,4 @@ print_precision 5$
 
 for i:=1:9 do write {i, hgCDF(100,20,10,i)} ;
 
-
+end;

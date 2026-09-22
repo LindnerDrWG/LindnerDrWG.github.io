@@ -18,3 +18,4 @@ paretoCDF(2,1,1) ;     % ok
 paretoCDF(2,1,2) ;
 paretoCDF(2,1,3) ;
  
+end;

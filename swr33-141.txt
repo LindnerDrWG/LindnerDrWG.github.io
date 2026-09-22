@@ -46,3 +46,5 @@ for k:=0:4 do write {k/10, tINV1(k/10,5)} ;
 for k:=6:10 do write {k/10, tINV1(k/10,5)} ;
 
 % for k=5 **** Newton method does not converge 
+
+end;

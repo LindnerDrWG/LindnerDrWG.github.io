@@ -4,8 +4,7 @@ COMMENT
                       by W.G. Lindner 2026  $
                       
 
-procedure expINV(p,m);        
-          - log(1-p)/m $
+procedure expINV(p,m);    - log(1-p)/m $
           
 define  quantile_exp = expINV $
 
@@ -18,5 +17,6 @@ print_precision 5$
 X := for i:=0:10 collect i/10;
 for each i in X  do write {i/10, expINV(i/10, 2.5) };
 
+end;
 
 

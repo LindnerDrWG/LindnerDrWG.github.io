@@ -101,11 +101,10 @@ COMMENT
 procedure MEAN(lst); 
           (for each el in lst sum el)/length(lst); 
 
-load_package assist;
 procedure  median(X);
 begin
   scalar  Xs,n2,n2p; % local vars
-          Xs   := sortnumlist X; 
+          Xs   := sort(X,<); 
           n2   := floor(length(X)/2);  
           n2p  := n2+1;
           if evenp length(X) 
@@ -152,5 +151,7 @@ tp(TX);
 
 TXnew := mat((A,B,C),(1,2,3));
 
+  
+end;
 
   

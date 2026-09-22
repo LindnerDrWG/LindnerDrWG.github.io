@@ -2,19 +2,45 @@
 COMMENT
            STATISTICS WITH REDUCE ch. 2.1-59
                       by W.G. Lindner 2026  $
-                      
-                   
-         
+
+
+
 procedure binoPDF(x,n,p);
           binomial(n,x)*p^x*(1-p)^(n-x) $
-       
+
 % -------------------- Example usage ---------------------
-       
+
 on rounded $
 print_precision 5$
-       
+
 % --- a.
 
-for i:=1:10 do write binoPDF(i, 10, 1/6);  
+for i:=1:10 do write binoPDF(i, 10, 1/6);
 
+% --- b.   plots contributed by fjW
 
+on demo; % to see each plot if inputting this file using the IN command
+ 
+% Line plot:
+plot(for i:=1:10 collect {i, binoPDF(i, 10, 1/6)},
+title="Binomial Probability Distribution Function binoPDF(k,10,1/6)",
+xlabel="k", ylabel="binoPDF");
+
+% Point plot:
+plot(for i:=1:10 collect {i, binoPDF(i, 10, 1/6)}, style=points,
+title="Binomial Probability Distribution Function binoPDF(k,10,1/6)",
+xlabel="k", ylabel="binoPDF");
+
+% --- c.
+
+% Line plot:
+plot(for i:=1:10 collect {i, binoPDF(i, 40, 0.5)},
+title="Binomial Probability Distribution Function binoPDF(k,40,0.5)",
+xlabel="k", ylabel="binoPDF");
+
+% Point plot:
+plot(for i:=1:10 collect {i, binoPDF(i, 40, 0.5)}, style=points,
+title="Binomial Probability Distribution Function binoPDF(k,40,0.5)",
+xlabel="k", ylabel="binoPDF");
+
+end;

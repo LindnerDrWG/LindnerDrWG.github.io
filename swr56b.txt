@@ -65,3 +65,6 @@ COMMENT
 │  Total   11  14     -     ANOVA │
 └                                 ┘
 $$
+
+
+end;

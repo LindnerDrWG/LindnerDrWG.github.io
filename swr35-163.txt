@@ -68,3 +68,4 @@ for each el in p do write {el,  chi2INV_bi(el,10)} ;
 Off time$
 
 
+end;

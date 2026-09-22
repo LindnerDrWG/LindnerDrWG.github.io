@@ -28,3 +28,5 @@ X:={10,
 
 skew(X);    %  = 0  [MatLAB]
 
+
+end;

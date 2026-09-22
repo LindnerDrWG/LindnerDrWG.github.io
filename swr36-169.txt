@@ -5,10 +5,10 @@ COMMENT
              
 
 COMMENT 
-/*  cdf of a Pareto distribution with parameters 
+   cdf of a Pareto distribution with parameters 
 -- m='mu'=location and a='alpha'=shape parameter.
 -- https://search.r-project.org/CRAN/refmans/EnvStats/html/Pareto.html
--- We adpot this R convention. */ $
+-- We adpot this R convention.  $
 
 
 procedure paretoCDF(x,m,a);
@@ -24,3 +24,4 @@ print_precision 5$
 
 paretoCDF(4, 1, 1) ;
  
+end;

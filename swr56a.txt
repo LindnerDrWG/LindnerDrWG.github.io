@@ -92,3 +92,7 @@ anova1(X):
 │  Total   11  14     -     ANOVA │
 └                                 ┘
 $
+
+
+
+end;

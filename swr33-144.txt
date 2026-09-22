@@ -60,6 +60,8 @@ print_precision 5$
 
 %% ... wait ...
 
+end;
+
 for df:=1:6 do write {df, tINV_NR(0.99,df)} ;
 
 $ ok

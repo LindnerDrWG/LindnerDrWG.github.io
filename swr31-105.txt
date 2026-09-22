@@ -4,8 +4,6 @@ COMMENT
                       
            
 
-% load_package specfn;     
-%      w.r.t. erf, not necessary, autoloaded
 
 procedure normCDF(x,m,s); 
           1/2+erf((x-m)/(s*sqrt(2)))/2 $
@@ -25,4 +23,4 @@ normCDF(1., 0,1);    % = 0.8413
 stdnormCDF(1.);
 Phi(1.);
 
-
+end;

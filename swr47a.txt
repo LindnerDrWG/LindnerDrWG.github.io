@@ -3,7 +3,7 @@ COMMENT
                       by W.G. Lindner 2026  $
                   
     
-%|         varTest II
+%|                   varTest II
              
 % ------------------- helper functions ---------------------
 procedure fCDF(x,df1,df2);                         % see 149
@@ -107,3 +107,5 @@ lcl       : 0.30882
 ucl       : 11.185
 accept H0
 $
+
+end;

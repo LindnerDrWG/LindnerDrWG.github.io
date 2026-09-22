@@ -52,3 +52,4 @@ normINV(3/10,0,1);
 for k:=0:10 do write {k/10, normINV(k/10,2,1)};
 
 
+end;

@@ -64,3 +64,5 @@ nbinCDF(4, 3, 0.30);        % result: 0.3529305
 off rounded;   % switch to exakt mode
 nbinCDF(2, 2, 1/2);        % 11/16
 
+
+end;

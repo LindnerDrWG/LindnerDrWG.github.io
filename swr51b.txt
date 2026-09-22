@@ -14,11 +14,12 @@ procedure SP(X,Y);  % scalar product alias inner product
                              % zip the sum of products 
 define    DOT = SP$
 
-%--------------------------------------------------------
-%      DEFINITION (CORRELATION Coefficient rho alias r)
-%--------------------------------------------------------
+%-- DEFINITION of CORRELATION Coefficient rho alias r
 
+
+%--------------------------------------------------------
 procedure corrcoef(X,Y);
+%--------------------------------------------------------
 begin scalar nom:=0,denom:=1, Xm,Ym;
    xbar := Mean(X);
    ybar := Mean(Y);
@@ -29,7 +30,7 @@ begin scalar nom:=0,denom:=1, Xm,Ym;
    return num/den
 END;
 
-procedure r(X,Y); corrcoef(X,Y)$
+define r =  corrcoef$          % alias
 %--------------------------------------------------------
 
 
@@ -43,3 +44,5 @@ print_precision 5$
 
 corrcoef(X,Y);
 r(X,Y);
+
+end;

@@ -1,6 +1,6 @@
 
 COMMENT
-           STATISTICS WITH REDUCE ch. 4.10 a
+           STATISTICS WITH REDUCE ch. 4.14 b
                       by W.G. Lindner 2026  $
                       
 %|         FISHER exact test
@@ -54,3 +54,5 @@ fishertest(1,4, 14,12, 0.05)
 │ 1   0.18638 │
 └             ┘
 $
+
+end;

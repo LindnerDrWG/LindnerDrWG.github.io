@@ -2,7 +2,7 @@ COMMENT
            STATISTICS WITH REDUCE ch. 4.3 a
                       by W.G. Lindner 2026  $
                       
-%|         t test
+%|                    t test
              
 % ------------------- helper functions ---------------------
 COMMENT
@@ -106,3 +106,5 @@ accept H0
 %   M(5,2) := p;
 %   tp(M)
       
+$
+end;

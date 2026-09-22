@@ -54,3 +54,4 @@ for i:=1:10 do write {i/10,  chi2INV_bi(i/10,10)} ;
 Off time$
 
 
+end;

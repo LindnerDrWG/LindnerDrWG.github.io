@@ -16,9 +16,8 @@ procedure putNTH(L,k,v); begin scalar a:=L, b:={};
     return append(b,a) end;  
     %  check: putnth({1,2,3},2,9);   --> {1,9,3};
     % sometime read 2-times in Input Editor ------------ ??
-load_package assist$
 procedure percentile(X, perc);      
-     part( sortnumlist(X), ceiling(length(X) * perc/ 100));
+     part( sort(X,<), ceiling(length(X) * perc/ 100));
 define    dim = length $
 
 
@@ -35,11 +34,14 @@ begin scalar n, r, M, Mboot, estimatedMean;
         begin           
           for  i:=1:n do 
             begin r := 1 + random(n);
-              Mboot := putNTH( Mboot, i, part(X,r));
+              Mboot := (part(Mboot,i):=part(X,r));
+              % Mboot := putNTH( Mboot, i, part(X,r));
               write "Mboot: ", Mboot;
-              write "mean(Mboot) = ", Mean(Mboot);
-              M     := putNTH( M, j, Mean(Mboot));
+              M  := (part(Mt,j):=Mean(Mboot));
+              %M     := putNTH( M, j, Mean(Mboot));
                               %-- bootstrap sample mean 
+             write "mean(Mboot) = ", Mean(Mboot);
+
               write "M: ", M  
             end;
        end;                       %-------- mean(M) not reached --- ???
@@ -59,7 +61,7 @@ print_precision $
 %--    1.  2. 3   4.  5   6   7   8   9.  10 
 X := {25, 30, 35, 40, 45, 50, 55, 60, 65, 70}$
 
-part(sortnumlist(X), ceiling(10 * 90 / 100));
+part(X:=sort(X,<), ceiling(10 * 90 / 100));
 %    {25,30,..,65,70}      9       --> 65, ok
 percentile(X, 90);         %       --> 65, ok
 
@@ -72,3 +74,5 @@ COMMENT  result should be
 │  48.135   39.5  50.5 │
 └                      ┘
 $
+
+end;

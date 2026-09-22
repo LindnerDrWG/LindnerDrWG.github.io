@@ -157,3 +157,6 @@ left: reject H0
  │                               │
  │   Critical value:    - 1.8595 │
  └                               ┘
+$
+
+end;

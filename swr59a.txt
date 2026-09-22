@@ -11,13 +11,6 @@ procedure randlist(n); for i:=1:n collect rnd() $
 procedure sum_(lst);   for each el in lst sum el $ 
 procedure mean(lst);   sum_(lst)/length(lst) $ 
 procedure listmake(m); for i:=1:m collect 0$
-procedure putNTH(L,k,v); begin scalar a:=L, b:={};
-    for i:=1:(k-1) do
-         << b:=append(b,{first a}); a:=rest a>>;
-    b := append(b,{v}); a := rest a;
-    return append(b,a) end;  
-    %  check: putnth({1,2,3},2,9);   --> {1,9,3};
-    % sometime read 2-times in Input Editor ------------ ??
 define    dim = length $
 
 % --------------------------------------------------------
@@ -66,12 +59,12 @@ for j:=1:numSamples do  %-- perform bootstrap sampling
      begin           
      for  i:=1:n do 
             begin r := 1 + random(10);
-              M := putNTH( M, i, part(X,r));
+              M := (part(M,i):=part(X,r));
               write M;
               % Now calculate the mean age of the 
               % bootstrap sample M; this calculated mean is 
               % stored in list bootstrapMeans:
-              bootstrapMeans := putNTH( bootstrapMeans, j, Mean(M));
+              bootstrapMeans := (part(bootstrapMeans,j):=Mean(M));
               write bootstrapMeans
             end;
 end;
@@ -87,8 +80,7 @@ estimatedMean := Mean(bootstrapMeans);
 % Example:  90 % percentile of sorted X
 
 X := {25, 30, 35, 40, 45, 50, 55, 60, 65, 70}$
-load_package assist$
-part(sortnumlist(X), ceiling(10 * 90 / 100));
+part(sort(X,<), ceiling(10 * 90 / 100));
 %    {25,30,..,65,70}      9       --> 65, ok                
 
 COMMENT
@@ -98,11 +90,8 @@ COMMENT
   # integer in the range 1 to 99. 
   # For instance, the 25th percentile is denoted by 𝑃25.   $
 
-load_package assist$
 procedure percentile(X, perc);      
-     part( sortnumlist(X), ceiling( length(X) * perc/ 100));
-
-%% SOMETIMES DOES NOT WORK ?? 
+     part( X:=sort(X,<), ceiling( length(X) * perc/ 100));
 
 
 %- c. -  Bootstrap Sampling for Confidence Interval (CI).
@@ -129,3 +118,7 @@ bootstrapMeans : [47, 50, 51.5];
 ci1 : 51.5
 ci2 :  47
 confidenceIntervall : [ci1,ci2]= [47, 51.5]
+
+$
+
+end;

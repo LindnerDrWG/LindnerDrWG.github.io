@@ -4,12 +4,10 @@ COMMENT
                       by W.G. Lindner 2026  $
                       
                       
-load_package assist;
-
 procedure  median(X);
 begin
   scalar  Xs,n2,n2p; % local vars
-          Xs   := sortnumlist X; 
+          Xs   := sort(X,<); 
           n2   := floor(length(X)/2);  
           n2p  := n2+1;
           if evenp length(X) 
@@ -25,3 +23,5 @@ print_precision 5$
 X := {4, 36, 45, 50, 75}$
 median(X);
   
+  
+end;

@@ -6,17 +6,21 @@ COMMENT
 
           
 %% according to  math formula
-procedure binoCDF1(k,n,p);
+procedure binoCDF(k,n,p);
           for j := 0:k sum binomial(n,j)*p^j*(1-p)^(n-j);
 
+% FJW 20/09/2026: This short finite sum is a much simpler expression
+% to evaluate than the special function ibeta, which REDUCE currently
+% does not evaluate reliably, although it should soon be revised.
+
 %% according to remark
-procedure binoCDF(k,n,p);
+procedure binoCDF1(k,n,p);
           iBeta(n-k,k+1,1-p);
 
 % -------------------- Example usage ---------------------
 
 % if switch rounded is off or not activated
-% binoCDF is 'only' evaluated symbolically,
+% binoCDF1 is 'only' evaluated symbolically,
 % i.e. iBeta does not return a number:
 
 binoCDF(4, 10, 0.5);       % no number back
@@ -32,3 +36,4 @@ print_precision  5$
 binoCDF(4, 10, 0.5);    % 0.3769
 binoCDF1(4, 10, 0.5);   % 0.3769
 
+end;

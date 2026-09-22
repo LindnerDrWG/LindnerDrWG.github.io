@@ -6,16 +6,14 @@ COMMENT
 
 %-- We use the 'nearest-rank method' for calculating the quantile.
 
-procedure quantile(X,p);
+procedure quantile(X,p);              % improved by fjW
 begin scalar Xs, i, dim;
-      if  p = 100 then max(X);
-      if  p = 0 then min(X);
-      load_package assist;
-      dim    := length(X);
-      Xs     := sortnumlist(X); 
-      i      := ceiling(dim * p/100);     %-- always round
+      if p >= 100 then return max(X);
+      if p <= 0 then return min(X);
+      dim := length(X);
+      Xs  := sort(X, <);
+      i   := 1 + round((dim-1)*p/100);
       return part(Xs, i)
-      % or  (part(Xs, i)+part(Xs, i))/2    %-- alternative
 end;
 
 % ------------------- Example usage ---------------------
@@ -31,3 +29,4 @@ quantile(X, 50);
 quantile(X, 75); 
 quantile(X, 100);
   
+end;

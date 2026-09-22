@@ -16,7 +16,7 @@ procedure nbinINV(alpha,n,p);
 begin scalar x; x:=0; k:=0;
    repeat << k := k+1;
              x := nbinCDF(k,n,p); >>
-   until x > alpha;
+   until x >= alpha;
    return(k)
 end;
 
@@ -30,4 +30,6 @@ nbinINV(0.99, 5, 0.25);  % = 38
 nbinINV(0.95, 10, 0.7) ; % =  9 
 
 
+
+end;
 

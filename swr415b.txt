@@ -1,6 +1,6 @@
 
 COMMENT
-           STATISTICS WITH REDUCE ch. 4.10 a
+           STATISTICS WITH REDUCE ch. 4.15 b
                       by W.G. Lindner 2026  $
                       
              
@@ -77,3 +77,5 @@ mcnemarTest(X[1], X[2],  X[3], X[4], "exact");
 │ chi  1.9245  1  │
 └                 ┘
 $
+
+end;

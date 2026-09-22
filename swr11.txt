@@ -24,3 +24,5 @@ S := for each el in X sum el;   % (2)
 procedure xapply(f,lst); lisp(f.cdr(lst))$        % (1)
 procedure mean(lst); xapply(+, lst)/length(lst)$  % (2)
 mean({4 ,36, 45, 50, 75});                        % (3)
+
+end;

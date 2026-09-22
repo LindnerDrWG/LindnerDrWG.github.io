@@ -33,3 +33,5 @@ on rounded $
 print_precision 5$
 
 tINV_Hill(0.95, 10);        %  reference value: 1.6759...
+
+end;

@@ -21,4 +21,4 @@ print_precision 5$
 
 hgCDF(100,20,10,2);    % = 0.6812
 
-
+end;

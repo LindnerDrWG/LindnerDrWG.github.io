@@ -30,6 +30,7 @@ procedure count_eq(X,a);
    end;
 define    DIM = length$
 
+
 % ---------------------------------------------------
 procedure  signtest2(X, Y,  method);     
 %------------ method: left=-1, right=1,both=0 -------
@@ -74,3 +75,5 @@ signtest2(IGh , IQl, 0);
 │ 9  0.146 │
 └          ┘
 $
+
+end;

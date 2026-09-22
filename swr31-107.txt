@@ -19,3 +19,4 @@ print_precision 5$
 for i:=-2:2 do write {i, normCDF(i, 2,1)};
 
 
+end;

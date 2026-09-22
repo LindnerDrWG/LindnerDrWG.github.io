@@ -28,3 +28,5 @@ on rounded $
 print_precision 5$
 
 for k:=1:9 do write {k*0.1, stdnormINV(k*0.1)};
+
+end;

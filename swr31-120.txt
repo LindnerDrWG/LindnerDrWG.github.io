@@ -17,3 +17,5 @@ Phi(1) - Phi(-1);       % 1 standard deviation  = 0.6826894921370859
 Phi(2) - Phi(-2);       % 2 standard deviations = 0.9544997361036416 
 Phi(3) - Phi(-3);       % 3 standard deviations = 0.9973002039367398 
 $ ok
+
+end;

@@ -35,3 +35,4 @@ write "The inverse chi-squared value is: ", numeric_result;
 %% R> qchisq(0.95, df = 10)
 %%    [1] 18.30704
 
+end;

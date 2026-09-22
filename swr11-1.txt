@@ -33,4 +33,4 @@ print_precision 5$
 X := {5,8,11,9,12,6,14,10};
 meanA(X,9);
 
-
+end;

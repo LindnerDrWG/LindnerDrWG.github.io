@@ -43,3 +43,5 @@ finisted := 1 - (for i:=5:30 sum f(i)) ;
 finisted;
 
 
+
+end;

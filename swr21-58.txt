@@ -15,13 +15,14 @@ print_precision 5$
        
 binoPDF(4, 6, 0.3);
 
-COMMENT ----------------------------------- Hint by F.J. Wright:
+
+COMMENT ........................... Hint by F.J. Wright:
     You can literally define an alias in REDUCE by using the define 
     command, e.g.
                      define choose = binomial
     which is actually more efficient than defining a new procedure 
-    just to provide a different name for a function. 
-    ------------------------------------------------------------  ;
+    just to provide a different name for a function.     $
+    
     
 define choose = binomial;
 
@@ -32,3 +33,4 @@ procedure binoPDF1(x,n,p);
 
 binoPDF1(4, 6, 0.3);
 
+end;
