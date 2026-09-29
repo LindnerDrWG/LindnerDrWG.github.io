@@ -1,0 +1,114 @@
+COMMENT
+           STATISTICS WITH REDUCE ch. 4.12 b
+                      by W.G. Lindner 2026  $
+                      
+             
+%|         MANN-WHITNEY-U-test  with REDUCE
+  
+% ----------------------- helper functions ----------------
+
+procedure SORTINC(l);  sort(l, <);
+
+procedure  MEDIAN(X);
+begin scalar  Xs,n2,n2p; % local vars
+   Xs   := sortinc(X); 
+   n2   := floor(length(X)/2);  
+   n2p  := n2+1;
+   if evenp length(X) 
+      then return 0.5*(part(Xs,n2)+part(Xs,n2p))
+      else return  part(Xs,n2p)
+end$
+
+procedure SUM_(X);     for each el in X sum el$ 
+procedure LISTMAKE(m); for i:=1:m collect 0$
+procedure SP(X,Y);     % scalar product alias inner product
+   for i := 1:length(X) sum part(X,i) * part(Y, i)$
+
+procedure crank_aux(v, sL, nL);
+   begin scalar positions:={};
+      for k:=1:nl do
+          if part(sl,k) = v
+             then positions := k . positions;
+      return sum_(positions) / length(positions)
+   end;
+
+procedure crank(w);
+   begin scalar s, n;
+       s := sortinc(w);
+       n := length(w);
+       return for each el in w collect crank_aux(el, s, n)
+   end;
+
+procedure correspond(X,soX);
+   begin scalar n:=length(X);
+       M  := for i:=1:n collect 0;
+       rX := cRank(soX);
+       for j:=1:n do for i:=1:n do
+           if    part(soX,i)=part(X,j)
+           then  M := (part(M,j):=part(rX,i));
+      return M;
+   end;
+
+procedure stdnormCDF(x);   1/2*erfc(-x/sqrt(2)) ;
+
+define    DIM  = length $
+define    DOT  = sp $
+
+             
+%-- We abstract the procedure of 4.12a to function 
+%-- 'rankSum' alias 'MANN-WHITNEY-U-test'
+%-- We use pValue criterion instead of U_critical_value.
+
+%#########################################################
+procedure   rankSum(X,Y); 
+%#########################################################
+BEGIN scalar n1,n2,mX,mY,Z,sZ,cZ, R1,R2,U1,U2,U,T_, Ho;
+
+       n1 := dim(X);
+       n2 := dim(Y);
+       mX := median(X);  
+       mY := median(Y);  
+        Z := append(X,Y);
+	   sZ := sortinc(Z);
+       cZ := correspond(Z, sZ);
+       R1 := for i:=1:n1  sum part(cZ,i); 
+       R2 := for i:=1:n2  sum part(cZ,i+n1);  
+       n  := n1+n2;
+       U1 := R1 - n1*(n1+1)/2;
+       U2 := R2 - n2*(n2+1)/2;
+        U := min(U1,U2);
+       T_ := (R2-0.5*n2*(n+1))/sqrt(n1*n2*(n+1)/12);
+       pValue := stdnormCDF(abs(T_));      %%%%%%%%%%%%%%%%%% to fix ???
+       Ho := if   (pValue < 0.975) 
+             then write("accept H0") 
+             else write("reject H0");
+
+       write "----- ranksum -----";
+       write "U  = ", U;
+       write "p  = ", pValue;
+       write "Ho = ", Ho
+END;
+%----------------------------------------------------------
+
+% TEST with butterflies problem (cited from Zoefel)
+
+on rounded $
+print_precision 5$
+
+X := {6, 15, 35, 35, 62, 73, 98, 112};
+Y := {1, 4, 8, 17, 23, 34, 43};
+
+ranksum(X,Y)$
+
+
+COMMENT ..... Result
+              ranksum(X,Y)
+------------- ranksum ------
+┌                          ┐
+│  U       p        Ho     │
+│                          │
+│ 11.0  0.97543  reject H0 │
+└                          ┘
+$
+
+end;

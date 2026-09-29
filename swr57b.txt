@@ -37,28 +37,30 @@ begin
     begin                         %-- start bootstrap samples 
       for i:=1:n do               %-- create one resample of X
           begin r := 1 + random(n);  
-            Mboot := (part(Mboot,i):=part(X,r));
-            Sboot := (part(Sboot,i):=part(X,r));
+            Mboot := (part(Mboot,i) := part(X,r));
+            Sboot := (part(Sboot,i) := part(X,r))
            end;                    %-- bootstrap new sample 
-        M := (part(M,j):=Mean(Mboot)); %-- j.th bootstrap mean 
-        S := (part(S,j):=sd(Sboot));   %-- j.th bootstrap sd 
-       write M(j)," ; ",S(j)       %-- show intermediate results
+        M := (part(M,j) := Mean(Mboot)); %-- j.th bootstrap mean 
+        S := (part(S,j) := sd(Sboot))    %-- j.th bootstrap sd 
      end;                     
-estM := Mean(M);                   %-- bootstrap sample mean/sd
-estS := sd(S);                     %-- i.e. estimated values */ ;
-
- mat( (estMean_, estSD_),(estM, estS))
+ estM := Mean(M);                   %-- bootstrap sample mean/sd
+ estS := sd(S);                     %-- i.e. estimated values */ ;
+ write "estimated mean: ",     estM;
+ write "estimated std-dev.: ", estS;
 END;
 % ----------------------- boot1 ---------------------------- END
 
 COMMENT  Consider the sample X= {4,5,4,7,2}.
-Estimate the standard deviation of the bootstrap distribution. $
+   Estimate the standard deviation of the bootstrap distribution. $
+
+on rounded $
+print_precision 5$
 
 X := {4,5,4,7,2}$
 
-boot1(X, 10)$
+% boot1(X, 10)$
 boot1(X, 100)$      %-- using 100 repetitions ("resamples")
-boot1(X, 1000)$
+% boot1(X, 1000)$
 % boot1(X, 10000)$
 
 
@@ -94,3 +96,18 @@ boot1(X, 10000)$
 $
 
 end;
+
+
+% ----------------------------------------------------------
+COMMENT      boot1 version using ARRAYs 
+% ----------------------------------------------------------
+
+Here is advice by fjW:
+  However, you are using lists as if they were arrays, 
+  and I think it would be better to use arrays! 
+  It would simplify the code because array elements are 
+  automatically initialised to 0, and array elements are 
+  accessed using A(i) syntax, which is clearer than using part.
+
+TASK: program boot1 using array structures.
+$

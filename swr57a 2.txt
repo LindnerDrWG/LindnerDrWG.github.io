@@ -50,7 +50,7 @@ define    dim = length $
 on rounded $
 print_precision 5$
 
-% COMMENT FIRST we do some experiments with random
+COMMENT FIRST we do some experiments with random
 %       to get aquinted with it.
 % >  PLEASE do/interpret the following commands line-by-line
 % >  in order to get a solide intuition of this theme
@@ -92,12 +92,12 @@ for j:=1:IT do
     begin                         %-- start bootstrap samples 
       for i:=1:n do               %-- create one resample of X
           begin r := 1 + random(n);  
-            Mboot := (part(Mboot,i) := part(X,r) );
-            Sboot := (part(Sboot,i) := part(X,r) )
+            Mboot := (part(Mboot,i):=part(X,r));
+            Sboot := (part(Sboot,i):=part(X,r));
            end;                    %-- bootstrap new sample 
-      M := (part(M,j) := Mean(Mboot) ); %-- j.th bootstrap mean 
-      S := (part(S,j) := sd(Sboot) );   %-- j.th bootstrap sd 
-      write part(M,j)," ; ",part(S,j) %-- show intermediate results
+        M := (part(M,j):=Mean(Mboot)); %-- j.th bootstrap mean 
+        S := (part(S,j):=sd(Sboot));   %-- j.th bootstrap sd 
+       write M(j)," ; ",S(j)       %-- show intermediate results
      end;                     
 estM := Mean(M);                   %-- bootstrap sample mean/sd
 estS := sd(S);                     %-- i.e. estimated values */ ;

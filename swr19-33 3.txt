@@ -1,0 +1,34 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 1.9-33
+                      by W.G. Lindner 2026  $
+                      
+
+%-- We use the 'nearest-rank method' for calculating the quantile.
+
+procedure quantile(X,p);              % improved by fjW
+begin scalar Xs, i, dim;
+      if p >= 100 then return max(X);
+      if p <= 0 then return min(X);
+      dim := length(X);
+      Xs  := sort(X, <);
+      i   := 1 + round((dim-1)*p/100);
+      return part(Xs, i)
+end;
+
+define percentile = quantile;  %-- alias for Matlab compatibility
+define Qp =         quantile;  %-- relax notation
+
+% ------------------- Example usage ---------------------
+
+
+X:={1                  };
+% test
+
+on rounded $
+print_precision 5$
+
+quantile(X, 42);
+
+  
+end;

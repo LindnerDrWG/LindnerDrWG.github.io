@@ -1,5 +1,5 @@
 COMMENT
-           STATISTICS WITH REDUCE ch. 2.5-98
+           STATISTICS WITH REDUCE ch. 2.5-100
                       by W.G. Lindner 2026  $
                       
 
@@ -9,13 +9,22 @@ procedure poissonPDF(k, lam);
 procedure poissonCDF(x, lam);
           for k:=0:floor(x)  sum poissonPDF(k, lam);
 
+procedure poissonINV(alpha,lam);
+   begin scalar k := 0;
+         repeat k := k+1 until poissonCDF(k, lam) >= alpha;
+         return k
+   end;
 
 % -------------------- Example usage ---------------------
 
 on rounded$
 print_precision 5$
 
+poissonINV(0.95,2);
 
-1 - poissonCDF(4,2);
+%%%%% check with R:
+%  R> qpois(0.95, 2)
+%     [1] 5
+
 
 end;

@@ -1,17 +1,17 @@
 COMMENT
            STATISTICS WITH REDUCE ch. 3.3-141
                       by W.G. Lindner 2026  $
-                      
+
 
 on rounded; precision 10;
 
 procedure normINV(q,m,s);
      if q=0 then  infinity else
-     if q=1 then -infinity else     
-     if 0<q and q<1 then
+     if q=1 then -infinity else
+     if 0<q and q<1 then if q = 0.5 then 0 else
      begin scalar y := 2*q-1, xx;
         clear x;
-        xx := num_solve(erf x = y, x = y); 
+        xx := num_solve(erf x = y, x = y);
         xx := rhs first xx;
         return m + sqrt(2) * s * xx;
     end$
@@ -20,31 +20,38 @@ procedure stdnormINV(q); normINV(q,0,1) $
 
 % ---------- inverse t distribution ------------------------
 
-procedure tINV1(x,f);          
-%-- after Preizer & Pratt  
+procedure tINV1(x,f);
+%-- after Preizer & Pratt
 %-- t reserved symbol for t(rue); therefore sysmbol tt
-begin scalar q,c, tt;                           %%-- 0<x<1
-      if f=1 then tan(PI*(x-0.5));
-      if f=2 then <<tt:=2.*x-1.; sqrt(2.)*tt/sqrt(1.-tt*tt)>>; 
-      q := stdnormINV(x);
-      c := f -2/3 + 1/(10*f);
-      c := (f-5/6)/(c*c);
-      tt := sqrt(f*exp(c*q*q)-f);
-      if x>0.5 then return tt else return -tt;
+begin scalar q,c, tt;
+      if f=1 then return tan(PI*(x-0.5));
+      if f=2 then return <<tt:=2.*x-1.; sqrt(2.)*tt/sqrt(1.-tt^2)>>;
+      if x = 0 or x = 1 then tt := infinity
+      else <<                      %-- 0<x<1
+         q := stdnormINV(x);
+         c := f - 2/3 + 0.1/f;
+         c := (f-5/6)/c^2;
+         tt := sqrt(f*exp(c*q^2)-f);
+      >>;
+      return if x>0.5 then tt else -tt;
 end;
 
 % -------------------  Example usage     -------------------
 
 tINV1(0.99,3);   %% -- 4.54 vs 4.61
 
-%% input NOT allowed:  .95
-tinv1(0.95,50);  %% 1.6759, ok bis x.xxxxx 
+%% An abbreviated input like .95 is not allowed, write 0.95:
+tinv1(0.95,50);  %% 1.6759, ok bis x.xxxxx
                  %% MatLab>  ans = 1.6759
                  %% R>       qt(.95,50) [1] 1.675905
 
-for k:=0:4 do write {k/10, tINV1(k/10,5)} ;
-for k:=6:10 do write {k/10, tINV1(k/10,5)} ;
+for k:=0:10 do write "tINV1(",k/10,",5) := ", tINV1(k/10,5);
 
-% for k=5 **** Newton method does not converge 
+COMMENT  CAUTION
+  See section 2.2 of the REDUCE manual:
+  CAUTION: The unsigned part of any number may not begin with a decimal point,
+  as this causes confusion with the CONS (.) operator, i.e., NOT ALLOWED ARE:
+  .5, -.23, +.12. Use 0.5, -0.23, +0.12 instead. $
+
 
 end;

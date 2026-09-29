@@ -1,13 +1,11 @@
 COMMENT
-           STATISTICS WITH REDUCE ch. 2.5-98
+           STATISTICS WITH REDUCE ch. 2.5-96
                       by W.G. Lindner 2026  $
                       
+               
 
 procedure poissonPDF(k, lam);
           exp(-lam) * lam^k / factorial(k);
-
-procedure poissonCDF(x, lam);
-          for k:=0:floor(x)  sum poissonPDF(k, lam);
 
 
 % -------------------- Example usage ---------------------
@@ -15,7 +13,8 @@ procedure poissonCDF(x, lam);
 on rounded$
 print_precision 5$
 
+%%%%% YOUR turn:
 
-1 - poissonCDF(4,2);
 
 end;
+

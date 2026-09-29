@@ -58,7 +58,8 @@ bootstrapMeans := listmake(numSamples);
 for j:=1:numSamples do  %-- perform bootstrap sampling
      begin           
      for  i:=1:n do 
-            begin r := 1 + random(10);
+            begin 
+              r := 1 + random(10);
               M := (part(M,i):=part(X,r));
               write M;
               % Now calculate the mean age of the 
@@ -113,12 +114,10 @@ confidenceIntervall := {ci1,ci2};
 
 COMMENT #################
 
-bootstrapMeans : [47, 50, 51.5];
-%o18	
+bootstrapMeans : [47, 50, 51.5]
 ci1 : 51.5
 ci2 :  47
 confidenceIntervall : [ci1,ci2]= [47, 51.5]
-
 $
 
 end;

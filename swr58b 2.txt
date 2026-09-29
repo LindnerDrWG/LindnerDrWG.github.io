@@ -1,0 +1,116 @@
+
+COMMENT
+           STATISTICS WITH REDUCE ch. 5.8 b
+                      by W.G. Lindner 2026  $
+                   
+
+%|         BOOTSTRAP2 for independend samples
+
+% ---------------------- helper functions ------------------
+random_new_seed(1)$ % Seeding recommended before generating
+procedure rnd();       random(10000000)/10000000.0 $
+procedure randlist(n); for i:=1:n collect rnd() $
+procedure sum_(lst);   for each el in lst sum el $ 
+procedure mean(lst);   sum_(lst)/length(lst) $ 
+define    dim = length $
+
+
+%|     BOOTSTRAP2 for independend samples with REDUCE
+% -------------------- boot2 --------------------------------
+% --- calculate the significance level of 2 independent samples
+% --- w.r.t. equalness of their means
+
+COMMENT  Method bootstrap2 :
+-- To alculate the significance level of 2 independent samples X, Y
+-- w.r.t. equalness of their means, we do:
+-- 1. determine the difference D of their means
+-- 2. build a new sample M by the union of X and Y: M = X v Y
+-- 3. draw a big number of pairwise samples out of M
+-- 4. count the number z of the random samples from M,
+--    whose means have a difference d > D.
+-- 5. the significance level is counter z / number of drawn samples 
+-- We abstract this procedure in a functon boot2:      $
+
+% -------------------- boot2 --------------------------------
+procedure boot2(X,Y);
+% -------------------- boot2 --------------------------------
+    begin scalar d,g,r,z,sX,sY,s,t_,p, m,n, XY, IT ;
+           IT := 10000;       %-- number of ITerations
+           m  := dim(X);
+           n  := dim(Y);
+           z  := 0;              
+           sX := sum_(X); 
+           sY := sum_(Y);
+           d  := sX/m - sY/n;   %-- d = mean(X)-mean(Y)      
+           g  := m + n;        %-- total dimension of container XY
+           XY := append(X,Y);  % append X and Y to (X|Y)
+           for j:=1:IT do
+             begin 
+               s := 0; t_ := 0;   %-- reset s,t to 0
+               for i:=1:m do      %-- choose index r randomly        
+                 << r := 1 + random(g);  %-- 1 <= r <= g
+                    s := s + part(XY,r)
+                    % write "s= ",s 
+                  >>;       % -- sum m elements of XY randomly
+               for i:=1:n do           
+                 << r  := 1 + random(g);  
+                    t_ := t_ + part(XY,r)
+                    % write "t= ",t_ 
+                 >>;        %-- sum n elements of XY randomly
+              s  := s/m; 
+              t_ := t_/n;    %-- new means s and t 
+              % write "s/m=",s," t/n=",t_;
+              if s-t_ >= d then z := z + 1;
+              % write "z=",z 
+              end;
+           p := z/IT;         %-- probability
+           write("   ____________ boot2 ____________ ");
+           write "expected Mean_X = ",s;
+           write "expected Mmean_Y = ", t_;
+           write "significance = ",p     
+END;   
+%------------------------------------------------------------ 
+
+on rounded $
+print_precision $
+
+% ========== 1. EXAMPLE:  figure 5.1 ==========
+
+X:={4.3,2.1,5.3};
+Y:={2.4,1.1,2.8};
+
+write ".. wait ..";
+boot2(X,Y);
+
+
+
+%========== 2. EXAMPLE:  31 US presidents =====
+
+Comment    cf. HERRMANN, [6, p. 207].
+-- There was a random sample of 31 US presidents drawn, 
+-- who died of natural causes. The whole sample was 
+-- divided in tall (X) and small (Y) persons.
+-- The null hypothesis is: age and height are independent.
+-- SOLUTION:         $
+
+on rounded $
+print_precision $
+
+X := {85,79,90,67,80};
+
+Y := {67,56,53,77,88,57,63,78,70,
+     66,83,67,60,74,65,64,73,71,
+     60,90,63,71,64,78,68,72};
+     
+mean(X);
+mean(Y);
+D := mean(X)-mean(Y);  
+
+write ".. wait ..";
+boot2(X,Y);
+
+COMMENT
+-- RESULT:  We get values around 0.013.
+-- With a 5% probability of error, the null hypothesis, that age and 
+-- size differ only by chance, can be rejected.
+$
