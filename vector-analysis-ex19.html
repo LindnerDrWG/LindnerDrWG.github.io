@@ -1,0 +1,111 @@
+<!DOCTYPE html><html><body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:1em">
+
+
+##| VectorAnalysis : Problem set in 'Horan/Lavelle'
+##| https://lindnerdrwg.github.io/VectorAnalysis-using-Eigenmath.pdf
+##|         by Dr. W.G. Lindner, Leichlingen DE, 2026
+
+----- operators grad div curl in R^3 in Cartesian coord's -----
+
+I = (1,0,0)
+J = (0,1,0)
+K = (0,0,1)
+
+Grad(f) = d(f,x)*I + d(f,y)*J + d(f,y)*K       -- i.e. \/f
+
+Div(F) = d(F[1],x) + d(F[2],y) + d(F[3],z)     -- i.e. \/ . F
+
+Curl(F) = (d(F[3],y)-d(F[2],z))*I + 
+          (d(F[1],z)-d(F[3],x))*J +
+          (d(F[2],x)-d(F[1],y))*K              -- i.e. \/ x f
+
+Laplacian(f) = d(f,x,x) + d(f,y,y)+ d(f,z,z)   -- i.e. /\f
+----------------------------------------------------------------
+
+-- REMARK
+-- Because only Cartesian coordinates are involved,
+-- you may also use the lowercase noted build-in
+-- operators    grad, div, curl    instead of the user-defined
+-- operators    Grad, Div, Curl
+
+
+""
+"====================== EXAMPLE 2.1, page 2"
+-- Find the gradient of 𝝋 where 𝝋 is 𝟑𝒙^2𝒚 − 𝒚^3𝒛^2 at (𝟏,−𝟐, 𝟏).
+----------------------------------------------------------------
+
+phi = 3*x^2*y-y^3*z^2     
+
+Grad(phi)
+
+eval(Grad(phi), x,1, y,-2, z,1)
+
+"ok"
+
+""
+"====================== EXAMPLE 2.6, page 4"
+-- Find the directional derivative of 𝝋 = 𝟒𝒙𝒛^𝟐 + 𝒙^𝟐𝒚𝒛 at (𝟏,−𝟐,-𝟏) 
+-- in the direction of 𝟐𝒊 - 𝒋 − 𝟐𝒌.
+----------------------------------------------------------------
+
+phi = 4*x*z^2 + x^2*y*z     
+
+Grad(phi)
+
+GradP = eval(Grad(phi), x,1, y,-2, z,-1)
+GradP
+
+a = (2,-1,-2)
+abs(a)
+
+DD = dot( GradP, a/abs(a) )
+DD
+
+"ok"
+
+"======================= Q.32, Q.33"
+-- For these Quiz you may use adapted coordinate systems.
+
+" You may use the direct definition of _C_ylindrical coordinates"
+-- use X,Y,Z as symbols for the _C_ylindrical basis Er,Ephi,Ez.
+
+GradC(f) = d(f,r)*X + 1/r*d(f,phi)*Y + d(f,z)*Z         
+
+DivC(F) = 1/r*d(r*F[1],r) + 1/r*d(F[2],phi) + d(F[3],z) 
+
+CurlC(F) = (1/r*d(F[3],phi)-d(F[2],z))   *X + 
+        (d(F[1],z)-d(F[3],r))         *Y +
+        1/r*(d(r*F[2],r)-d(F[1],phi)) *Z   
+
+LaplacianC(f) = 1/r*d(f,r)+d(f,r,r) + 1/r^2*d(f,phi,phi)+ d(f,z,z)   
+
+
+".. Or use the direct definition of _S_pherical coordinates:"
+-- use X,Y,Z as symbols for the spherical basis Er, Etheta, Ephi.
+
+GradS(f) = d(f,r)*X + 1/r*d(f,theta)*Y + 
+                    1/(r*sin(theta))*d(f,phi)*Z         
+
+DivS(F) = 1/r^2*d(r^2*F[1],r) +
+       1/(r*sin(theta))*d(sin(theta)*F[2],theta) + 
+       1/(r*sin(theta))*d(F[3],phi) 
+
+CurlS(F) = 1/(r*sin(theta))*( d(sin(theta)*F[3],theta)-d(F[2],phi))*X + 
+        1/r*( d(F[1],phi)/sin(theta) - d(r*F[3],r) )*Y +
+        1/r*( d(r*F[2],r)-d(F[1],theta) )*Z 
+
+LaplacianC(f) = 1/r^2*d(r^2*d(f,r),r) + 
+                1/(r^2*sin(theta))*d(sin(theta)*d(f,theta),theta) + 
+                1/(r^2*sin(theta)^2)*d(f,phi,phi)   
+
+"NOW do the Quiz .."
+
+"========== Check your solution"
+"... using the free WolframCloud.Basic CAS"
+"... or ask AI (google): 'calculate curl of F(r,phi,z) = ... in ... coordinates' "
+
+</textarea> 
+<button onclick="run()"style="font-size:20pt">Run</button><br>
+<div id="stdout"></div></body></html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html><html><body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:1em">
+
+
+
+##| VectorCalculus : cylindrical coordinates
+##| Book https://lindnerdrwg.github.io/VectorCalculus-with-Eigenmath.pdf
+##|      by Dr. W.G. Lindner, Leichlingen DE, 2026
+
+# EIGENMATH
+-- we introduce cylindrical coordinates in R^2 by
+
+R(r,theta,z) = (r cos(theta),r sin(theta),z)
+R
+
+-- the  basis in cylindrical coordinates
+Z = d(R,(r,theta,z))   -- basis vectors are in the columns
+Z = transpose(Z)       -- therefore we have to transpose
+Z
+Z[1]
+eval(Z[1], r,1, theta,pi/4, z,2)
+
+</textarea> 
+<button onclick="run()"style="font-size:20pt">Run</button><br>
+<div id="stdout"></div></body></html>

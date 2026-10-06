@@ -1,0 +1,93 @@
+<!DOCTYPE html><html><body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:1em">
+
+
+##| VectorCalculus : polar coordinates
+##| https://lindnerdrwg.github.io/VectorCalculus-with-Eigenmath.pdf
+##|         by Dr. W.G. Lindner, Leichlingen DE, 2026
+
+
+"========= FIRST: direct definition of grad-div-curl in polar coordinates"
+-- X,Y are the basis vectors 
+
+gradP(f) = d(f,r)*X + 1/r*d(f, phi)*Y
+
+divP(F) = d(F[1],r) + F[1]/r + 1/r*d(F[2],phi)
+
+curlP(F)=  ( 1/r*d(F[2],r) - 1/r*d(F[1],phi))*Z  
+            -- musst be perpendicular to x,y direction
+ 
+LaplacianP(f) = d(f,r,r) + 1/r*d(f,r) + 1/r^2*d(f, phi, phi)
+--------------------------------------------------------------
+
+"-- 1. EXAMPLE: calculate divPolar"
+
+-- Consider a purely radial, position-dependent vector field 
+-- (often representing a source, such as electric field or fluid
+-- flow): F(r, theta) = r*{r}° 
+-- Here, the radial component is F_r = r, and the angular component 
+-- is F_theta = 0. 
+-- Plugging these into the formula yields 1/r*(2r) = 2
+-- Because the divergence is a constant 2, this means the field is 
+-- expanding outward uniformly, creating a constant density of 
+-- outward flux across space.
+
+F(r, phi) = (r,0)
+divP(F)
+
+"-- 2. EXAMPLE from physicspages"
+
+-- https://physicspages.com/pdf/Relativity/Divergence%20of%20vector%20field%20in%20polar%20coordinates.pdf
+
+F = (x^2+3*y, y^2+3*x)
+
+-- WARNING: build-in div(F) works only in R^3, so we overrite it
+
+div(F) = d(F[1],x) + d(F[2],y)
+div(F)
+
+-- use polar coordinates
+
+eval(div(F), x,r cos(phi), y,r sin(phi))
+
+F = (x^2+3*y, y^2+3*x)
+F
+x=r cos(phi) 
+y=r sin(phi)
+F
+
+divP(F)
+
+
+"-- 3.TASK : DEFINE grad-div-curl in polar coordinates"
+--  using curvilinear coordinates and redo 2."
+
+
+CurlP(F)= 1/Jac*(1111)
+
+
+LaplacianP(f)= 1/Jac *(2222)
+
+
+"-- now EXAMPLE: SOLUTION to 3.5-9 using curvilinear coords:"
+
+f(r,phi)                   -- f:R^2 --> R
+F(r,phi)                   -- F:R^2 --> R^2
+
+polar          -- choose curvilinear coo system 
+
+Grad(f)        -- i.e. \/f
+
+Div(V)         -- i.e. \/ . F
+simplify
+
+Curl(V)        -- i.e. \/ x F
+
+Laplacian(f)   -- i.e. \/^2 f == /\f
+
+"ok"
+
+</textarea> 
+<button onclick="run()"style="font-size:20pt">Run</button><br>
+<div id="stdout"></div></body></html>

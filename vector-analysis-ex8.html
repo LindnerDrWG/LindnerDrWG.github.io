@@ -1,0 +1,101 @@
+<!DOCTYPE html><html><body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:1em">
+
+
+##| VectorCalculus : parabolic coordinates, problem 3.5
+##| https://lindnerdrwg.github.io/VectorCalculus-with-Eigenmath.pdf
+##|         by Dr. W.G. Lindner, Leichlingen DE, 2026
+
+
+"DEFINITIONS for curvilinear coordinates:"
+-- u : coordinates
+-- f : scalar function
+-- F : vector function
+-- h : scale factors
+-- Jac : Jacobi matrix
+-----------------------------------------------------------------
+
+F = (f1(),f2(),f3())
+
+Grad(f) = ( d(f,u[1])/h[1], d(f,u[2])/h[2], d(f,u[3])/h[3] ) 
+
+Div(F) = 1/Jac * ( d(Jac F[1]/h[1],u[1]) +
+                   d(Jac F[2]/h[2],u[2]) + 
+                   d(Jac F[3]/h[3],u[3]))
+
+Curl(F)= 1/Jac *(h[1]*(d(h[3]*F[3],u[2]) - d(h[2]*F[2],u[3])),
+                 h[2]*(d(h[1]*F[1],u[3]) - d(h[3]*F[3],u[1])),
+                 h[3]*(d(h[2]*F[2],u[1]) - d(h[1]*F[1],u[2])))
+
+Laplacian(f)= 1/Jac *( d(h[2]*h[3]/h[1]*d(f,u[1]),u[1]) + 
+                       d(h[3]*h[1]/h[2]*d(f,u[2]),u[2]) +
+                       d(h[1]*h[2]/h[3]*d(f,u[3]),u[3]) )
+
+-----------------------------------------------------------------
+
+"Use parabolic coords (1/2*(u1^2-u2^2), u1*u2, u3)"
+
+u = (u1,u2,u3)                       -- parabolic coords
+u
+R = (1/2*(u1^2-u2^2), u1*u2, u3)     -- position vector
+R
+
+"tangent vectors to u1, u2, u3 lines at position R:"
+Uu1 = d(R,u[1])
+Uu1
+
+Uu2 = d(R,u[2])
+Uu2
+
+Uu3 = d(R,u[3])
+Uu3
+
+Uu1u2u3 =  d(R,u)      
+Uu1u2u3
+
+U = transpose(d(R,u))    -- tangent vectors collected as columns
+U
+
+"scale factors:"
+h(i) = sqrt(dot(U[i], U[i]))
+h = (simplify(h(1)), simplify(h(2)), simplify(h(3)) )
+h
+
+"Jacobian:"
+Jac = h[1]* h[2]* h[3]
+Jac = simplify(Jac)
+Jac       -- ok: Spiegel AC p158 p87
+
+"unit vectors in these directions:"
+-- ei are NOT the unit vectors in the surrounding 
+-- cartesian coordinate system !!
+
+e1 = Uu1/h[1]               
+e1
+e2 = Uu2/h[2]             
+e2
+e3 = Uu3/h[3]
+e3
+
+"------------------ solve 3.5 -------------------"
+
+f(u1,u2,u3) = u1^2*u3^3
+F(u1,u2,u3) = (u3,−u2^2, 2*u1^2*u2)
+
+"Grad:"
+Grad(f)
+
+"Divergence:"
+Div(F)
+
+"curl: "
+Curl(F)
+
+"Laplacian:"
+Laplacian(f)
+
+
+</textarea> 
+<button onclick="run()"style="font-size:20pt">Run</button><br>
+<div id="stdout"></div></body></html>

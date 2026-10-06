@@ -1,0 +1,297 @@
+
+<!DOCTYPE html><html><body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:1em">
+
+##| VectorCalculus : cylindrical coordinates, section 3.2
+##| https://lindnerdrwg.github.io/VectorCalculus-with-Eigenmath.pdf
+##|         by Dr. W.G. Lindner, Leichlingen DE, 2026
+
+
+"DEFINITIONS for curvilinear coordinates"
+-- u : coordinates
+-- f : scalar function
+-- F : vector function
+-- h : scale factors
+-- Jac : Jacobi matrix
+-----------------------------------------------------------------
+
+F = (f1(),f2(),f3())
+
+Grad(f) = ( d(f,u[1])/h[1], d(f,u[2])/h[2], d(f,u[3])/h[3] ) 
+
+Div(F) = 1/Jac * ( d(Jac F[1]/h[1],u[1]) + 
+                   d(Jac F[2]/h[2],u[2]) + 
+                   d(Jac F[3]/h[3],u[3]))
+
+Curl(F)= 1/Jac *(h[1]*(d(h[3]*F[3],u[2]) - d(h[2]*F[2],u[3])),
+                 h[2]*(d(h[1]*F[1],u[3]) - d(h[3]*F[3],u[1])),
+                 h[3]*(d(h[2]*F[2],u[1]) - d(h[1]*F[1],u[2])))
+
+
+Laplacian(f)= 1/Jac *( d(h[2]*h[3]/h[1]*d(f,u[1]),u[1]) + 
+                       d(h[3]*h[1]/h[2]*d(f,u[2]),u[2]) +
+                       d(h[1]*h[2]/h[3]*d(f,u[3]),u[3]) )
+
+-----------------------------------------------------------------
+-- REMARK
+-- The terms for F, Grad(F) and Curl(F) calculates 'only' the 
+-- coordinates of these objects in the cylindrical coordinate system.
+-- If wanted, you have to expand the result in the actual basis 
+-- i.e. F(r,phi,z) = (z,-phi^2,2*r^2*z) 
+--                ==  z*Er - phi^2*Ephi +2*r^2*z*Ez 
+-- with Er, Phi, Ez as cylindrical basis in R^3 at point R.
+
+"========== Step-by-step procedure."
+
+-- specify the variables u, f, F, h, Jac to use the formulae above
+
+"cylindrical coord are (r,phi,z)"
+
+u = (r,phi,z)
+u
+
+"position vector of a point in cylindrical coords:"
+ -- i.e. transformation rule (x,y,z)->(r,phi,z)
+
+R = (r cos(phi), r sin(phi), z) 
+R
+
+"tangent vectors to r, phi, z lines at position R:"
+
+Ur = d(R,u[1])
+Ur
+
+Uphi = d(R,u[2])
+Uphi
+
+Uz = d(R,u[3])
+Uz
+
+Urphiz =  d(R,u)      
+Urphiz
+
+U = transpose(d(R,u))    -- tangent 'vectors' collected as columns
+U
+
+"scale factors"
+-- REMARK (AI Overview): In cylindrical coordinates (r,phi,z), 
+-- the scale factors are: h_r = 1, h_phi = r, and h_z = 1. 
+-- These factors convert differential coordinate changes into 
+-- actual physical lengths, allowing you to compute infinitesimal 
+-- line, area, and volume elements accurately.
+
+h(i) = sqrt(dot(U[i], U[i]))
+h    = (simplify(h(1)), simplify(h(2)), simplify(h(3)) )
+h
+
+"Jacobian:"
+Jac = h[1]* h[2]* h[3]         -- from theory
+Jac = simplify(Jac)
+Jac
+
+Jac = simplify(det(U))         -- alternative from definition
+Jac 
+
+"unit vectors in these directions:"
+
+er   = Ur/h[1]
+er
+ephi = Uphi/h[2]
+ephi
+ez   = Uz/h[3]
+ez
+
+"========== Check curvilinear formula's in Eigenmath syntax"
+
+"Grad, Div, Curl, Laplace in cylindrical coords:"
+
+"... Gradient of f:"
+Grad(f(r,phi,z))
+
+"... Divergence of F:"
+F(r,phi,z)=(f1(r,phi,z),f2(r,phi,z),f3(r,phi,z))
+Div(F(r,phi,z))
+
+"... Curl of F:"
+Curl(F(r,phi,z))
+
+"... Laplacian of f:"
+Laplacian(f(r,phi,z))
+
+"========== EXAMPLE: SOLUTION to 3.2.a using curvilinear coords:"
+
+f(r,phi,z) = r^2*z^3             -- f:R^3 --> R
+F(r,phi,z) = (z,-phi^2,2*r^2*z)  -- F:R^3 --> R^3 is in cyl.coords
+
+Grad(f)        -- i.e. \/f
+Div(F)         -- i.e. \/ . F
+Curl(F)        -- i.e. \/ x F
+Laplacian(f)   -- i.e. \/^2 f == /\f
+"ok"
+
+-- check via Google, ask e.g.
+-- calculate curl of F(r,phi,z) = (z,-phi^2,2*r^2*z) in cylindrical coordinates
+
+"========== SOLUTION to 3.2.a using direct definition (1c) .."
+
+f(r,phi,z) = r^2*z^3             -- f:R^3 --> R
+F(r,phi,z) = (z,-phi^2,2*r^2*z)  -- F:R^3 --> R^3 is already in 
+
+Gradf = d(f,r)*X + 1/r*d(f,phi)*Y + d(f,z)*Z         
+Gradf
+
+DivF = 1/r*d(r*F[1],r) + 1/r*d(F[2],phi) + d(F[3],z) 
+DivF
+
+CurlF = (1/r*d(F[3],phi)-d(F[2],z))*X + 
+        (d(F[1],z)-d(F[3],r))*Y +
+        1/r*(d(r*F[2],r)-d(F[1],phi))*Z   
+CurlF
+
+Laplacianf = 1/r*d(f,r)+d(f,r,r) + 1/r^2*d(f,phi,phi)+ d(f,z,z)   
+Laplacianf
+
+"ok"
+
+"========== SOLUTION to 3.2.a using cylindrical basis"
+
+-- solve with help of Xmaxima (or by hand):
+-- solve([cos(p)*I+sin(p)*J=Er,-sin(p)*I+cos(p)*J=Ep], [I,J]);
+-- or by inverting the transformation matrix M:
+
+M = ((cos(phi), -sin(phi)),
+     (sin(phi),  cos(phi)) )
+M   
+dot(simplify(inv(M)) ,(Er,Ep))
+
+-- to get:
+
+I = -Ep*sin(phi)+Er*cos(phi)
+J =  Er*sin(phi)+Ep*cos(phi)
+
+-- Now express F(x,y,z) as F(r,phi,z): 
+-- F = zI-2yJ+yK =
+F    = z*(-Ep*sin(phi)+Er*cos(phi)) -
+       2*r*cos(phi)*(Er*sin(p)+Ep*cos(p))+
+       r*sin(phi)*Ez                          
+F
+
+-- ablesen of f1,f2,f3:
+F(r,phi,z)=(-2*r*cos(phi)*sin(phi) + z*cos(phi), 
+            -2*r*cos(phi)*sin(phi) -z*sin(phi), 
+            r*sin(phi))
+F
+
+"Gradient:"
+Grad(f(r,phi,z))
+simplify(Grad(f(r,phi,z))) --ok
+
+"Divergence:"
+--F(r,phi,z)=(f1(r,phi,z),f2(r,phi,z),f3(r,phi,z))
+Div(F(r,phi,z))
+simplify(Div(F(r,phi,z)))  --ok
+
+"Curl:"
+Curl(F(r,phi,z))
+simplify(Curl(F(r,phi,z))) --ok
+
+"Laplacian:"
+Laplacian(f(r,phi,z))
+
+
+"========== EXAMPLE: SOLUTION to 3.2.a using curvilinear coords: II"
+
+-- REMARK
+-- The terms for F, Grad(F) and Curl(F) calculates 'only' the 
+-- coordinates of these objects in the cylindrical coordinate system.
+-- This timr we adapt the formulae to use the curivilinear basis  
+-- i.e. F(r,phi,z) ==  z*Er - phi^2*Ephi +2*r^2*z*Ez 
+-- with Er, Phi, Ez as cylindrical basis in R^3 at point R.
+
+Er   = Ur/h[1]
+Ephi = Uphi/h[2]
+Ez   = Uz/h[3]
+
+F = f1()*Er + f2()*Ephi + f3()*Ez
+
+Grad(f) = d(f,u[1])/h[1]*Er + d(f,u[2])/h[2]*Ephi + d(f,u[3])/h[3]*Ez 
+
+Div(F) = 1/Jac * ( d(Jac F[1]/h[1],u[1]) + 
+                   d(Jac F[2]/h[2],u[2]) + 
+                   d(Jac F[3]/h[3],u[3]))
+
+Curl(F)= 1/Jac *(h[1]*(d(h[3]*F[3],u[2]) - d(h[2]*F[2],u[3]))*Er +
+                 h[2]*(d(h[1]*F[1],u[3]) - d(h[3]*F[3],u[1]))*Ephi +
+                 h[3]*(d(h[2]*F[2],u[1]) - d(h[1]*F[1],u[2]))*Ez)
+
+
+Laplacian(f)= 1/Jac *( d(h[2]*h[3]/h[1]*d(f,u[1]),u[1]) + 
+                       d(h[3]*h[1]/h[2]*d(f,u[2]),u[2]) +
+                       d(h[1]*h[2]/h[3]*d(f,u[3]),u[3]) )
+
+-----------------------------------------------------------------
+
+-- NOW use the adapted formulae for cylindrical coords
+
+f(r,phi,z) = r^2*z^3                        -- f:R^3 --> R
+F(r,phi,z) = z*Er - phi^2*Ephi +2*r^2*z*Ez  -- F:R^3 --> R^3
+
+Grad(f)        -- i.e. \/f
+Div(F)         -- i.e. \/ . F
+Curl(F)        -- i.e. \/ x F
+Laplacian(f)   -- i.e. /\f
+
+
+"========== SOLUTION to 3.2.a. using option set"
+
+-- The derivation of the objects u, R, U, h, Jac, e1 ..
+-- are stepwise shows to enhance your unterstanding.
+-- When done, we collect the results in an OPTION SET 'cylindrical':
+
+--------------- vector analysis grad div curl ------------------
+
+F = (f1(),f2(),f3())
+
+Grad(f) = ( d(f,u[1])/h[1], d(f,u[2])/h[2], d(f,u[3])/h[3] ) 
+
+Div(F) = 1/Jac * ( d(Jac F[1]/h[1],u[1]) + 
+                   d(Jac F[2]/h[2],u[2]) + 
+                   d(Jac F[3]/h[3],u[3]))
+
+Curl(F)= 1/Jac *(h[1]*(d(h[3]*F[3],u[2]) - d(h[2]*F[2],u[3])),
+                 h[2]*(d(h[1]*F[1],u[3]) - d(h[3]*F[3],u[1])),
+                 h[3]*(d(h[2]*F[2],u[1]) - d(h[1]*F[1],u[2])))
+
+Laplacian(f)= 1/Jac *( d(h[2]*h[3]/h[1]*d(f,u[1]),u[1]) + 
+                       d(h[3]*h[1]/h[2]*d(f,u[2]),u[2]) +
+                       d(h[1]*h[2]/h[3]*d(f,u[3]),u[3]) )
+
+cylindrical = do(
+  u = (r,phi,z),                     -- names of cylindrical coords
+  R = (r cos(phi), r sin(phi), z),   -- position vector of a point
+  U = transpose(d(R,u)),             -- tangent vectors as columns
+  h = (1,r,1),                       -- scale factors
+  Jac = h[1]* h[2]* h[3],            -- Jacobian determinant
+  Er   = U[1]/h[1],                  -- unit vectors for (r,phi,z)
+  Ephi = U[2]/h[2],
+  Ez   = U[3]/h[3])
+
+
+-- Now we calculate the vector analysis operators via a call
+-- to 'cylindrical':
+
+cylindrical      -- choose coordinate system
+
+f(r,phi,z) = r^2*z^3             -- f:R^3 --> R
+F(r,phi,z) = (z,-phi^2,2*r^2*z)  -- F:R^3 --> R^3 is in cyl.coords
+
+Grad(f)        -- i.e. \/f
+Div(F)         -- i.e. \/ . F
+Curl(F)        -- i.e. \/ x F
+Laplacian(f)   -- i.e. /\f
+
+
+</textarea> 
+<button onclick="run()"style="font-size:20pt">Run</button><br>
+<div id="stdout"></div></body></html>

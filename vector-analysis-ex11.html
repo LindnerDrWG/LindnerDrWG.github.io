@@ -1,0 +1,68 @@
+<!DOCTYPE html><html><body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:1em">
+
+
+##| VectorAnalysis : Exercise from Roolfs
+##| https://lindnerdrwg.github.io/VectorAnalysis-using-Eigenmath.pdf
+##|         by Dr. W.G. Lindner, Leichlingen DE, 2026
+
+
+"DEFINITIONS for curvilinear coordinates:"
+-----------------------------------------------------------------
+
+Grad(f) = ( d(f,u[1])/h[1], d(f,u[2])/h[2], d(f,u[3])/h[3] ) 
+
+cartesian = do(
+  u = (x,y,z),                     -- names of cartesian coords
+  R = (x,y,z),                     -- position vector of a point
+  U = transpose(d(R,u)),           -- tangent vectors as columns
+  h = (1,1,1),                     -- scale factors
+  Jac = h[1]* h[2]* h[3],          -- Jacobian determinant
+  Ex = U[1]/h[1],                  -- unit vectors for (x,y,z)
+  Ey = U[2]/h[2],
+  Ez = U[3]/h[3])
+-----------------------------------------------------------------
+
+
+"EXERCISE for you:"
+
+-- You may use the gradient via
+-- a. the above curvilinear definition
+-- b. the direct definition in 3.1 (1') Grad(f)
+-- c. the build-in definition grad(f)
+
+"===== a."
+
+cartesian
+
+f = 1
+
+Grad(f)
+
+
+"===== b."
+
+f = 2            -- write term here instead of pattern '1)
+
+I = (1,0,0)
+J = (0,1,0)
+K = (0,0,1)
+
+-- standard definition for grad in standard cartesian coord:
+
+Gradf = d(f,x)*I + d(f,y)*J + d(f,y)*K     -- i.e. \/f
+
+Gradf
+
+"===== c."
+
+f = 3
+
+grad(f)
+
+
+
+</textarea> 
+<button onclick="run()"style="font-size:20pt">Run</button><br>
+<div id="stdout"></div></body></html>

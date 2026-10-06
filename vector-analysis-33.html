@@ -1,0 +1,271 @@
+
+<!DOCTYPE html><html><body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:1em">
+
+
+##| VectorCalculus : spherical coordinates, section 3.3
+##| https://lindnerdrwg.github.io/VectorCalculus-with-Eigenmath.pdf
+##|         by Dr. W.G. Lindner, Leichlingen DE, 2026
+
+
+"DEFINITIONS for curvilinear coordinates:"
+-- u : coordinates
+-- f : scalar function
+-- F : vector function
+-- h : scale factors
+-- Jac : Jacobi matrix
+-----------------------------------------------------------------
+
+F = (f1(),f2(),f3())
+
+Grad(f) = ( d(f,u[1])/h[1], d(f,u[2])/h[2], d(f,u[3])/h[3] ) 
+
+Div(F) = 1/Jac * ( d(Jac F[1]/h[1],u[1]) +
+                   d(Jac F[2]/h[2],u[2]) + 
+                   d(Jac F[3]/h[3],u[3]))
+
+Curl(F)= 1/Jac *(h[1]*(d(h[3]*F[3],u[2]) - d(h[2]*F[2],u[3])),
+                 h[2]*(d(h[1]*F[1],u[3]) - d(h[3]*F[3],u[1])),
+                 h[3]*(d(h[2]*F[2],u[1]) - d(h[1]*F[1],u[2])))
+
+Laplacian(f)= 1/Jac *( d(h[2]*h[3]/h[1]*d(f,u[1]),u[1]) + 
+                       d(h[3]*h[1]/h[2]*d(f,u[2]),u[2]) +
+                       d(h[1]*h[2]/h[3]*d(f,u[3]),u[3]) )
+
+-----------------------------------------------------------------
+-- REMARK
+-- The terms for F, Grad(F) and Curl(F) calculates 'only' the 
+-- coordinates of these objects in the spherical coordinate system.
+-- If wanted, you have to expand the result in the actual basis 
+-- i.e. F=(x^2,y,z-1) ==  x^2*X + y*Y +(z-1)*Z 
+-- with X,Y,Z as spherical basis in R^3 at point P.
+
+"========== Step-by-step procedure."
+
+-- specify the variables u, f, F, h, Jac to use the formulae above
+
+"spherical coord are (r,theta,phi):"
+
+u = (r,theta,phi)
+R = (r sin(theta) cos(phi), r sin(theta) sin(phi), r cos(theta))
+U = transpose(d(R,u))
+U
+
+"tangent vectors to r, theta, phi lines at position R:"
+Ur = d(R,u[1])
+Ur
+
+Utheta = d(R,u[2])
+Utheta
+
+Uphi = d(R,u[3])
+Uphi
+
+Urthetaphi =  d(R,u)      
+Urthetaphi
+
+U = transpose(d(R,u))    -- tangent vectors collected as columns
+U
+
+"scale factors:"
+
+h(i) = sqrt(dot(U[i], U[i]))
+h = (simplify(h(1)), simplify(h(2)), simplify(h(3)) )
+h
+
+-- REMARK
+-- In spherical coordinates (r, theta, phi), the scale factors 
+-- often denoted as (h_r, h_theta, h_phi) relate changes in the 
+-- coordinates to physical distances. 
+-- They are: Radial distance (r)  : h_r = 1
+--           Polar angle (theta)  : h_theta = r
+--           Azimuthal angle (phi): h_phi = r *sin(theta)
+-- PROOF:
+-- The expression 1/2 - cos(2 theta)) simplifies to 
+-- 1/2*(1 - 2*sin^2 theta) = sin^2(theta) - 0.5. 
+-- Therefore
+--   h(3) = r*sqrt(0.5 + sin^2(theta) - 0.5)
+--   h(3) = r*sqrt(sin^2(theta))
+--   h(3) = r*sin(theta)
+
+h = (1, r, r*sin(theta))
+h
+
+"Jacobian:"
+
+Jac = h[1]* h[2]* h[3]
+Jac = simplify(Jac)
+Jac
+
+"========== Check curvilinear formula's in Eigenmath syntax"
+
+"Grad, Div, Curl, Laplace in spherical coords:"
+
+"... Gradient:"
+Grad(f(r,phi,z))
+
+"... Divergence:"
+F(r,phi,z)=(f1(r,phi,z),f2(r,phi,z),f3(r,phi,z))
+Div(F(r,phi,z))
+
+"... Curl:"
+Curl(F(r,phi,z))
+
+"... Laplacian:"
+Laplacian(f(r,phi,z))
+
+
+"========== EXAMPLE: SOLUTION to 3.3.a using curvilinear coords:"
+
+f(r,theta,phi) = 1/2*(2*cos(theta)+3*sin(theta)^2*cos(phi))
+F(r,theta,phi) = (1, 2/theta, phi*r*sin(theta))
+
+"Grad:"
+Grad(f(r,theta,phi))
+
+"Divergence:"
+Div(F)
+
+"Curl:"
+Curl(F)
+
+"Laplacian:"
+Laplacian(f)
+simplify
+
+""
+"========== SOLUTION to 3.3.a using direct definition (1S) .."
+""
+f(r,theta,phi) = 1/2*(2*cos(theta)+3*sin(theta)^2*cos(phi))
+F(r,theta,phi) = (1, 2/theta, phi*r*sin(theta))
+
+-- Er, Etheat, Ephi symbols for the basis vectors
+
+Gradf = d(f,r)*Er + 1/r*d(f,theta)*Etheta + 
+                    1/(r*sin(theta))*d(f,phi)*Ephi         
+Gradf
+
+
+DivF = 1/r^2*d(r^2*F[1],r) +
+       1/(r*sin(theta))*d(sin(theta)*F[2],theta) + 
+       1/(r*sin(theta))*d(F[3],phi) 
+DivF
+
+CurlF = 1/(r*sin(theta))*( d(sin(theta)*F[3],theta)-d(F[2],phi))*Er + 
+        1/r*( d(F[1],phi)/sin(theta) - d(r*F[3],r) )*Etheta +
+        1/r*( d(r*F[2],r)-d(F[1],theta) )*Ephi 
+CurlF
+
+Laplacianf = 1/r^2*d(r^2*d(f,r),r) + 
+             1/(r^2*sin(theta))*d(sin(theta)*d(f,theta),theta) + 
+             1/(r^2*sin(theta)^2)*d(f,phi,phi)   
+Laplacianf
+simplify
+
+"ok"
+
+
+"========== EXAMPLE: SOLUTION to 3.3.a using curvilinear coords"
+
+-- REMARK
+-- The terms for F, Grad(F) and Curl(F) calculates 'only' the 
+-- coordinates of these objects in the spherical coordinate system.
+-- This timr we adapt the formulae to use the curivilinear basis  
+-- i.e. F(r,theta,phi) = 1*Er - 2/theta*Etheta +phi*r*sin(theta)*Ephi 
+-- with Er, Etheat, Ephi as spherical basis in R^3 at point R.
+
+f(r,theta,phi) = 1/2*(2*cos(theta)+3*sin(theta)^2*cos(phi))
+F(r,theta,phi) = (1, 2/theta, phi*r*sin(theta))  
+
+Er     = Ur/h[1]
+Etheta = Utheta/h[2]
+Ephi   = Uphi/h[3]
+
+F = f1()*Er + f2()*Etheta + f3()*Ephi
+
+Grad(f) = d(f,u[1])/h[1]*Er + d(f,u[2])/h[2]*Etheta + d(f,u[3])/h[3]*Ephi 
+
+Div(F) = 1/Jac * ( d(Jac F[1]/h[1],u[1]) + 
+                   d(Jac F[2]/h[2],u[2]) + 
+                   d(Jac F[3]/h[3],u[3]))
+
+Curl(F)= 1/Jac *(h[1]*(d(h[3]*F[3],u[2]) - d(h[2]*F[2],u[3]))*Er +
+                 h[2]*(d(h[1]*F[1],u[3]) - d(h[3]*F[3],u[1]))*Etheta +
+                 h[3]*(d(h[2]*F[2],u[1]) - d(h[1]*F[1],u[2]))*Ephi)
+
+
+Laplacian(f)= 1/Jac *( d(h[2]*h[3]/h[1]*d(f,u[1]),u[1]) + 
+                       d(h[3]*h[1]/h[2]*d(f,u[2]),u[2]) +
+                       d(h[1]*h[2]/h[3]*d(f,u[3]),u[3]) )
+
+-----------------------------------------------------------------
+
+-- NOW use the adapted formulae for spherical coords
+
+f(r,theta,phi) = 1/2*(2*cos(theta)+3*sin(theta)^2*cos(phi))
+F(r,theta,phi) = (1, 2/theta, phi*r*sin(theta))  
+
+Grad(f)        -- i.e. \/f
+simplify
+
+Div(F)         -- i.e. \/ . F
+simplify
+
+Curl(F)        -- i.e. \/ x F
+simplify
+
+Laplacian(f)   -- i.e. /\f
+simplify
+
+
+"========== SOLUTION to 3.1.a. using option set"
+
+-- The derivation of the objects u, R, U, h, Jac, e1 ..
+-- are stepwise shows to enhance your unterstanding.
+-- When done, we collect the results in an OPTION SET 'spherical':
+
+spherical  = do(
+  u = (r,theta,phi),                 -- names of spherical coords
+  R = (r*sin(theta)*cos(phi), r*sin(theta)*sin(phi), r*cos(theta)),
+  U = transpose(d(R,u)),             -- tangent vectors as columns
+  h = (1, r, r*sin(theta) ),         -- scale factors
+  Jac = h[1]* h[2]* h[3],            -- Jacobian determinant
+  Er     = U[1]/h[1],                -- unit vectors for (r,phi,z)
+  Etheta = U[2]/h[2],
+  Ephi   = U[3]/h[3] )
+
+
+F = (f1(),f2(),f3())
+
+Grad(f) = ( d(f,u[1])/h[1], d(f,u[2])/h[2], d(f,u[3])/h[3] ) 
+
+Div(F) = 1/Jac * ( d(Jac F[1]/h[1],u[1]) +
+                   d(Jac F[2]/h[2],u[2]) + 
+                   d(Jac F[3]/h[3],u[3]))
+
+Curl(F)= 1/Jac *(h[1]*(d(h[3]*F[3],u[2]) - d(h[2]*F[2],u[3])),
+                 h[2]*(d(h[1]*F[1],u[3]) - d(h[3]*F[3],u[1])),
+                 h[3]*(d(h[2]*F[2],u[1]) - d(h[1]*F[1],u[2])))
+
+Laplacian(f)= 1/Jac *( d(h[2]*h[3]/h[1]*d(f,u[1]),u[1]) + 
+                       d(h[3]*h[1]/h[2]*d(f,u[2]),u[2]) +
+                       d(h[1]*h[2]/h[3]*d(f,u[3]),u[3]) )
+
+-- Now we calculate the vector analysis operators via a call
+-- to 'spherical':
+
+spherical      -- choose coordinate system
+
+f(r,theta,phi) = 1/2*(2*cos(theta)+3*sin(theta)^2*cos(phi))
+F(r,theta,phi) = (1, 2/theta, phi*r*sin(theta))
+
+Grad(f)        -- i.e. \/f
+Div(F)         -- i.e. \/ . F
+Curl(F)        -- i.e. \/ x F
+Laplacian(f)   -- i.e. /\f
+simplify
+
+</textarea> 
+<button onclick="run()"style="font-size:20pt">Run</button><br>
+<div id="stdout"></div></body></html>

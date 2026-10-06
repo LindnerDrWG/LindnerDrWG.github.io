@@ -1,0 +1,172 @@
+<!DOCTYPE html><html><body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:1em">
+
+
+##| VectorAnalysis : vector calculus operators
+##| https://lindnerdrwg.github.io/VectorAnalysis-using-Eigenmath.pdf
+##|         by Dr. W.G. Lindner, Leichlingen DE, 2026
+
+
+-- DEFINITIONs FOR grad-div-curl IN SPECIAL COORDINATE SYSTEMS
+--   scale factors h and Jacobian determinant Jac are integrated
+--   If only Cartesian coordinates are involved,
+--   you may also use the lowercase noted build-in
+--   operators    grad, div, curl    instead of the user-defined
+--   operators    Grad, Div, Curl
+
+--========== operators grad div curl in R^3 in Cartesian coord's
+
+I = (1,0,0)
+J = (0,1,0)
+K = (0,0,1)
+
+Grad(f) = d(f,x)*I + d(f,y)*J + d(f,y)*K       -- i.e. \/f
+
+Div(F) = d(F[1],x) + d(F[2],y) + d(F[3],z)     -- i.e. \/ . F
+
+Curl(F) = (d(F[3],y)-d(F[2],z))*I + 
+          (d(F[1],z)-d(F[3],x))*J +
+          (d(F[2],x)-d(F[1],y))*K              -- i.e. \/ x f
+
+Laplacian(f) = d(f,x,x) + d(f,y,y)+ d(f,z,z)   -- i.e. /\f
+
+-- EXAMPLE
+f(x,y,z) = x^2*y*z^3              -- f:R^3 --> R
+F(x,y,z) = (x*z, -y^2, 2*x^2*y)   -- F:R^3 --> R^3
+Grad(f)
+Div(F)
+
+
+--==========  operators grad div curl in R^3 in (C)ylindrical coord's
+
+-- use X,Y,Z as symbolic basis for Er,Ephi,Ez
+-- you MUST use the coordinate names (r, phi)
+
+GradC(f) = d(f,r)*X + 1/r*d(f,phi)*Y + d(f,z)*Z       
+  
+DivC(F) = 1/r*d(r*F[1],r) + 1/r*d(F[2],phi) + d(F[3],z) 
+
+CurlC(F) = (1/r*d(F[3],phi)-d(F[2],z))   *X + 
+        (d(F[1],z)-d(F[3],r))         *Y +
+        1/r*(d(r*F[2],r)-d(F[1],phi)) *Z   
+
+LaplacianC(f) = 1/r*d(f,r)+d(f,r,r) + 1/r^2*d(f,phi,phi)+ d(f,z,z)   
+
+-- EXAMPLE
+f(r,phi,z) = r^2*z^3             -- f:R^3 --> R
+F(r,phi,z) = (z,-phi^2,2*r^2*z)  -- F:R^3 --> R^3 
+GradC(f)
+DivC(F)
+
+--==========  operators grad div curl in R^3 in (S)pherical coord's
+
+-- use X,Y,Z as symbolic basis for Er, Etheta, Ephi
+-- you MUST use the coordinate names (r, theta, phi)
+
+GradS(f) = d(f,r)*Er + 1/r*d(f,theta)*Etheta + 
+                    1/(r*sin(theta))*d(f,phi)*Ephi         
+
+DivS(F) = 1/r^2*d(r^2*F[1],r) +
+       1/(r*sin(theta))*d(sin(theta)*F[2],theta) + 
+       1/(r*sin(theta))*d(F[3],phi) 
+
+CurlS(F) = 1/(r*sin(theta))*( d(sin(theta)*F[3],theta)-d(F[2],phi))*Er + 
+        1/r*( d(F[1],phi)/sin(theta) - d(r*F[3],r) )*Etheta +
+        1/r*( d(r*F[2],r)-d(F[1],theta) )*Ephi 
+
+LaplacianS(f) = 1/r^2*d(r^2*d(f,r),r) + 
+             1/(r^2*sin(theta))*d(sin(theta)*d(f,theta),theta) + 
+             1/(r^2*sin(theta)^2)*d(f,phi,phi)   
+
+-- EXAMPLE
+f(r,theta,phi) = 1/2*(2*cos(theta)+3*sin(theta)^2*cos(phi))
+F(r,theta,phi) = (1, 2/theta, phi*r*sin(theta))
+GradS(f)
+DivS(F)
+
+"=================== WORKED EXAMPLES ==================="
+
+"---------- PROBLEM 1 ------------------------------------"
+-- If V = (x+3y)I + (y-2z)J + (x+2Lz)K 
+-- is 'solenoidal', find L. 
+----------------------------------------------------------
+-- V 'soleniodal' iff div V = 0.
+
+V = (x+3*y)I + (y-2*z)J + (x+2*L*z)K
+Div(V)
+
+-- 2L+2==0  ==> L=-1
+
+
+"---------- PROBLEM 2 -----------------------------------"
+-- Show that F = (x^2-y^2+x)I - (2xy+y)J 
+-- is 'irrotational', i.e. curl F =0. 
+----------------------------------------------------------
+ 
+F = (x^2-y^2+x)I - (2 x y + y)J
+Curl(F)
+check(Curl(F)==0)
+"ok"
+
+"---------- PROBLEM 3 -----------------------------------"
+-- If F = (x^3)I + (y^3)J + (z^3)K 
+-- find Div(Curl(F)  i.e. \/.\/x F. 
+----------------------------------------------------------
+
+F=(x^3)I + (y^3)J + (z^3)K
+F
+Div(Curl(F))
+
+
+"---------- PROBLEM 6 -----------------------------------"
+--  if R=(x,y,z) is the position vector of a point,
+--  show that Div(R)=3  & Curl(R)=0. 
+----------------------------------------------------------
+
+R = (x,y,z)         
+Div(R)
+Curl(R)
+"ok"
+
+"---------- PROBLEM 7 -----------------------------------"
+--  Evaluate \/^2 (log r) for R = (x,y,z)  
+--                        and r := |R|
+----------------------------------------------------------
+
+--  REMARK
+--  We have these alias notations for the same concept:
+--  \/^2 (log r) == ∆(log r) == del(log r) == Laplacian(log r):
+
+R = (x,y,z)                  -- position vector
+r = sqrt(x^2+y^2+z^2)
+r
+log(r)
+
+-- Laplacian in different calculations
+
+d(d(log(r),x),x) + d(d(log(r),y),y) + d(d(log(r),z),z)
+
+d(log(r),x,x) + d(log(r),y,y) + d(log(r),z,z)
+
+d(log(r),x,2)+d(log(r),y,2)+d(log(r),z,2)
+
+div(grad(log(r)))            -- using build-in definitons
+
+Div(Grad(log(r)))            -- using general coordinates
+
+Laplacian( log(r) )          -- using general direct formula
+
+simplify(last)
+
+-- REMARK
+-- Regrettably, Eigenmath can't simplify the result.
+-- But the check works (hint of G.Weigt):
+
+check( div(grad(log(r))) == 1/r^2 )
+"ok"
+
+
+</textarea> 
+<button onclick="run()"style="font-size:20pt">Run</button><br>
+<div id="stdout"></div></body></html>

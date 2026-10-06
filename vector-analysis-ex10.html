@@ -1,0 +1,191 @@
+<!DOCTYPE html><html><body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:1em">
+
+
+##| VectorAnalysis : §5 problems
+##| https://lindnerdrwg.github.io/VectorAnalysis-using-Eigenmath.pdf
+##|         by Dr. W.G. Lindner, Leichlingen DE, 2026
+
+
+--------------- vector analysis Operators: grad div curl ------
+
+F = (f1(),f2(),f3())
+
+Grad(f) = ( d(f,u[1])/h[1], d(f,u[2])/h[2], d(f,u[3])/h[3] ) 
+
+Div(F) = 1/Jac * ( d(Jac F[1]/h[1],u[1]) + 
+                   d(Jac F[2]/h[2],u[2]) + 
+                   d(Jac F[3]/h[3],u[3]))
+
+Curl(F)= 1/Jac *(h[1]*(d(h[3]*F[3],u[2]) - d(h[2]*F[2],u[3])),
+                 h[2]*(d(h[1]*F[1],u[3]) - d(h[3]*F[3],u[1])),
+                 h[3]*(d(h[2]*F[2],u[1]) - d(h[1]*F[1],u[2])))
+
+
+Laplacian(f)= 1/Jac *( d(h[2]*h[3]/h[1]*d(f,u[1]),u[1]) + 
+                       d(h[3]*h[1]/h[2]*d(f,u[2]),u[2]) +
+                       d(h[1]*h[2]/h[3]*d(f,u[3]),u[3]) )
+
+
+"---------- PROBLEM 5.1.1 --------------------------"
+--  U=x^2. Find grad(U) in cartesian coords.
+------------------------------------------------------
+
+V = x^2         -- do not use name U, it is predefined below
+
+cartesian = do(
+  u = (x,y,z),                     -- names of cartesian coords
+  R = (x,y,z),                     -- position vector of a point
+  U = transpose(d(R,u)),           -- tangent vectors as columns
+  h = (1,1,1),                     -- scale factors
+  Jac = h[1]* h[2]* h[3],          -- Jacobian determinant
+  I = U[1]/h[1],                   -- unit vectors for (x,y,z)
+  J = U[2]/h[2],
+  K = U[3]/h[3])
+
+Grad(V)
+2x*I
+grad(V)
+
+"---------- PROBLEM 5.1.2 --------------------------"
+--  U=r^2. Find grad(U) in cartesian coords, 
+--  where  r = sqrt(x^2+y^2+z^2).               
+------------------------------------------------------
+
+cartesian               -- chose chart
+V = x^2 + y^2 + z^2     -- V: R^3 --> R
+Grad(V)
+grad(V)
+
+
+"---------- PROBLEM 5.3.1 --------------------------"
+--  a=r^2. Find div(a) in cartesian coords, 
+--  where  r = sqrt(x^2+y^2+z^2).               
+------------------------------------------------------
+
+cartesian
+a = x*I + y*J + z*K     
+a
+
+Div(a)
+div(a)
+
+check( Div(a) == 3 )
+"ok"
+
+"---------- PROBLEM 5.5.1 --------------------------"
+--  f=1/r. Find laplacian(f) in cartesian coords, 
+--  where  r = sqrt(x^2+y^2+z^2).               
+------------------------------------------------------
+
+cartesian
+f = 1/sqrt(x^2+y^2+z^2)     
+
+Laplacian(f)
+simplify
+
+"ok"
+
+"---------- PROBLEM 5.6.a --------------------------"
+--  a=-y*I+x*J. Find curl(a) in cartesian coords.
+------------------------------------------------------
+
+cartesian               -- chose chart
+a = -y*I+x*J     -- do not use name U, it is predefined
+
+Curl(a)
+curl(a)
+2 K
+check( Curl(a)== 2 K )
+"ok"
+
+
+"---------- PROBLEM 6.14.Q2 --------------------------"
+--  Find divergence(F) in (a) cartesian (b) spherical coords 
+--  when F=r*C, C=(c1,c2,c3) mit r = sqrt(x^2+y^2+z^2).               
+------------------------------------------------------
+
+"========== ad (a):"
+
+cartesian 
+
+C = (c1,c2,c3)
+r = sqrt(x^2+y^2+z^2)    -- sqrt(R^2) = abs(R) 
+F = r*C        
+Div(F)                   -- using curivlinear coords, ok
+div(F)                   -- build-in, the same result
+
+1/r*dot(R,C)
+
+check( Div(F) == 1/r*dot(R,C) )
+"ok"
+
+"========== ad (b): using spherical coord (r,theta,phi)"
+ -- we override the old defintions 'cartesian' to use
+
+clear(r)     -- because r was used before in F=r*C
+ 
+spherical  = do(
+  u = (r,theta,phi),            -- names of spherical coords
+  R = (r sin(theta) cos(phi), r sin(theta) sin(phi), r cos(theta)),
+  U = transpose(d(R,u)),        -- tangent vectors as columns
+  h = (1, r, r*sin(theta)),     -- scale factors
+  Jac = h[1]* h[2]* h[3],       -- Jacobian determinant
+  Er     = U[1]/h[1],           -- unit vectors for (r,phi,z)
+  Etheta = U[2]/h[2],
+  Ephi   = U[3]/h[3])
+
+
+"now calculate Divergence of a"
+
+C = (cx,cy,cz)
+
+a = dot((Er,Etheta,Ephi),r*C)      -- in spherical basis 
+a
+
+-- the components of a
+ar     = a[1]
+ar
+atheta = a[2]
+atheta
+aphi   = a[3]
+aphi
+
+" ... FIRST solution:"
+---------------------------------- direct definition via 3.3.(3S)
+DivF = 1/r^2*d(r^2*F[1],r) +
+       1/(r*sin(theta))*d(sin(theta)*F[2],theta) + 
+       1/(r*sin(theta))*d(F[3],phi) 
+----------------------------------
+
+-- the single summands
+
+1/r^2*d(r^2*a[1],r) 
+1/(r*sin(theta))*d(sin(theta)*a[2],theta) 
+1/(r*sin(theta))*d(a[3],phi) 
+
+-- their sum alias the divergence
+
+DivA = 1/r^2*d(r^2*a[1],r) +
+       1/(r*sin(theta))*d(sin(theta)*a[2],theta) +
+       1/(r*sin(theta))*d(a[3],phi) 
+DivA
+
+
+" ... SECOND solution:"
+--    using curvilinear definition
+---------------------------------- curvilinear definition
+Div(F) = 1/Jac * ( d(Jac F[1]/h[1],u[1]) + 
+                   d(Jac F[2]/h[2],u[2]) + 
+                   d(Jac F[3]/h[3],u[3]))
+---------------------------------- 
+
+Div(a)
+
+"ok"
+
+
+</textarea> 
+<button onclick="run()"style="font-size:20pt">Run</button><br>
+<div id="stdout"></div></body></html>

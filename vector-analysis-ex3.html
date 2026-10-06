@@ -1,0 +1,87 @@
+<!DOCTYPE html><html><body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:1em">
+
+
+##| VectorCalculus : coversion of coordinates, Exercise 3
+##| https://lindnerdrwg.github.io/VectorCalculus-with-Eigenmath.pdf
+##|         by Dr. W.G. Lindner, Leichlingen DE, 2026
+
+-- For conversion of the cylindrical coordinates (rho, theta, z) to 
+-- the spherical coordinates (rho, theta, phi)
+-- the below-mentioned equations are used.
+-- cyl: (rho, theta, z) -- > sph: (rho, theta, phi)
+
+rho   = sqrt(r^2 +z^2)
+rho
+theta = theta
+phi   = arccos(z/sqrt(r^2+z^2))
+phi
+
+"========== a."
+"Express the cylindrical coordinates (2, 2 pi/3 , -2)"
+"as rectangular coordinates."
+
+(2, 2 pi/3 , -2)
+
+"Solution: Using conversion equations"
+
+x = 2 cos(2 pi/3)    -- = -1
+x
+
+y = - 2 sin(2 pi/3)  -- = r sinθ = -1
+y
+
+z = -2
+z
+
+"Answer: cylindrical (2,2 pi/3,-2) --> (x=-1, y=-sqrt{3}, z=-2) rectangular."
+
+"========== b."
+"Convert Cartesian Coordinates (3,4,2) to cylindrical coordinates."
+
+clear
+
+"Solution: Using the following conversion equations"
+
+r     = sqrt(x^2 + y^2)
+theta = arctan(y / x)
+z     = z                  -- (z remains the same)
+
+-- Given Cartesian coordinates (3, 4, 2), do
+-- r = √(3² + 4²) = √(9 + 16) = √25 = 5
+-- θ = tan⁻¹(4 / 3) ≈ 0.93 radians
+-- z = 2
+
+do( x=3, y=4, z=2)
+r
+float(theta)
+z
+
+"Answer: The cylindrical coordinates of (3,4,2) are (5, 0.93, 2)"
+
+"========== c."
+"Convert spherical coordinates (16,pi/3,pi/6) to cylindrical coords."
+
+-- Solution: Using the conversion equations we have,
+
+clear
+
+do(rho=16, theta=pi/3, phi=pi/6)
+
+r = rho sin(phi)          -- 16 sin{pi/6}=8
+r
+
+theta = pi/3              -- given, remains
+theta
+
+z=rho cos(phi)            -- 16 cos(pi/6) =8 sqrt{3}
+z
+float
+
+"Answer: r = 8, theta = pi/3, z = 8*sqrt{3} cylindrical"
+
+
+</textarea> 
+<button onclick="run()"style="font-size:20pt">Run</button><br>
+<div id="stdout"></div></body></html>

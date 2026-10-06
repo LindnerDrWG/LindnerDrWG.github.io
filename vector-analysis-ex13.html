@@ -1,0 +1,204 @@
+<!DOCTYPE html><html><body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:1em">
+
+
+##| VectorAnalysis : Problem VC-3.pdf, 6.14 Q1
+##| https://lindnerdrwg.github.io/VectorAnalysis-using-Eigenmath.pdf
+##|         by Dr. W.G. Lindner, Leichlingen DE, 2026
+
+##  url: https://www.lehman.edu/faculty/anchordoqui/VC-3.pdf
+##  Murray
+ 
+#####----------- curvilinear curl ---------------------
+F = (f1(),f2(),f3())
+
+Curl(F)= 1/Jac *(h[1]*(d(h[3]*F[3],u[2]) - d(h[2]*F[2],u[3])),
+                 h[2]*(d(h[1]*F[1],u[3]) - d(h[3]*F[3],u[1])),
+                 h[3]*(d(h[2]*F[2],u[1]) - d(h[1]*F[1],u[2])))
+
+#####------------------------------------------------------------
+
+
+"---------- PROBLEM 6.14.Q1 --------------------------"
+--  Find curl(F) in (i) cartesian (ii) spherical polars    
+--  when F = x*(x*I+y*J+z*K).               
+------------------------------------------------------
+
+"========== ad (i):"
+
+"use predefined chart 'cartesian' "
+
+cartesian = do(
+  u = (x,y,z),                     -- names of cartesian coords
+  R = (x,y,z),                     -- position vector of a point
+  U = transpose(d(R,u)),           -- tangent vectors as columns
+  h = (1,1,1),                     -- scale factors
+  Jac = h[1]* h[2]* h[3],          -- Jacobian determinant
+  I = U[1]/h[1],                   -- unit vectors for (x,y,z)
+  J = U[2]/h[2],
+  K = U[3]/h[3])
+
+F = x*(x*I+y*J+z*K)   -- F = x*(x,y,z) = (x^2,xy,xz)
+Curl(F)               -- using curivlinear coords, ok
+curl(F)               -- build-in, the same result
+
+
+"========== ad (ii): spherical coord (r,theta,phi)"
+ -- we override the old defintions 'cartesian' to use
+ 
+spherical  = do(
+  u = (r,theta,phi),                 -- names of spherical coords
+  R = (r sin(theta) cos(phi), r sin(theta) sin(phi), r cos(theta)),
+  U = transpose(d(R,u)),             -- tangent vectors as columns
+  h = (1, r, r*sin(theta)),          -- scale factors
+  Jac = h[1]* h[2]* h[3],            -- Jacobian determinant
+  Er     = U[1]/h[1],                -- unit vectors for (r,phi,z)
+  Etheta = U[2]/h[2],
+  Ephi   = U[3]/h[3])
+
+"now calculate Curl of F"
+
+-- x = r sin(theta) cos(phi), ergo
+-- Er = sqrt(dot(R,R)) = X wg verwechslung
+
+F = r sin(theta) cos(phi) * X
+simplify
+F
+
+F = (r^2 sin(theta) cos(phi), 0,0)   -- = x*(x*I+y*J+z*K) 
+F
+
+CurlF = Curl(F)     -- Curl(F) in spherical coords
+CurlF
+
+"========== (iii) Verify the equivalence of both calculations"
+
+-- Q: is curl independent of the coordinate system?
+
+-- AI Overview:  Yes, the curl of a vector field is independent 
+-- of the coordinate system. It is a true physical/geometric 
+-- operation, meaning its magnitude and direction represent an 
+-- intrinsic property of the vector field at a specific point, 
+-- regardless of whether you measure it in Cartesian, 
+-- cylindrical, or spherical coordinates.
+
+-- While the formula you use to calculate the curl changes depending 
+-- on your coordinate system (e.g., using partial derivatives with
+-- (x,y, z) versus (r,theta, phi), the final output vector will 
+-- always point in the exact same physical direction and have the 
+-- same magnitude.
+
+-- The curl is a true vector field operation — the result is 
+-- independent of the coordinate system that is used.
+
+"========== ========== SECOND calculation with spherical Curl"
+
+clear
+
+"... alternativ we use the coordinate change via substitution"
+-- this calculation is much shorter ;)
+
+F = x*(x,y,z) 
+
+-- we feed x,y,z with the spherical coordinates
+
+x = r sin(theta) cos(phi)
+x
+y = r sin(theta) sin(phi)
+z = r cos(theta)
+
+-- and get F directly expressed in spherical coordinates
+
+F
+
+CurlF = 1/(r*sin(theta))*( d(sin(theta)*F[3],theta)-d(F[2],phi))*X + 
+        1/r*( d(F[1],phi)/sin(theta) - d(r*F[3],r) )*Y +
+        1/r*( d(r*F[2],r)-d(F[1],theta) )*Z 
+
+CurlF
+simplify
+
+-- Result
+
+A = -r*cos(phi)^2*sin(theta) + 
+    2*r*cos(phi)*cos(theta)^2-r*cos(phi)*sin(phi)^2 +
+    r*sin(theta)*sin(phi)^2
+B = -3*r*cos(phi)*cos(theta)*sin(theta) -
+     2*r*cos(phi)*sin(phi)*sin(theta)
+C = -2*r*cos(phi)^2*cos(theta)*sin(theta) +
+     3*r*cos(phi)*sin(phi)*sin(theta)^2
+
+CurlF =(A,B,C)
+CurlF
+simplify
+
+
+"... alternativ we use the coordinate change via basis"
+
+clear
+
+F = x*(x*I+y*J+z*K)        -- in cartesian coords
+
+-- To write the Cartesian vector F = x*(x,y,z) = (x^2,xy,xz) 
+-- in spherical coordinates, i.e. 
+-- substitute the standard coordinate transformations: 
+--      x = r sin(theta) cos(phi)
+--      y = r sin(theta) sin(phi)
+--      z = r cos(theta)
+-- The converted vector is: 
+--      F = r sin(theta) cos(phi) *
+--           (r sin(theta) cos(phi), 
+--            r sin(theta) sin(phi), r cos(theta) )
+--        = r sin(theta) cos(phi) * R
+
+--        = z*I  -2x*J + y*K
+--        = z*I -2r*cos(theta)*J + r*sin(theta)*K
+--        = z*Er -2r*cos(theta)*Ephi + r*sin(theta)*Ez
+
+R = (r sin(theta) cos(phi), r sin(theta) sin(phi), r cos(theta))
+
+RR = ((sin(theta) cos(phi),sin(theta) sin(phi), cos(theta)),
+      (cos(theta) cos(phi),cos(theta) sin(phi), -sin(theta)),
+      ( -sin(phi),cos(phi),0))
+RR
+
+ErEtEp = dot(RR, (I,J,K))    -- (Er,Etheta,Ephi) = 
+ErEtEp
+
+-- we have found:
+
+CurlF = 0*Er - r*sin(phi)*Etheta - r*cos(phi)*cos(theta)*Ephi
+CurlF
+
+Etheta = dot(RR, (I,J,K))[2]
+Etheta
+Ephi = dot(RR, (I,J,K))[3]
+Ephi
+
+-- now in cartesian 
+
+CurlF = - r*sin(phi)*Etheta - r*cos(phi)*cos(theta)*Ephi
+CurlF
+CurlF = simplify(CurlF)
+CurlF
+
+-- substitute
+eval(CurlF, r*cos(theta), z, r sin(theta) sin(phi), y)
+ 
+-- i.e.
+
+(0,-z,y)
+
+--x = r sin(theta) cos(phi)
+--y = r sin(theta) sin(phi)
+--z = r cos(theta)
+
+CurlF
+
+-- this is exactly the result in Cartesians
+
+
+</textarea> 
+<button onclick="run()"style="font-size:20pt">Run</button><br>
+<div id="stdout"></div></body></html>

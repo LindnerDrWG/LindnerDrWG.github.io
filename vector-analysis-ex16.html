@@ -1,0 +1,110 @@
+<!DOCTYPE html><html><body>
+<script src="https://georgeweigt.github.io/eigenmath.js"></script>
+<textarea id="stdin" rows="24" cols="80" style="font-family:courier;font-size:1em">
+
+
+##| VectorAnalysis : Problem set in ’Introduction to Vector Calculus’
+##| https://lindnerdrwg.github.io/VectorAnalysis-using-Eigenmath.pdf
+##|         by Dr. W.G. Lindner, Leichlingen DE, 2026
+
+
+"-- the vector analysis :curvilinear operators: grad div curl"
+
+F = (f1(),f2(),f3())
+
+Grad(f) = ( d(f,u[1])/h[1], d(f,u[2])/h[2], d(f,u[3])/h[3] ) 
+
+Div(F) = 1/Jac * ( d(Jac F[1]/h[1],u[1]) + 
+                   d(Jac F[2]/h[2],u[2]) + 
+                   d(Jac F[3]/h[3],u[3]))
+
+Curl(F)= 1/Jac *(h[1]*(d(h[3]*F[3],u[2]) - d(h[2]*F[2],u[3])),
+                 h[2]*(d(h[1]*F[1],u[3]) - d(h[3]*F[3],u[1])),
+                 h[3]*(d(h[2]*F[2],u[1]) - d(h[1]*F[1],u[2])))
+
+
+Laplacian(f)= 1/Jac *( d(h[2]*h[3]/h[1]*d(f,u[1]),u[1]) + 
+                       d(h[3]*h[1]/h[2]*d(f,u[2]),u[2]) +
+                       d(h[1]*h[2]/h[3]*d(f,u[3]),u[3]) )
+
+"Predefined charts aka curvilinear coordinate systems:"
+
+chart(cosy) = 
+ test(cosy=cartesian,              -- cosy : coord.system
+ do(
+  u = (x,y,z),                     -- names of cartesian coords
+  R = (x,y,z),                     -- position vector of a point
+  U = transpose(d(R,u)),           -- tangent vectors as columns
+  h = (1,1,1),                     -- scale factors
+  Jac = h[1]* h[2]* h[3],          -- Jacobian determinant
+  Ex = U[1]/h[1],                  -- unit vectors for (x,y,z)
+  Ey = U[2]/h[2],
+  Ez = U[3]/h[3]),
+cosy=cylindrical, do(
+  u = (r,phi,z),                     -- names of cylindrical coords
+  R = (r cos(phi), r sin(phi), z),   -- position vector of a point
+  U = transpose(d(R,u)),             -- tangent vectors as columns
+  h = (1,r,1),                       -- scale factors
+  Jac = h[1]* h[2]* h[3],            -- Jacobian determinant
+  Er   = U[1]/h[1],                  -- unit vectors for (r,phi,z)
+  Ephi = U[2]/h[2],
+  Ez   = U[3]/h[3]),
+cosy=spherical  , do(
+  u = (r,theta,phi),                 -- names of spherical coords
+  R = (r sin(theta) cos(phi), r sin(theta) sin(phi), r cos(theta)),
+  U = transpose(d(R,u)),             -- tangent vectors as columns
+  h = (1, r, r*sin(theta)),          -- scale factors
+  Jac = h[1]* h[2]* h[3],            -- Jacobian determinant
+  Er   = U[1]/h[1],                  -- unit vectors for (r,phi,z)
+  Etheta = U[2]/h[2],
+  Ephi   = U[3]/h[3])
+)
+-----------------------------------------------------------------
+
+""
+"========== EXAMPLE: Q26."
+
+chart(cartesian)
+
+R
+f = x^3 + y^3 + z^3 - 3 x y z
+F=Grad(f)
+F
+grad(f)
+
+Div(F)
+Curl(F)
+
+"ok"
+
+
+"========== YOUR task starts here:"
+
+-- Now we calculate the vector analysis operators via a call
+-- to a apecial chart, i.e. 'cartesian', 'cylindrical' or 'spherical':
+
+f = yourterm                  -- f:R^3 --> R
+F = YourTerm                  -- V:R^3 --> R^3
+
+chart(cylindrical)     -- Chose your curvilinear coord system ('chart')
+
+Grad(f)        -- i.e. \/f
+simplify
+
+Div(V)         -- i.e. \/ . F
+simplify
+
+Curl(V)        -- i.e. \/ x F
+simplify
+
+Laplacian(f)   -- i.e. \/^2 f == /\f
+simplify
+
+"========== Check your solution"
+"... using the free WolframCloud.Basic CAS"
+"... or ask AI (google): 'calculate curl of F(r,phi,z) = ... in ... coordinates' "
+
+
+</textarea> 
+<button onclick="run()"style="font-size:20pt">Run</button><br>
+<div id="stdout"></div></body></html>
