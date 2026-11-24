@@ -1,0 +1,17 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 18b
+                     W.G. Lindner, 2027
+$                     
+
+load_package ORTHOVEC$
+
+a := svec(a_1,a_2,a_3);
+b := svec(b_1,b_2,b_3);
+a  >< b;      
+
+a := svec(1, 0, 2*x);
+b := svec(0, 1, 2);
+a ><  b;      
+
+end;

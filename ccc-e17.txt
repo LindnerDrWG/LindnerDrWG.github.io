@@ -1,0 +1,22 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 17
+                     W.G. Lindner, 2027
+$                     
+
+load_package excalc;
+spacedim 3; 
+coframe e(1) = d x, e(2) = d y, e(3) = d z;
+pform alpha=1, beta=1;
+ 
+linearity := # (a*alpha + b*beta) - (a*(# alpha) + b*(# beta));
+
+exdegree # alpha;
+
+volume_form := # 1;
+ 
+volume_star := # (e(1)^e(2)^e(3));
+
+# # alpha;
+
+end;

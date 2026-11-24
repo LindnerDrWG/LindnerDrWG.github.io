@@ -1,0 +1,18 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 10
+                     W.G. Lindner, 2027
+$                     
+
+load_package excalc;
+
+% Define a 2D polar coordinate system with a metric
+coframe o(r) = dr, o(phi) = r*dphi;
+
+% Look at covariant (lower) vs contravariant (upper) indices
+eps(r, phi);      % Returns 1
+eps(-r, -phi);    % Returns 1 / r^2 
+                  % adjusted automatically by the metric determinant
+
+
+end;

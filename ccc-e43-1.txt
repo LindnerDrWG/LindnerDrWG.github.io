@@ -1,0 +1,18 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 43-1
+                     W.G. Lindner, 2027
+$                     
+
+load_package avector;        
+ 
+S := avec(u*cos(v), u*sin(v), v);    % x = u cos(v), y = u sin(v), z = v
+a := vmod( df(S,u) cross  df(S,v) );
+area := defint( defint(a, u,0,1),  v,0,3*pi);
+ 
+on rounded;
+print_precision 5;
+area;
+
+
+end;

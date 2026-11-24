@@ -1,0 +1,26 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 18c
+                     W.G. Lindner, 2027
+$                     
+
+load_package LISTVECOPS$
+
+% function CROSS in package listvecops using (9.7)
+listproc cross(u,v);
+   begin scalar x,y,z, Cx,Cy,Cz;
+     Cx := u _(2)*v _(3) - u _(3)*v _(2);
+     Cy := u _(3)*v _(1) - u _(1)*v _(3);
+     Cz := u _(1)*v _(2) - u _(2)*v _(1);
+     return {Cx,Cy,Cz}
+   end;
+   
+a := {a_1,a_2,a_3};
+b := {b_1,b_2,b_3};
+cross (a,b);      
+
+a := {1, 0, 2*x};
+b := {0, 1, 2};
+cross (a,b);      
+
+end;

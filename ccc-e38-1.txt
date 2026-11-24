@@ -1,0 +1,13 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 37-1
+                     W.G. Lindner, 2027
+$                     
+
+load_package avector;
+g := avec(x, x, 0);
+F := avec(x, 0 ,0);
+Line_integral := defint( F dot df(g, x), x, 0, 1);
+
+
+end;

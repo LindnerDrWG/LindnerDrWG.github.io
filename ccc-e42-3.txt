@@ -1,0 +1,28 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 41-3
+                     W.G. Lindner, 2027
+$                     
+
+load_package excalc;
+
+% Define the coordinates of the 3D ambient space
+pform {x, y, z}=0;
+
+% Establish an orthonormal coframe (Euclidean basis 1-forms)
+coframe e(1) = d x, e(2) = d y, e(3) = d z;
+
+% Define the surface implicitly as f(x,y,z) = 0
+pform f=0, df=1;
+f := z - x**2 - 2*y;
+df := d f;
+
+% Compute the norm squared of the normal vector field via Hodge star
+pform norm_sq=0;
+norm_sq := #(df ^ # df);
+
+% integrate the square root 
+surface_area := int(int( sqrt(norm_sq),  y, 0,1), x, 0,1);
+
+
+end;

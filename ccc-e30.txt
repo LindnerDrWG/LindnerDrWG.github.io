@@ -1,0 +1,10 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 30
+                     W.G. Lindner, 2027
+$                     
+
+int(x^2,x);
+int(x^2,x,1,2);
+
+end;

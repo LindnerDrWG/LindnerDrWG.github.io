@@ -1,0 +1,28 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 34
+                     W.G. Lindner, 2027
+$                     
+
+% Load the vector calculus package
+load_package avector;
+
+% Define the curve as a 3D vector parameterized by x
+g := avec(x, x^2, 0);
+
+% Differentiate the curve w.r.t. x to get the tangent vector
+dg := df(g, x);
+
+% Compute the scalar magnitude (vector modulus) of the tangent vector
+define mag = vmod;
+ds := mag dg;
+
+% Evaluate the definite integral from x = 0 to x = 1
+arc_length := defint(ds, x, 0, 1);
+
+on rounded;
+print_precision 5;
+arc_length;
+
+
+end;

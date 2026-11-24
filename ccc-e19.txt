@@ -1,0 +1,16 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 19
+                     W.G. Lindner, 2027
+$                     
+
+load_package excalc;
+spacedim 3;                   % set dimension of the underlying space 
+coframe e(1) = d x, e(2) = d y, e(3) = d z;
+ 
+pform f=0;                    % f is a scalar function
+fdomain f = f(x,y,z);         % f is a function of the variables x,y and z
+ 
+d f;                          % total differential of f, i.e. the gradient
+
+end;

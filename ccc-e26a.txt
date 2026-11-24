@@ -1,0 +1,14 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 26a
+                     W.G. Lindner, 2027
+$                     
+
+load_package eds;
+pform {x,y,z, u,v, f} = 0;
+pform w = 2;
+w := y * (d x ^ d z);
+phi := {x = u**2, y = u*v, z = v**2};
+pullback(w, phi);
+
+end;

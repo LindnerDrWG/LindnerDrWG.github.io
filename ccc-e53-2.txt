@@ -1,0 +1,48 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 52-2
+                     W.G. Lindner, 2027
+$                     
+
+load_package excalc;
+pform {x,y,z}=0, omega=2;
+
+% associated 2-form w.r.t. field F=(x-y,x+z,z-y)  
+omega := (x-y)*d y^d z + (x+z)*d z^d x + (z-y)*d x^d y;
+
+% 1. ---------- VOLUME Integral (LHS Divergence Side) 
+
+% Compute the exterior derivative of omega and extract the divergence 
+div_F := (d omega) / (d x ^ d y ^ d z); 
+
+% Calculate the volume of cone using cylindrical coordinates
+% with bounds 0 <= phi <= 2*pi, 0 <= z <= 1, 0 <= r <= z,  h-factor r
+
+volume := int(int(int( div_F * r, r,0,z), z,0,1), phi, 0,2*pi);
+
+% 2. ---------- SURFACE Integral (RHS)
+%               we have to add the areas of a cone and his top
+clear x,y,z;
+pform {x,y,z, u,v}=0;
+
+% 2.a .......... area cone 
+x := u*cos(v);   y := u*sin(v);   z := u;
+
+% integrate with orientation sign -1
+flux_cone := - int(int( coeffn(omega, d u^d v, 1), v, 0,2*pi), u, 0,1);
+
+% 2.b .......... area top disk (z=1)
+clear x,y,z;
+pform {x,y,z, r,theta}=0;
+omega := (x-y)*d y^d z + (x+z)*d z^d x + (z-y)*d x^d y;
+
+% parametrization with cylindrical coordinates, 0<=r<=1, 0<=theta<=2 pi
+x := r*cos(theta);   y := r*sin(theta);   z := 1;
+
+flux_top  := int(int(coeffn(omega,d r^d theta,1),theta,0,2*pi),r,0,1);
+
+total_flux := flux_cone + flux_top;
+write "Check GAUSS theorem:", volume = total_flux;
+
+
+end;

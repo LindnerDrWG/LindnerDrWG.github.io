@@ -1,0 +1,16 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Exercise xx
+                     W.G. Lindner, 2027
+$                     
+
+% This is an empty playground for your work.
+
+
+load_package excalc;
+
+
+
+
+
+end;

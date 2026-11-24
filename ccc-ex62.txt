@@ -1,0 +1,26 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Exercise 62
+                     W.G. Lindner, 2027
+$                     
+
+% contributed by F.J. Wright
+
+lineint(1, avec(e^(theta/4), 0, theta), theta = 0 .. theta);
+
+
+% Result:
+%            theta/4
+% sqrt(17)*(e        - 1)
+
+lineint(1, avec(e^(theta/4), 0, theta), theta = 0 .. 2pi);
+
+
+%            pi/2
+% sqrt(17)*(e     - 1)
+
+ws with on rounded;
+
+% 15.7110007257
+
+end;

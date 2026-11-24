@@ -1,0 +1,39 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 47-2
+                     W.G. Lindner, 2027
+$                     
+
+load_package excalc;
+
+% Define t as the base manifold coordinate
+coframe e(t) = d t;
+pform {x,y}=0;
+
+% Declare x and y as scalar functions dependent on t
+fdomain x = x(t), y = y(t);
+
+% Define components of parametrization phi(t) 
+x := t**9;
+y := sin(t*pi/2)**9;
+
+% Define the field-associate 1-form omega = y*dx + x*dy 
+pform omega = 1;
+omega := y * d x + x * d y;
+
+% Pull back the 1-form to the t-manifold. 
+% This automatically evaluates the exterior derivatives 
+% d x and d y via the chain rule.
+omega;
+
+% Extract the scalar integration coefficient by dividing by 'd t' 
+% or use coeffn(..) or substitute dt ->1 in omega
+pullback1 := omega / d t;
+pullback2 := coeffn(omega, d t, 1);
+pullback3 := sub(d t = 1, omega);
+
+% Perform the definite line integration from t = 0 to t = 1
+result := int(pullback1, t, 0, 1);
+
+
+end;

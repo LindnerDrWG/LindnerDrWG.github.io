@@ -1,0 +1,13 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 25-4
+                     W.G. Lindner, 2027
+$                     
+
+in "mappings.red"$   % E. Schruefer
+
+pform {x,y,z, u,v}=0;
+mapping phi: (u,v) -> (x=2*u-v,y=3*u+2*v);
+phi(*,x**2-y**2);
+
+end;

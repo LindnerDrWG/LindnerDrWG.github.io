@@ -1,0 +1,61 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 52-1
+                     W.G. Lindner, 2027
+$                     
+
+load_package avector;  
+
+% Declare vectors
+vec F, R, Rt, Rth, N, Fc, Ft, Nt;
+
+% Define the vector field
+F := avec(x-y, x+z, z-y);
+
+% 1. ---------- VOLUME Integral (LHS Divergence Side) 
+
+% Calculate divergence and triple integrate, radius = ra
+Volume := defint(defint(defint( div(F) * ra, ra,0,z), z,0,1), th,0,2*pi );
+
+% 2. ---------- SURFACE Integral (RHS)
+%               we have to add the areas of a cone and his top
+
+% 2.a ......... flux  through cone with parametrization by
+R := avec( t*cos(th), t*sin(th), t);
+
+% Calculate tangent vectors in direction t resp. th(eta)
+Rt  := df(R,t);
+Rth := df(R,th);
+
+% Outward normal vector
+N := Rth cross Rt;
+
+% Substitute parametrization into F 
+Fc := avec(  t*cos(th)-t*sin(th),  t*cos(th)+t, t-t*sin(th) );
+
+% Flux through the cone
+flux_cone := defint( defint( Fc dot N, t,0,1), th,0,2*pi);
+
+
+
+
+% 2.b .......... Flux through the circular top (z=1)
+
+% Vector field Ft on z=1
+Ft := avec(x-y,x+1,1-y);
+
+% Substitute parametrization into F
+Ft := avec( t*cos(th)-t*sin(th),  t*cos(th)+1, 1-t*sin(th) );
+
+% Outward normal of top surface
+Nt := avec(0,0,1);
+
+% Use polar coordinates on the disk, radius = ra
+flux_top := defint( defint( (Ft dot Nt) * ra, ra,0,1), th, 0,2*pi );
+
+% check GAUSS theorem
+total_flux := flux_cone + flux_top;
+write "Check GAUSS theorem:", volume = total_flux;
+
+
+end;

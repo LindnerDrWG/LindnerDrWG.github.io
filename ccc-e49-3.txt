@@ -1,0 +1,31 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 48-3
+                     W.G. Lindner, 2027
+$                     
+
+load_package excalc;
+
+% Declare coordinates as 0-forms and omega as 1-form 
+pform x=0, y=0, r=0, phi=0, omega=1;
+
+% Define the differential form
+omega := (2*x**3 - y**3)*d x + (x**3 + y**3)*d y;
+
+% Compute the exterior derivative 
+%         which applies Green's Theorem automatically
+d_omega := d omega;
+
+% Set up the transformation to polar coordinates
+x := r*cos(phi);
+y := r*sin(phi);
+
+% Evaluate d_omega w.r.t. polar coframe (dphi ^ dr)
+polar_form := d_omega;
+
+% Extract the coeff of d_omega and calculate the double integral
+integrand := polar_form / (d phi ^ d r);
+int(int( integrand, r,0,1), phi,0,2*pi);
+
+
+end;

@@ -1,0 +1,29 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 2b
+                     W.G. Lindner, 2027
+$                     
+
+
+load_package excalc;
+
+% declare the coordinates x, y and z as 0-forms
+pform x=0, y=0, z=0;
+
+% set dependencies in the function domain
+fdomain x=x(theta,phi), y=y(theta,phi), z=z(theta,phi);
+
+% define the parametrization via component functions
+x := cos(theta)*cos(phi);
+y := cos(theta)*sin(phi);
+z := sin(theta);
+
+% differentiate using excalc's partial differentiation operator @
+Z1 := {@(x,theta), @(y,theta), @(z,theta)};
+Z2 := {@(x,phi), @(y,phi), @(z,phi)};
+
+% calculate tangent vectors v
+sub( {theta=pi/4, phi =0}, Z1);
+sub( {theta=pi/4, phi =0}, Z2);
+
+end;

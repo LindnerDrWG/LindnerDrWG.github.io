@@ -1,0 +1,28 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 39-2
+                     W.G. Lindner, 2027
+$                     
+
+load_package excalc;
+
+pform x=0, y=0, t=0, omega=1;
+fdomain x=x(t), y=y(t);
+
+x := cos t;
+y := sin t;
+
+% the 1-form associated with F
+omega := -y*d x + x*d y;
+
+% automatically pull-back to the t parameter interval
+omega;
+
+% integrate the extracted coefficient of dt
+%           dividing by dt is a bit abusive ;) but possible
+Int( omega/d t, t, 0, pi);
+% this is more 'correct' 
+int( coeffn(omega, d t, 1), t, 0, pi);
+
+
+end;

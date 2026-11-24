@@ -1,0 +1,30 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 12b
+                     W.G. Lindner, 2027
+$                     
+
+load_package excalc;
+
+% 1. Define a 3D coordinate frame and three 1-forms
+coframe e(1)=d x, e(2)=d y, e(3)=d z; 
+pform row1=1, row2=1, row3=1;
+ 
+% 2. Define the rows of matrix A as 1-forms filled with symbolic variables
+row1 := a11*e(1) + a12*e(2) + a13*e(3);
+row2 := a21*e(1) + a22*e(2) + a23*e(3);
+row3 := a31*e(1) + a32*e(2) + a33*e(3);
+ 
+ % 3. Calculate determinant using wedge product
+det_form := row1 ^ row2 ^ row3; 
+ 
+ % 2. Define the rows of matrix A as 1-forms filled with concrete values
+row1 := 2*e(1) + 2*e(2) + 4*e(3);
+row2 := 1*e(1) + 2*e(2) - 5*e(3);
+row3 := 3*e(1) + 1*e(2) - 3*e(3);
+
+ % 3. Calculate determinant value using wedge product
+det_form := row1 ^ row2 ^ row3;
+
+
+end;

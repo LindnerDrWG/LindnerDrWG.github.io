@@ -1,0 +1,10 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 45
+                     W.G. Lindner, 2027
+$                     
+
+f := x+y+z;
+int( int( int(f, x,0,1), y,0,1), z,0,1);     % triple integral
+
+end;

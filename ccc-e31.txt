@@ -1,0 +1,18 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 31
+                     W.G. Lindner, 2027
+$                     
+
+f := x*y;
+int(int(f,x),y);
+
+f := x*y;
+int(int(f,x,0,1),y,2,3);
+
+
+load_package avector;
+f := x*y;
+defint (defint(f,x,0,1), y,2,3);
+
+end;

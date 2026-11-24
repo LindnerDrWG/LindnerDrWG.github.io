@@ -1,0 +1,19 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 25
+                     W.G. Lindner, 2027
+$                     
+
+load_package excalc;
+
+% Declare coordinates and functions as 0-forms
+pform {x,y, u,v} =0, f=0; phi=0;
+
+% Define implicit the components of function phi 
+x := 2*u-v;
+y := 3*u+2*v;
+
+% the pullback phi*f = f o phi is automatically and implicitly done with 
+f := x**2 - y**2;
+
+end;

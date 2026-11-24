@@ -1,0 +1,45 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 14
+                     W.G. Lindner, 2027
+$                     
+
+% a. ---------- core Reduce 
+procedure det2(u,v); part(u,1)*part(v,2)-part(u,2)*part(v,1);
+det2({1,2},{3,4});
+ 
+% b. ---------- core Reduce with built-in det
+matrix A(2,2);
+A(1,1):=1;
+A(1,2):=2;
+A(2,1):=3;
+A(2,2):=4;
+A;
+det(A);
+ 
+% c. ---------- Reduce package AVECTOR
+%    We interpret det as 2-dim cross product with
+%    both vectors lying in the XY plane of R^3
+load_package avector$
+
+u := avec(1, 2, 0);
+v := avec(3, 4, 0);
+w := u cross v;          % result in 3rd component
+
+% d. ---------- Reduce package ORTHOVEC
+load_package orthovec$
+u := svec(1, 2, 0);
+v := svec(3, 4, 0);
+u><v;                    % result in 3rd component
+
+% e. ---------- Reduce package EXCALC
+load_package excalc;
+pform {x,y}=0;
+spacedim 2;
+u:=1*@ x + 2*@ y;
+v:=3*@ x + 4*@ y;
+
+v  _|  (u  _|  (d x ^ d y));
+(3*@ x + 4*@ y) _| ((1*@ x + 2*@ y) _|  (d x ^ d y));
+
+end;

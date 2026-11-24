@@ -1,0 +1,21 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 2c
+                     W.G. Lindner, 2027
+$                     
+
+
+load_package excalc;
+
+% basis of TpM analog to basis E1, E2, E3 in R^3
+coframe e(1) = d x, e(2) = d y, e(3) = d z;
+
+% declare the coordinate functions x, y, z as 0-forms
+pform x=0, y=0, z=0;
+
+% expressions containing differentials of the coordinate functions
+% will be transformed into expressions of the basis one-forms
+tvector v;
+v:=1*@ x + 2*@ y + 3*@ z ;
+
+end;

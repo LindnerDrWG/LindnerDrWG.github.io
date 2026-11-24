@@ -1,0 +1,40 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 43-2
+                     W.G. Lindner, 2027
+$                     
+
+% Load the differential geometry package
+load_package excalc$
+
+for all x let cos(x)**2 + sin(x)**2 = 1;
+ 
+% Declare parameters u and v as 0-forms
+pform u=0, v=0$
+
+% Define the surface parametrization
+x := u * sin(v);
+y := u * cos(v);
+z := v;
+
+% Compute the standard coordinate differential forms
+pform dx=1, dy=1, dz=1$
+dx := d x;  dy := d y;  dz := d z;
+
+% Set up a 2D basis frame o() to extract scalar coefficients
+coframe o(1) = d u, o(2) = d v;
+frame e;
+
+% Extract the scalar coefficients from each 2-form component
+f_xy := e(2) _| (e(1) _| (dx ^ dy));   % brackets important!
+f_yz := e(2) _| (e(1) _| (dy ^ dz));
+f_zx := e(2) _| (e(1) _| (dz ^ dx));
+
+% integrand is the Euclidean norm of the pulled back wedge products
+integrand := sqrt(f_xy**2 + f_yz**2 + f_zx**2);
+
+% Integrate over the bounds: u from 0 to 1,  v from 0 to 3*pi
+surface_area := int(int(integrand, u, 0, 1), v, 0, 3*pi);
+
+
+end;

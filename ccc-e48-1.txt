@@ -1,0 +1,39 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 47-1
+                     W.G. Lindner, 2027
+$                     
+
+% I. we use core REDUCE
+% CHECK LHS:
+
+% Define the parametric equations of the curve C
+x := t^9;
+y := sin(t*pi/2)^9;
+
+% Calculate the differential components dx/dt and dy/dt
+% and do the dot product with the vector field components
+% F * dr =  y*(dx/dt) + x*(dy/dt)
+integrand := y * df(x, t) + x * df(y, t);
+
+% Calculate the definite line integral from t = 0 to t = 1
+result := int( integrand, t, 0, 1);
+
+% CHECK RHS:
+operator f;
+f := x*y; 
+sub(x=1,y=1, f) - sub(x=0,y=0,f);   %  = f(1,1) - f(0,0);
+
+% II. We use package AVECTOR as alternative
+load_package avector;
+
+% Define 3D vector field F in Cartesian coordinates
+F := avec(y, x, 0);
+
+% Define the parameterized curve C using parameter t
+C := avec(t**9, sin(t*pi/2)**9, 0);     % t*pi/2 ~ 1.5708*t 
+
+% Evaluate the definite line integral from 0 to 1
+deflineint(F, C, t, 0, 1);
+
+end;

@@ -1,0 +1,27 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 38-2
+                     W.G. Lindner, 2027
+$                     
+
+% Load the EXCALC package
+load_package excalc;
+
+% Declare 0-forms (scalars/coordinates)
+pform x=0, y=0, z=0, t=0, w=1;
+
+% Define the original differential 1-form omega named w
+w := z*d(x) + x*d(y) + y*d(z);
+
+% Parametrize the coordinates in terms of t
+x := 2*t + 1;
+y := t**2;
+z := 1 + t**3;
+
+% Evaluate w on the parameterized space (pullback to t)
+w;
+
+% Compute the line integral over t from 0 to 1
+result := int(w / d(t), t, 0, 1);
+
+end;

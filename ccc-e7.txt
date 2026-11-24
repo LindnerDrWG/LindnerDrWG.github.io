@@ -1,0 +1,18 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 7
+                     W.G. Lindner, 2027
+$                     
+
+load_package excalc;
+
+coframe e(1) = d x;   % 1. calculate w.r.t. basis e1 one-form (the coframe) 
+pform f = 0;          % 2. declare f as a 0-form (scalar function)
+fdomain f = f(x);     % 3. tell EXCALC that f depends on x 
+f:=x**2+2*x-1;        % 4. define our explicit function
+
+d f;                  % 5. calculate the gradient of f in R^1
+1*@ x _| d f;         %    along unit tangent vector v=(1) of R^1
+sub(x=2, 1*@ x _| d f);    % at point p=2
+
+end;

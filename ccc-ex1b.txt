@@ -1,0 +1,27 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE §1-1b
+                     Dr. W.G. Lindner, 2026
+$                     
+
+
+% USING excalc PACKAGE OF REDUCE
+
+% the following command _must_ be executed first in a input line for itself
+load_package excalc;
+
+% declare component functions as so-called 0-forms
+pform t=0, x=0, y=0;
+ 
+% set dependencies
+fdomain x=x(t), y=y(t);
+ 
+% define the parametrization
+x := t;
+y := t**2;
+
+% differentiate using excalc's partial differentiation operator @
+@(x,t);
+@(y,t);
+
+% calculate tangent vector v
+v := sub(t=1, {@(x,t),@(y,t)});

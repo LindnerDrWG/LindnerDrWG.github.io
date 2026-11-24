@@ -1,0 +1,16 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 16
+                     W.G. Lindner, 2027
+$                     
+
+load_package excalc;
+spacedim 2;        % we are in R^2
+  
+coframe e(x) = d x, e(y) = d y with metric g = e(x)*e(x) + e(y)*e(y);
+# 1;               % = dx ^ dy      (1)
+# d x;             % = dy
+# d y;             % = - dx
+# (d x ^ d y);     % = 1            (2)
+
+end;

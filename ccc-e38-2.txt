@@ -1,0 +1,22 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 37-2
+                     W.G. Lindner, 2027
+$                     
+
+load_package excalc;
+
+pform {x,y,t} = 0, {dx,dy,ds} = 1;
+x := t;
+y := t;
+
+@(t) _| d x;
+
+% Line element
+ds := sqrt( (@(t) _| d x)**2 + (@(t) _| d y)**2 );   
+
+% Integral
+int( x*ds, t, 0, 1);
+
+
+end;

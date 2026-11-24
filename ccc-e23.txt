@@ -1,0 +1,20 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 23
+                     W.G. Lindner, 2027
+$                     
+
+load_package excalc;
+
+%  Declare coordinates and functions as 0-forms
+pform {x,y, u,v, f}=0;
+fdomain x=x(u,v), y=y(u,v);
+ 
+% calculate JACOBI determinant
+d x;
+d y;
+d x ^ d y;
+jac1 := det mat( (@ (x,u),@ (x,v)), (@ (y,u),@ (y,v) );
+jac2 := @ (x,u) * @ (y,v) - @ (x,v) * @ (y,u);
+
+end;

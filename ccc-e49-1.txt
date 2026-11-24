@@ -1,0 +1,17 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 48-1
+                     W.G. Lindner, 2027
+$                     
+
+P := 2x^3 - y^3;
+Q := x^3 + y^3;
+
+f := df(Q,x) - df(P,y);
+let {x=>r*cos(theta), y => r*sin(theta)}; 
+let sin(x)^2+cos(x)^2   => 1;
+
+int(int( f * r, r, 0, 1), theta, 0, 2*pi);
+
+
+end;

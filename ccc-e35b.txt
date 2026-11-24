@@ -1,0 +1,20 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 35c
+                     W.G. Lindner, 2027
+$                     
+
+load_package avector;
+getcsystem 'cartesian;
+
+% Define the parametric path g of the curve
+g := avec(x, x^2, 0);
+
+% Define the vector function to yield the arc length integrand
+v := avec( sqrt(1 + 4*x^2), 0, 0);
+
+% Calculate the definite line integral from x = 0 to x = 1
+deflineint(v, g, x, 0, 1);
+
+
+end;

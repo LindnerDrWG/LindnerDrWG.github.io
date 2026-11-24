@@ -1,0 +1,29 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 18d
+                     W.G. Lindner, 2027
+$                     
+
+load_package excalc;
+
+% Euclidean 3-space with orthonormal coframe ex,ey,ez
+% metric is necessary for using HODGE star operator # 
+coframe e(x)=d x, e(y)=d y, e(z)=d z with signature 1,1,1;
+pform {x,y,z} = 0;
+
+% cross product on 1-forms
+procedure cross(a,b);  # (a ^ b);
+
+% check
+pform {a1,a2,a3, b1,b2,b3} = 0;
+pform {a,b,c} = 1;
+
+a := a1*d x + a2*d y + a3*d z;
+b := b1*d x + b2*d y + b3*d z;
+c := cross( a,b );
+
+a := 1*d x + 0*d y + 2*x*d z;
+b := 0*d x + 1*d y + 2*d z;     % i.e. vec (0, 1, 2)
+cross(a,b);
+
+end;

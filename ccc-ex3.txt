@@ -1,0 +1,32 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Exercise 3
+                     W.G. Lindner, 2027
+$                     
+
+% contributed by E. Schruefer
+
+load_package excalc;
+
+pform {x, y, z, w} = 0;
+
+% F as a 1-form expressed in the basis d_x, d_y and d_z
+f := x**2*y*d x + x*y*z*d y + (x**2 + y**2 +z*w**2)*d z;
+
+% v as tangential vector expressed in basis @_x, @_y, @_z, @_w 
+v := vx*@ x + vy*@ y +vz*@ z + vw*@ w;
+ 
+% then the directional derivative in direction v is
+dvf := v _| (d (@ x  _|  f))*d x +
+       v _| (d (@ y  _|  f))*d y +
+       v _| (d (@ z  _|  f))*d z ; 
+
+% specialized for vector v: vx=0, vy=1, vz=2, vw=-2
+dvf0 := sub(vx=0, vy=1, vz=2, vw= -2, dvf);
+
+% and for point x=1, y=2, z= -1, w= -2
+sub(x=1,y=2,z=-1,w=-2, @ x _| dvf0);
+sub(x=1,y=2,z=-1,w=-2, @ y _| dvf0);
+sub(x=1,y=2,z=-1,w=-2, @ z _| dvf0);
+
+end;

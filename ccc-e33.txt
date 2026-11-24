@@ -1,0 +1,22 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 33
+                     W.G. Lindner, 2027
+$                     
+
+% 1. using exp-form of term 
+for all x let sin(x) = (exp(I*x) - exp(-I*x))/(2*I);
+for all x let cos(x) = (exp(I*x) + exp(-I*x))/2;
+
+f := sin(t)^4 - 2 cos(t/2)^3 sin(t);
+repart( int(f, t, 0, 2 *pi) );
+
+% 2. alternatively using core REDUCE 
+int(sin(x)^4 -2*cos(x/2)^3*sin(x), x,0,2*pi);
+
+% 3. alternatively use REDUCE package Avectorr
+load_package avector;
+defint(sin(x)^4 -2*cos(x/2)^3*sin(x), x,0,2*pi) ;
+
+
+end;

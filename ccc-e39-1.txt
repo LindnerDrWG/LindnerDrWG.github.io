@@ -1,0 +1,13 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 38-1
+                     W.G. Lindner, 2027
+$                     
+
+load_package avector;
+g := avec(2*s+1, s^2, 1+s^3);
+F := avec(1+s^3, 2*s+1, s^2);
+defint(F dot df(g,s), s, 0, 1);
+
+
+end;

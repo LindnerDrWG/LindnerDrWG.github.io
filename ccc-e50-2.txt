@@ -1,0 +1,47 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 49-2
+                     W.G. Lindner, 2027
+$                     
+
+load_package excalc;
+
+% Declare coordinates and forms
+pform x=0, y=0, r=0, phi=0, omega=1;
+
+% translate the vector field F to the associated 1-form
+omega := (1 - y)*d x + x*d y;
+
+% .......... LHS: Line Integral around the boundary C (r = 2)
+
+% substitute boundary parameterization for a circle C of radius 2
+% and pullback omega to the boundary parameter space with 1-dim
+% coordinate phi 
+omega_C := sub({x = 2*cos(phi), y = 2*sin(phi)}, omega);
+
+% Extract integrand for the line integral from 0 to 2*pi
+line_integrand := omega_C / (d phi);
+Int_C := int(line_integrand, phi, 0, 2*pi);
+
+% .......... RHS: Area Integral over the disk D (r <= 2)
+
+% Compute the exterior derivative of omega
+dw := d omega;
+
+% transform dw to polar coordinates for 2-dim area D
+% and calculate (d omega) in terms of polar coordinates
+% where automatically (dx^dy) -->  2*r*(dr^dphi)
+
+omega_D := sub({x = r*cos(phi), y = r*sin(phi)}, dw);
+
+% Extract integrand for the 2-dim integral with coordinates r and phi
+
+area_integrand := omega_D /(d r ^ d phi);   % = 2*r;
+Int_D := int(int(area_integrand, r, 0, 2), phi, 0, 2*pi);
+
+% RESULTS:
+write "LHS (Line Integral around boundary): ", Int_C;
+write "RHS (Area Integral of disk): ", Int_D;
+
+
+end;

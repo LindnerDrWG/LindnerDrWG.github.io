@@ -1,0 +1,31 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 51-1
+                     W.G. Lindner, 2027
+$                     
+
+% 1. ---------- LHS of Stoke's formula (13.4) using avector
+load_package avector;
+
+F := avec(y, 4-x^2-y^2, x);         % substituted z = 4 - x^2 - y^2
+S := avec(x, y, 4-x^2-y^2);
+
+A := curl(F) dot (df(S,x) cross df(S,y)) ;
+
+x := r*cos(theta);
+y := r*sin(theta);
+
+defint( defint( A * r, r, 0, 2), theta, 0, 2*pi);
+
+% 2. ---------- RHS of Stoke's formula (13.4) using core Reduce
+ 
+x := 2*cos(t_);                     % parametrize circle with r=2
+y := 2*sin(t_);
+P := y;
+Q := 4 - x^2 - y^2;                 % z = 4-x^2-y^2
+R := x;
+f := P*df(x,t_) + Q*df(y,t_) + R*df(z,t_);
+int(f, t_, 0, 2*pi);
+
+
+end;

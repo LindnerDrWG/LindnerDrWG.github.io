@@ -1,0 +1,14 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 26b
+                     W.G. Lindner, 2027
+$                     
+
+in "mappings.red"$
+pform {u,v, x,y,z}=0;
+pform w = 2;
+w := y * (d x ^ d z);
+mapping phi: (u,v) -> (x = u**2, y = u*v, z = v**2);
+phi(*,w);
+
+end;

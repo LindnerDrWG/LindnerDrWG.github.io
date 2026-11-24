@@ -1,0 +1,14 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 24
+                     W.G. Lindner, 2027
+$                     
+
+int(sin(x**2)*2*x, x,2,3);            %  - cos(4) + cos(9)
+on  rounded$
+print_precision 5$
+int(sin(x**2)*2*x, x,2,3);            %  0.2575
+
+int( sin(u), u,4,9);                  %  0.2575
+
+end;

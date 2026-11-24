@@ -1,0 +1,30 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 28
+                     W.G. Lindner, 2027
+$                     
+
+load_package eds;
+spacedim 4;
+
+% 1. Declare coordinates as 0-forms
+pform {x1,x2,x3,x4, u,v} = 0;
+
+% 2. Declare omega w as 2-form 
+pform w = 2;
+w := x2 * d x1 ^ d x3 - x4 * d x3 ^ d x4;
+
+% 3. Define map phi as substitution list
+phi := {x1 = u, x2 = u-v, x3 = 3-u+u*v, x4 = -3*v};
+
+% 4. Calculate the pullback i.e. the integrand w_*_phi
+pullback(w, phi);
+
+% 5a. integrate w_*_phi in steps (hint by fjW)
+int (u^2-u*v+9v-9v^2, u, -sqrt(1-v^2), sqrt(1-v^2));
+int(ws, v, -1, 1);
+
+% 5b. integrate w_*_phi using polar coords and a bit trigonometry
+int( int( (r**2*cos(th)**2 - 9*r**2*sin(th)**2)*r, r,0,1), th, 0,2*pi);
+
+end;

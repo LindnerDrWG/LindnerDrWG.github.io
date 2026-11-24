@@ -1,0 +1,32 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 41-2
+                     W.G. Lindner, 2027
+$                     
+
+load_package excalc;
+
+% coordinates of unit square
+pform {x,y} = 0;
+
+% basis 1-forms and induced metric
+coframe e(x) = d x, e(y) = d y
+   with metric g = (1+4*x**2)*e(x)*e(x)
+                   + 4*x*e(x)*e(y) + 4*x*e(y)*e(x)
+                   + 5*e(y)*e(y);
+
+pform area = 2;
+area := # 1;
+
+% Integrate the area coefficient sqrt(4*x2+5) over the unit square
+coeff := coeffn( area, e(x)^e(y), 1);
+a := int(int(coeff, x, 0, 1), y, 0, 1);
+
+on rounded;
+a;     
+
+% alternative in one step
+a := int(int( sqrt(detm!*), x, 0, 1), y, 0, 1);
+
+
+end;

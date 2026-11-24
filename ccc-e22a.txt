@@ -1,0 +1,24 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 22a
+                     W.G. Lindner, 2027
+$                     
+
+procedure lap(f); df(f, x,2) + df(f, y,2) +df(f, z,2);
+f := x^2+3*y^3;             % scalar field on R^3 to R
+lap(f);
+
+procedure vlap(f); {lap(part(f,1)), lap(part(f,2)), lap(part(f,3))};
+vF := {x,x^2,x^3};          % vector field on R^3 to R^3
+vlap(vF);
+
+load_package avector$
+
+f := x^2+3*y^3;
+delsq(f);
+
+vF := avec(x,x^2,x^3);    
+delsq(vF);
+
+
+end;

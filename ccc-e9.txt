@@ -1,0 +1,17 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 9
+                     W.G. Lindner, 2027
+$                     
+
+load_package excalc;
+
+% define 3D Cartesian space to establish indices x,y,z
+coframe e(x) = d x, e(y) = d y, e(z) = d z;
+
+eps(x, y, z);   % returns  1 (even permutation of x,y,z)
+eps(y, x, z);   % returns -1 (odd permutation)
+eps(x, x, y);   % returns  0 (repeating indices)
+eps(1, 3, 2);   % eps only works w.r.t. a metric space
+
+end;

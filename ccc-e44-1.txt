@@ -1,0 +1,21 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 43-1
+                     W.G. Lindner, 2027
+$                     
+
+load_package avector;
+ 
+F := avec(x*y^2*(1-x^2-y^2), -2*x^3, y*(1-x^2-y^2)^2);
+S := avec(x,y,  1 - x^2 - y^2);
+A := F dot (df(S,x) cross  df(S,y)) ; 
+h := sqrt(1 - x^2);
+
+defint(defint(A, y, -h, h), x, -1, 1);
+
+on rounded;
+print_precision 5;
+area;
+
+
+end;

@@ -1,0 +1,32 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 49-1
+                     W.G. Lindner, 2027
+$                     
+
+% 1. ---------- Line integral
+let {x=>2*cos(t_), y=>2*sin(t_)};    %  circle C: 2*(cos t, sin t) with r=2
+P := 1 - y;
+Q := x;
+
+int( P*df(x,t_) + Q*df(y,t_), t_, 0, 2*pi);
+
+% 2. ---------- Surface integral
+P := 1 - y;
+Q := x;
+h := sqrt(4 - x^2);
+f := df(Q,x) - df(P,y);
+
+int( int( f, y, -h, h), x, -2, 2);
+
+% 3. ---------- Surface integral: use polar coordinates
+P := 1 - y;
+Q := x;
+f := df(Q,x) - df(P,y);   % change to polar coordinates
+x := r*cos(theta);
+y := r*sin(theta);
+int(int( f * r, r, 0,2), theta, 0,2*pi);    % integrate first over r 
+int(int( f * r, theta, 0,2*pi), r, 0,2) ;   % integrate first over theta 
+
+
+end;

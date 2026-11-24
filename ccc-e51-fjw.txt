@@ -1,0 +1,31 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 51-1-fjW
+                     W.G. Lindner, 2027
+$                     
+
+% I. verification of Stoke's formula (13.4) using new Avector
+%    contributed by F.J. Wright
+%    a very compact solution using an enhanced version of Avector
+
+F := avec(y, z, x);
+
+surf_int := surfint(curl F, avec(x, y, 4 - x^2 - y^2),
+                x, -sqrt(4-y^2), sqrt(4-y^2),  y,-2,2);
+
+line_int := lineint(F, avec(x, sqrt(4-x^2), 0), x, 2,-2) 
+            + lineint(F, avec(x, -sqrt(4-x^2), 0), x, -2,2);
+
+% II. verification of Stoke's formula (13.4) using Avector
+%     with new limits notation contributed by F.J. Wright
+
+F := avec(y, z, x);
+
+surf_int := surfint(curl F, avec(x, y, 4 - x^2 - y^2),
+                x = -sqrt(4-y^2) .. sqrt(4-y^2), y = -2 .. 2);
+
+line_int := lineint(F, avec(x,  sqrt(4-x^2), 0), x = 2 .. -2) +
+            lineint(F, avec(x, -sqrt(4-x^2), 0), x = -2 .. 2);
+
+
+end;

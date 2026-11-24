@@ -1,0 +1,23 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 31
+                     W.G. Lindner, 2027
+$                     
+
+load_package eds;
+spacedim 4;
+pform {x1,x2,x3,x4, u,v,w} = 0;
+
+pform omega = 3;
+omega := x3 * d x1 ^ d x2 ^ d x4;
+phi := {x1 = v*w, x2 = u**2, x3 = 1-3*v+w, x4 = u*v};
+
+% calculate the integrand as pullback
+pullback(omega, phi);
+
+% integrate w_*_phi using the polar coords version in 4. in stages
+int( -(6*r^6)*sin(ph)^5*cos(th)^2*sin(th)^2,  r,0,1);
+int(ws,  th, 0, 2*pi);
+int(ws,  ph, 0,   pi);
+
+end;

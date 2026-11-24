@@ -1,0 +1,19 @@
+operator e;
+noncom e;
+for all j let e(j)**2 = 0;
+let e(2)*e(1) = -e(1)*e(2);
+
+v := (a*e(1)+b*e(2));
+w := (c*e(1)+d*e(2));
+
+v * w;
+w * v;
+
+v := 3*e(1)+1*e(2);
+w := 1*e(1)+4*e(2);
+
+v*w;
+w*v;
+
+det mat((a, b),
+        (c, d));

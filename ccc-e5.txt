@@ -1,0 +1,15 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 5
+                     W.G. Lindner, 2027
+$                     
+
+load_package excalc;
+pform {x, y} = 0;
+pform w=1;
+w := 2 * d x + 3 * d y; 
+tvector v;
+v := -1*@ x + 2*@ y 
+v  _|  w;
+
+end;

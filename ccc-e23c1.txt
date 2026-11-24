@@ -1,0 +1,17 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 23c1
+                     W.G. Lindner, 2027
+$                     
+
+% solution provided by F.J. Wright
+
+load_package avector;
+getcsystem cylindrical;
+on rounded;
+surfint(e^(-r^2), avec(r,0,phi), r=0 .. 2, phi=0 .. 2pi);
+
+off rounded;
+surfint(e^(-r^2), avec(r,0,phi), r=0 .. 2, phi=0 .. 2pi);
+
+end;

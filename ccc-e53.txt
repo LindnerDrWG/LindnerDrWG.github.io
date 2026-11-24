@@ -1,0 +1,13 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 53
+                     W.G. Lindner, 2027
+$                     
+
+load_package listvecops;
+listproc div(F);  df(F _1,x) + df(F _2,y) + df(F _3,z);
+F := {-y^3,x^3,-z^3}; 
+div(F);                 % = -3*z^2
+
+
+end;

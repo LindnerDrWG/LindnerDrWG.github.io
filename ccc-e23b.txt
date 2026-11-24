@@ -1,0 +1,22 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 23b
+                     W.G. Lindner, 2027
+$                     
+
+load_package excalc;
+     % 1. New and old coordinates as 0-forms
+pform {x,y}=0, {r,th}=0;
+x := r*cos(th);
+y := r*sin(th);
+for all th let sin(th)**2+cos(th)**2=1;
+     % 2. Pull back the area form
+omega := d x ^ d y;
+     % 3. Extract the Jacobian via interior products
+jac := @th _| (@r _| omega); 
+
+on rounded$
+print_precision 5$
+int(int( exp(-r^2) * r, r,0,2), th, 0,2*pi);
+
+end;

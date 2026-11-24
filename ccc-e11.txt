@@ -1,0 +1,19 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 11
+                     W.G. Lindner, 2027
+$                     
+
+load_package excalc;
+
+% Define 4D Minkowski spacetime metric with diag(-1, 1, 1, 1)
+coframe o(t) = d t, o(x) = d x, o(y) = d y, o(z) = d z 
+        with signature -1, 1, 1, 1;
+
+% Now evaluate contractions inside tensor expressions
+eps(t, x, y, z);         % Covariant volume element
+eps(-t, -x, -y, -z);     % Contravariant volume element; 
+                         %    accounts for the -1 metric component
+
+
+end;

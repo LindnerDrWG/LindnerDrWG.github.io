@@ -1,0 +1,38 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 51-2
+                     W.G. Lindner, 2027
+$                     
+
+load_package excalc;
+
+% declare coordinates, integrand (c) and omega (w) as forms
+pform   x=0, y=0, z=0, c=0,          w=1, dw=2;
+
+% Surface S: z = 4 - x^2 - y^2, parametrised by (x,y)
+z := 4 - x**2 - y**2;
+
+% omega = F . dr   [z is substituted, so dz and dw are 
+% automatically pulled back to the (x,y)-plane]
+w  := y*d x + z*d y + x*d z;     
+dw := d w;                        
+
+% We see: dw = (-2x-2y-1)*dx^dy with coeff c := (-2x-2y-1)
+% we extract the integrand c e.g. with interior products 
+c := @(y) _| (@(x) _| dw);
+
+% LHS: Surface integral over the disk x^2+y^2 <= 4 
+%      use polar coordinates and dA = r * dr dt 
+surface_int := int(int( sub(x=r*cos(t), y=r*sin(t), c) * r,
+                        r, 0,2), t, 0,2*pi);
+
+% RHS: Line integral over the boundary circle 
+%.     x = 2cos(t), y = 2 sin(t), z=0
+x_ := 2*cos(t)$  y_ := 2*sin(t)$  z_ := 0$
+line_int := int(y_*df(x_,t) + z_*df(y_,t) + x_*df(z_,t), t,0,2*pi);
+
+write "Stokes verified: ", (surface_int = line_int);
+end;
+
+
+end;

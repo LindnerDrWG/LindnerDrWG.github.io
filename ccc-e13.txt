@@ -1,0 +1,27 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 13
+                     W.G. Lindner, 2027
+$                     
+
+load_package excalc;
+spacedim 3;
+pform {x,y,z, xx,yy,zz}=0;  
+pform w =1;                % w means omega
+
+w := (xx + 2*zz) * d x ^ d y + yy * d x^d z; 
+
+a :=  1*@ x + 3*@ y + 3*@ z;   %  i.e.  (1,3,3) in TpR^3
+b := -1*@ x + 0*@ y + 7*@ z;   %        (-1,0,7)
+
+% action i.e. evaluation  w(a,b) using (7.1)
+
+(xx+2*zz) * det mat((a _| d x, a _| d y),
+                    (b _| d x, b _| d y))
+     + yy * det mat((a _| d x, a _| d z),
+                    (b _| d x, b _| d z)); 
+              
+sub(xx=1, yy=1, zz=5, ws);  % at point (1,1,5) \end{verbatim}%
+
+
+end;

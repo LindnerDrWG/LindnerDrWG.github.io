@@ -1,0 +1,23 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 44-1
+                     W.G. Lindner, 2027
+$                     
+
+% I.  USING core Reduce
+f:=1;
+int( int( int(f ,x,0,1), y,0,1), z,0,1);  % triple integral over unit cube
+
+f:=x^2+y^2+z^2;
+int( int( int(f ,x,0,1), y,0,1), z,0,1);
+
+% II.  USING Reduce package AVECTOR
+load_package Avector;
+
+vlb := avec(0,0,0);	                % Lower bounds
+vub := avec(1,1,1);	                % Upper bounds
+volintorder := avec(0,1,2);	        % The order of integration x->y->z
+volintegral(1,vlb,vub);	
+
+
+end;

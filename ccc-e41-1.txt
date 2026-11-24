@@ -1,0 +1,16 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 40-1
+                     W.G. Lindner, 2027
+$                     
+
+load_package avector;        
+z := 2;
+S := avec(x, y, z);                   % S = (x,y, z)
+df(S,x) cross  df(S,y);               % this is (12.3)
+a := vmod( df(S,x) cross  df(S,y) );  % the norm is named vmod in Avector
+
+defint( defint(a, y,-sqrt(1 - x^2),sqrt(1 - x^2)), x,-1,1);
+
+
+end;

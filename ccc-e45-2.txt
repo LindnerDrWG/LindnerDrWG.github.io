@@ -1,0 +1,33 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 44-2
+                     W.G. Lindner, 2027
+$                     
+
+load_package excalc;
+
+% Define x, y, z as coordinates
+pform x=0, y=0, z=0;
+
+% Define the density function
+pform f=0;
+f := x**2 + y**2 + z**2;
+
+% Construct the volume 3-form using the wedge product (^)
+pform omega=3;
+omega := f * (d x ^ d y ^ d z);
+
+% Extract the scalar coefficient of the 3-form omega
+coeff := omega / (d x ^ d y ^ d z);
+
+% Perform the sequential triple integration over the boundaries [0,1]
+% in three consecutive steps and in one step
+
+I1   := int(coeff, x, 0, 1);
+I2   := int(I1, y, 0, 1);
+I3   := int(I2, z, 0, 1);
+
+int(int(int( coeff, x, 0, 1), y, 0, 1), z, 0, 1);
+
+
+end;

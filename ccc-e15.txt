@@ -1,0 +1,54 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 15
+                     W.G. Lindner, 2027
+$                     
+
+% a. ---------- core Reduce with self-made operator det
+operator e;
+noncom e;
+for all j let e(j)*e(j)=0;
+for all j,k such that (j>k) let e(j)*e(k)=-e(k)*e(j);
+
+%         u=(2,2,4)  v=(1,2,-5)  w=(3,1,-3)
+det3 := ( 2*e(1)+2*e(2)+4*e(3) ) * 
+        ( 1*e(1)+2*e(2)-5*e(3) ) * 
+        ( 3*e(1)+1*e(2)-3*e(3) );
+% where e(1)e(2)e(3)= 1 = vol(unit box) 
+
+% b. ---------- core Reduce with built-in det.  
+%               u=(2,2,4)  v=(1,2,-5)  w=(3,1,-3)
+matrix M(3,3);
+M(1,1):=2; M(1,2):=2;  M(1,3):=4;
+M(2,1):=1; M(2,2):=2;  M(2,3):=-5;
+M(3,1):=3; M(3,2):=1;  M(3,3):=-3;
+M;
+det(M);
+ 
+% c. ---------- Reduce package AVECTOR
+%    We interpret det as 3-dim spat product in R^3
+load_package avector$
+
+u := avec(2,2,4);
+v := avec(1,2,-5);
+w := avec(3,1,-3);
+det := (u cross v) dot w;      
+
+% d. ---------- Reduce package ORTHOVEC
+load_package ORTHOVEC$
+
+u := svec(2,2,4);
+v := svec(1,2,-5);
+w := svec(3,1,-3);
+det := (u><v) * w;      
+
+% e. ---------- Reduce package EXCALC
+load_package excalc;
+pform {x,y,z}=0;
+spacedim 3;
+u := 2*@ x + 2*@ y + 4*@ z;         % u = (2,2, 4) 
+v := 1*@ x + 2*@ y - 5*@ z;         % v = (1,2,-5) 
+w := 3*@ x + 1*@ y - 3*@ z;         % w = (3,1,-3)
+w _| (v  _|  (u  _|  (d x ^ d y ^ d z)));
+
+end;

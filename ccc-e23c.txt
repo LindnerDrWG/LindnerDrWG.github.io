@@ -1,0 +1,33 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 23c
+                     W.G. Lindner, 2027
+$                     
+
+% define transformation (r,theta) -> (x,y)
+x := r * cos(theta);
+y := r * sin(theta);
+
+% declare Jacobi matrix and fill it with partial diff's
+matrix jacobi(2,2);
+   jacobi(1,1) := df(x, r);
+   jacobi(1,2) := df(x, theta);
+   jacobi(2,1) := df(y, r);
+   jacobi(2,2) := df(y, theta);
+
+% calculate JACOBI determinant jac
+for all x let sin(x)^2+cos(x)^2=1;
+jac := det(jacobi);
+
+% function f to be integrated
+f := exp(-(x^2 + y^2));
+
+% the new area element is f * jac
+integrand := f * jac;
+result := int( int( integrand, r, 0, 2), theta, 0, 2*pi); 
+
+on rounded$
+print_precision 5$
+int(int(exp(-r^2)*r, r,0,2), th,0,2*pi);
+
+end;

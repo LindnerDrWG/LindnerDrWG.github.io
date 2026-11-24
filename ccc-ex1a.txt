@@ -1,0 +1,35 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE §1-1
+                     Dr. W.G. Lindner, 2026
+$                     
+
+
+
+% SOLUTION IN core REDUCE
+
+% 1. Define the component functions of R=(t, t^2-1)
+R1 := t_$
+R2 := t_^2-1$
+
+% 2. Differentiate components with respect to t_ 
+dR1 := df(R1,t_);
+dR2 := df(R2,t_);
+ 
+% 3. Calculate the tangent vector v substituting 1 for  t_ 
+v := sub(t_=1,{dR1,dR2});
+
+% FIRST ALTERNATIVE SOLUTION
+
+% 1. Define the component functions as a list
+R := {t_, t_^2-1};
+ 
+% 2. Differentiate each component with respect to t_ 
+%    and collect the results in a new list named v
+v  := for each el in R collect df(el, t_); 
+v1 := sub(t_=1,v);   % evaluate v at 1
+
+% SECOND ALTERNATIVE SOLUTION
+
+% here is a one-liner using operator map()
+R := {s, s**2}$
+v := sub(s=1, map(df(~w, s), R));

@@ -1,0 +1,23 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 25-3
+                     W.G. Lindner, 2027
+$                     
+
+% 1. Load Exterior Differential Systems package EDS (Harper)
+load_package eds;
+
+% 2. Declare coordinates as 0-forms
+pform {x,y,z, u,v} = 0;
+
+% 3. Declare f as 0-form 
+pform f = 0;
+f := x**2 - y**2;
+
+% 4. Define map phi as substitution list
+phi := {x = 2*u-v, y = 3*u+2*v};
+
+% 5. Calculate the pullback with EDS-operator pullback(Form, Map)
+pullback(f, phi);
+
+end;

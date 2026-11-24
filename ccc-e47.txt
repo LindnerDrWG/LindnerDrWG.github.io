@@ -1,0 +1,14 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 47
+                     W.G. Lindner, 2027
+$                     
+
+load_package Avector;
+
+volintorder := avec(2, 0, 1);
+vlb := avec(0,   0, 0);
+vub := avec(p*z, h, 2*pi);
+volintegral(1, vlb, vub);
+
+end;

@@ -1,0 +1,18 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 48-2
+                     W.G. Lindner, 2027
+$                     
+
+for all x let sin(x) = (exp(I*x) - exp(-I*x))/(2*I);
+for all x let cos(x) = (exp(I*x) + exp(-I*x))/2;
+let {x=>cos(t_), y=>sin(t_)};
+
+P := 2x^3 - y^3;
+Q := x^3 + y^3;
+f := P*df(x,t_) + Q*df(y,t_);
+
+int(f, t_, 0, 2*pi);
+
+
+end;

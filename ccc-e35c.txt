@@ -1,0 +1,29 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 35
+                     W.G. Lindner, 2027
+$                     
+
+load_package excalc;
+
+% Define coordinates as 0-forms 
+pform x=0, y=0;
+
+% Define the curve term
+y := x**2;
+
+% Calculate dy/dx using _| of vector field @x and 1-form d y
+dydx := @ x _| d y;
+
+% Calculate the scalar line element ds
+ds := sqrt(1 + dydx**2);
+
+% Integrate to find the exact arc length
+arc_length := int(ds x, 0, 1);
+
+% Use rounded mode for numerical approximation
+on rounded;
+arc_length_approx := int(ds, x, 0, 1);
+
+
+end;

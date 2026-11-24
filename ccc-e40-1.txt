@@ -1,0 +1,19 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 39-1
+                     W.G. Lindner, 2027
+$                     
+
+% Load the vector calculus package
+load_package avector;
+
+% Define 3D vector field F in Cartesian coordinates
+F := avec(-y, x, 0);
+
+% Define the parameterized curve C using parameter t
+C := avec(cos(t), sin(t), 0);
+
+% Evaluate the definite line integral from 0 to pi
+deflineint(F, C, t, 0, pi);
+
+end;

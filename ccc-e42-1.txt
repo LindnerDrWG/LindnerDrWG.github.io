@@ -1,0 +1,18 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 41-1
+                     W.G. Lindner, 2027
+$                     
+
+load_package avector;         
+S := avec(x, y, x^2 + 2*y);   % S: z = x^2 + 2y;
+a := vmod( df(S,x) cross  df(S,y) );  %  abs is named vmod in Avector
+
+area := defint( defint( a, x, 0,1), y,0,1);
+
+on rounded;
+print_precision 5;
+area;
+
+
+end;

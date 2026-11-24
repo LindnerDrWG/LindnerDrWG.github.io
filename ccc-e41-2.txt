@@ -1,0 +1,31 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 40-2
+                     W.G. Lindner, 2027
+$                     
+
+load_package excalc$
+
+% Declare coordinates/parameters as 0-forms (scalars)
+pform r=0, theta=0, c=0$
+
+% Define the surface parametrization (z = 2 creates the parallel plane)
+x := r * cos(theta);
+y := r * sin(theta);
+z := 2;
+
+% Compute the area 2-form via exterior derivative and wedge product
+area_form := d x ^ d y;
+
+% set up orthonormal basis frame to contract and extract the integrand
+coframe o(1) = d r, o(2) = d theta;
+frame e;
+
+% Extract the scalar coefficient using interior product contraction _|
+integrand := e(2) _| (e(1) _| area_form);
+
+% Integrate over the unit disk bounds
+surface_area := int(int(integrand, r, 0, 1), theta, 0, 2*pi);
+
+
+end;

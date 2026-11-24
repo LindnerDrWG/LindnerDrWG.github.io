@@ -1,0 +1,17 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 18a
+                     W.G. Lindner, 2027
+$                     
+
+load_package Avector$
+
+a := avec(a_1,a_2,a_3);
+b := avec(b_1,b_2,b_3);
+a cross b;      
+
+a := avec(1, 0, 2*x);
+b := avec(0, 1, 2);
+a cross b;      
+
+end;

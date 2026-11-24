@@ -1,0 +1,16 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 32
+                     W.G. Lindner, 2027
+$                     
+
+int(int(x^2, x,-1,1), y,0,sqrt(1-x^2));    % incorrect order of variables 
+int(int(x^2, y,0,sqrt(1-x^2)),  x,-1,1);   % correct order
+
+
+I1 := int(x^2,y);                                 % 1st indefinite  integral
+I1 := sub(y=sqrt(1 - x^2), I1) - sub(y=0, I1);
+I2 := int(I1,x);                                  % 2nd  indefinite  integral
+sub(x=1,I2) - sub(x=-1, I2);
+
+end;

@@ -1,0 +1,29 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 4
+                     W.G. Lindner, 2027
+$                     
+
+% FIRST do the following command on a line for itself (!)
+load_package excalc;
+
+% THEN declare the scalar function f and its dependencies
+pform f = 0;
+fdomain f = f(x);
+f := x**2-1;         % do NOT write x^2 
+
+% do the derivative using the partial operator @ 
+fp := @(f,x);        % f prime i.e. f'(x)
+sub(x=2, fp);        % substitute 2 for x in f'(x)
+
+% integrate using core REDUCE
+int (x**2-1, x);
+int (x**2-1, x, 2, 3);
+
+% numerical integration, see manual 17.4
+load_package numeric;
+num_int(f, x = (2 .. 3));
+
+plot(x^2-1, x=(2 .. 3), 0, x=(0 .. 5), y=(-2 .. 10),  title="0-form f");
+
+end;

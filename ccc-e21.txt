@@ -1,0 +1,20 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 21
+                     W.G. Lindner, 2027
+$                     
+
+load_package excalc;
+spacedim 3; 
+coframe e(1) = d x, e(2) = d y, e(3) = d z;
+pform {f1,f2,f3} = 0, om2 = 2;
+ 
+fdomain f1 = f1(x,y,z);
+fdomain f2 = f2(x,y,z);
+fdomain f3 = f3(x,y,z);
+
+F:= f1*d y ^ d z  + f2*d z ^ d x +f3*d x ^ d y;
+d F;                     % read off div from this 3-form
+# d F;                   % express div as 0-form for formula (11.2)
+
+end;

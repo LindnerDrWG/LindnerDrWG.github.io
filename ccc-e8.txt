@@ -1,0 +1,26 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 8
+                     W.G. Lindner, 2027
+$                     
+
+load_package excalc;
+
+pform omega =1, nu=1;   % ---------- a.
+omega ^ nu;   
+ nu ^ omega;
+ 
+pform {x,y}=0;          % ---------- b.
+d x ^ d x;
+
+omega := 2*d x -3*d y;  % ---------- c.
+nu := d x + 5 * d y;
+omega ^ nu;
+nu ^ omega;
+ 
+pform {x,y,z}=0;        % ---------- d.
+omega := u_1*d x + u_2*d y +u_3*d z;
+nu    := v_1*d x + v_2*d y +v_3*d z;
+nu ^ omega;   % the result is alphabetical sorted
+
+end;

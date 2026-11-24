@@ -1,0 +1,54 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 22b
+                     W.G. Lindner, 2027
+$                     
+
+%%---------- SCALAR LAPLACIAN
+load_package excalc;
+
+% define 3D-space with coordinates x, y, z and Euclidian metric
+coframe e x = d x, e y = d y;
+
+% declaration of function f as 0-form
+pform f=0;
+
+% definition of scalar function term
+f := x**2 + 3*y**3;
+
+% calculation step-by-step
+
+d f;
+# d f;
+d # d f;
+# d # d f;
+
+% calculation of Laplace-operator (* d * d f) in one step
+lap := # d # d f;
+
+write "Laplacian(f) = ", lap;
+
+%%---------- VECTOR LAPLACIAN
+load_package excalc;
+
+% declare a 1-dim space with coordinate x and Euclidian metric
+% because F : R --> R^3
+coframe e x = d x;
+
+% declaration of the components of F as scalar 0-forms
+pform f1=0, f2=0, f3=0;
+
+% definition of the components of F=(x, x^2, x^3)
+f1 := x;
+f2 := x**2;
+f3 := x**3;
+
+% calculate the Laplace-operator for each component
+lap1 := # d # d f1;
+lap2 := # d # d f2;
+lap3 := # d # d f3;
+
+% output result
+write "vectorLaplacia(F) = ", mat((lap1,lap2,lap3));
+
+end;

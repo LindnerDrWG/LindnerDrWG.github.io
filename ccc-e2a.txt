@@ -1,0 +1,33 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 2a
+                     W.G. Lindner, 2027
+$                     
+
+
+% .......... WITH core REDUCE
+
+R := {cos(theta)*cos(phi), cos(theta)*sin(phi),  sin(theta)}$
+Z1 := {df( first R, theta), df( second R, theta), df( third R, theta)};
+Z2 := {df( first R, phi), df( second R, phi), df( third R, phi)};
+sub( {theta=pi/4, phi =0}, Z1);
+sub( {theta=pi/4, phi =0}, Z2);   
+
+% .......... WITH jacobian of PACKAGE linalg
+
+load_package linalg;
+
+% 1. Define your list of components (i.e. the vector function)
+R := {cos(theta)*cos(phi), cos(theta)*sin(phi),  sin(theta)}$
+
+% 2. Define the list of variables
+vars := {theta, phi};
+
+% relax the notation
+define jacobian = mat_jacobian;
+
+% 3. call procedure jacobian
+% the solutions Z1 and Z2 are the columns of the jacobian
+jacobian(R, vars);
+
+end;

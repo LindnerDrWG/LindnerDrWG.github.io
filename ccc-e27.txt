@@ -1,0 +1,18 @@
+COMMENT
+        DIFFERENTIAL FORMS WITH REDUCE
+                     Example 27
+                     W.G. Lindner, 2027
+$                     
+
+% 1. calculate integrand, i.e. pullback omega_*_phi
+load_package eds;
+pform {x,y,z, t_} = 0;
+pform w = 1;
+w := 2*y* d x - x*z* d y + d z;
+phi := {x = 3*t_, y = t_**2, z = 5-t_};
+pullback(w, phi);
+
+% 2. integrate omega_*_phi
+int(6*s^3-24*s^2-1, s,0,2);
+
+end;
